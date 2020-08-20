@@ -1,0 +1,234 @@
+CREATE TABLE "Menus"
+(
+    "MenuId" serial PRIMARY KEY,
+    "Name" character varying(300) ,
+    "Parent" character varying(300) ,
+    "Action" character varying(300) ,
+    "Controller" character varying(300)
+);
+
+
+
+CREATE TABLE "Roles"
+(
+    "RoleId" serial PRIMARY KEY, 
+    "RoleName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+CREATE TABLE "UserClaims"
+(
+    "ClaimId" serial PRIMARY KEY,
+    "MenuId" integer,
+    "RoleId" integer,
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+CREATE TABLE "Users"
+(
+    "UserId" serial primary key,
+    "Email" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "UserName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "Password" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "RoleId" integer,
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+CREATE TABLE "CustomerMaster"
+(
+    "CustmoerId" serial PRIMARY KEY,
+    "CompanyName" character varying(300) ,
+    "Address" character varying(300) ,
+    "CityId" int ,
+    "StateId" int,
+	"FirstName" character varying(300),
+	"IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+Create TABLE "ItemMaster"
+(
+    "ItemId" serial PRIMARY KEY,
+    "ItemCd" character varying(50),
+	"ItemDescription" character varying(500),
+	"ItemUnitId" int,
+	"ItemQOH" int,
+	"ItemCost" decimal(10,2),
+	"ItemPrice" decimal(10,2),
+	"IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+
+Create TABLE "ItemPrice"
+(
+    "ItemPriceId" serial PRIMARY KEY,
+    "PricCustId" int ,
+	"PricItemId" int,
+	"PricPrice" decimal(10,2)
+);
+
+Create TABLE "OrderMaster"
+(
+    "OrderId" serial PRIMARY KEY,
+    "OrderDate" timestamp,
+	"TotalAmount" decimal(10,2),
+	"CustomerId" int,
+	"ShipId" int,
+	"ShipDate" timestamp,
+	"CancelDate" timestamp,
+	"CancelReason" character varying(500),
+	"IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+
+Create TABLE "OrderDetail"
+(
+    "OrderDetailId" serial PRIMARY KEY,
+    "OrderId" int,
+	"ItemId" int,
+	"Description" character varying(500),
+	"UnitId" int,
+	"Quantity" int,
+	"PerUnitPrice" decimal(10,2),
+	"TotalPrice" decimal(10,2),
+	"IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+Create TABLE "OrderAssignment"
+(
+    "OrderAssignmentId" serial PRIMARY KEY,
+    "OrderId" int,
+	"EmployeeId" int,
+	"AssignmentDate" timestamp,
+	"Status" character varying(50),
+	"CompletedDate" timestamp,
+	"CompletedBy" int,
+	"Notes" character varying(500)
+);
+
+CREATE TABLE "Cities"
+(
+    "CityId" serial PRIMARY KEY, 
+    "CityName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+CREATE TABLE "States"
+(
+    "StateId" serial PRIMARY KEY, 
+    "StateName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+CREATE TABLE "Units"
+(
+    "UnitId" serial PRIMARY KEY, 
+    "UnitName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+ 
+CREATE TABLE  "CustmoerContact"
+(
+    "CustmoerContactId" serial PRIMARY KEY,
+    "ShipId" integer,
+    "CustmoerId" integer,
+    "FirstName" character varying(300) COLLATE pg_catalog."default",
+    "MiddleName" character varying(300) COLLATE pg_catalog."default",
+    "LastName" character varying(300) COLLATE pg_catalog."default",
+    "Email" character varying(150) COLLATE pg_catalog."default",
+    "Phone" character varying(15) COLLATE pg_catalog."default",
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+  
+);
+
+CREATE TABLE "CustmoerShipping"
+(
+    "ShipId" serial PRIMARY KEY,
+    "CustmoerId" integer,
+    "FirstName" character varying(300) COLLATE pg_catalog."default",
+    "MiddleName" character varying(300) COLLATE pg_catalog."default",
+    "LastName" character varying(300) COLLATE pg_catalog."default",
+    "Email" character varying(150) COLLATE pg_catalog."default",
+    "Phone" character varying(15) COLLATE pg_catalog."default",
+    "Address" character varying(300) COLLATE pg_catalog."default",
+    "CityId" integer,
+    "StateId" integer,
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+   
+);
+
+ CREATE TABLE  "EmployeeMaster"
+(
+    "EmployeeId" serial PRIMARY KEY,
+    "FirstName" character varying(300) COLLATE pg_catalog."default",
+    "MiddleName" character varying(300) COLLATE pg_catalog."default",
+    "LastName" character varying(300) COLLATE pg_catalog."default",
+    "Email" character varying(150) COLLATE pg_catalog."default",
+    "Phone" character varying(15) COLLATE pg_catalog."default",
+    "IsActive" bit(1) DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+ 
+
+
+

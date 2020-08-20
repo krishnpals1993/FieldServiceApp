@@ -1,0 +1,69 @@
+﻿@using Microsoft.AspNetCore.Http
+@using  Newtonsoft.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    String Username = Convert.ToString(@HttpContextAccessor.HttpContext.Session.GetString("Username"));
+    String RoleName = Convert.ToString(@HttpContextAccessor.HttpContext.Session.GetString("RoleName"));
+    String ShowTest = Convert.ToString(@HttpContextAccessor.HttpContext.Session.GetString("ShowTest"));
+    List<MenuViewModel> UserMenus = JsonConvert.DeserializeObject<List<MenuViewModel>>(@HttpContextAccessor.HttpContext.Session.GetString("UserMenus"));
+    List<String> ParentMenus = UserMenus.Select(s => s.Parent).Distinct().ToList();
+
+}
+<div class="row border-bottom white-bg">
+    <nav class="navbar navbar-expand-lg navbar-static-top" role="navigation">
+
+        <a href="#" class="navbar-brand"
+           style="margin-right: 0px;padding-left: 10px;padding-right: 10px;font-size:15px">In-Service Compliance</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fa fa-reorder"></i>
+        </button>
+
+        <div class="navbar-collapse collapse" id="navbar">
+            <ul class="nav navbar-nav mr-auto">
+
+                @foreach (var parent in ParentMenus)
+                {
+                    var menus = UserMenus.Where(w => w.Parent == parent).ToList();
+
+                    @if (menus.Count() == 1)
+                    {
+                        if (parent == menus[0].Name)
+
+                        {
+                            <li>
+                                <a href="@Url.Action(menus[0].Action, menus[0].Controller)">
+                                    @menus[0].Name
+                                </a>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="dropdown">
+                            <a aria-expanded="false" role="button" href="#" class="dropdown-toggle"
+                               data-toggle="dropdown">@parent</a>
+                            <ul role="menu" class="dropdown-menu">
+                                @foreach (var menu in menus)
+                                {
+
+                                    <li><a href="@Url.Action(menu.Action, menu.Controller)">@menu.Name</a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
+
+
+                }
+            </ul>
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li>
+                    <span class="m-r-sm welcome-message" style="color:#337ab7">Welcome @Username</span>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("Login", "Account")">Sign out</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>

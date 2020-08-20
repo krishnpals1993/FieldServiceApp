@@ -1,0 +1,506 @@
+﻿<!DOCTYPE html>
+<html style="font-size:0.850rem">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Field Service Application</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Add local styles, mostly for plugins css file -->
+    @if (IsSectionDefined("Styles"))
+    {@RenderSection("Styles", required: false)}
+
+    <environment names="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/fontawesome.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/regular.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/brands.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/solid.css" />
+        <link rel="stylesheet" href="~/css/ace-font.css" />
+        <link rel="stylesheet" href="~/css/ace.css" />
+    </environment>
+    <environment names="Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/fontawesome.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/regular.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/brands.css" />
+        <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/solid.css" />
+        <link rel="stylesheet" href="~/css/ace-font.css" />
+        <link rel="stylesheet" href="~/css/ace.css" />
+    </environment>
+    <link rel="icon" href="~/favicon.ico" type="image/svg" sizes="16x16">
+
+</head>
+<body>
+
+    <div class="body-container">
+        <div class="main-container">
+
+            <div id="sidebar" class="sidebar sidebar-dark sidebar-color sidebar-fixed sidebar-backdrop expandable" data-swipe="true" data-dismiss="true">
+                <div class="sidebar-inner">
+
+                    <div class="ace-scroll flex-grow-1 mt-1px" data-ace-scroll="{}">
+                        <!-- all sidebar header is inside scrollable area -->
+                        <!-- .navbar-brand inside sidebar, only shown in desktop view -->
+                        <div class="d-none d-xl-flex sidebar-section-item fadeable-left fadeable-top">
+                            <div class="fadeinable">
+                                <!-- shown when sidebar is collapsed -->
+                                <div class="py-2 mx-1" id="sidebar-header-brand1">
+                                    <a class="navbar-brand text-140">
+                                        <i class="fa fa-leaf text-success-l1"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="fadeable w-100">
+                                <!-- shown when sidebar is full-width -->
+                                <div class="py-2 text-center mx-3" id="sidebar-header-brand2">
+                                    <a class="navbar-brand ml-n2 text-140 text-white" href="#">
+                                        <i class="fa fa-leaf mr-1 text-success-l1"></i>
+                                        Field Service <span>App</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div><!-- /.sidebar-section-item  -->
+                        <!-- the user avatar and image -->
+                        <div class="sidebar-section-item pt-2 fadeable-left fadeable-top">
+                            <div class="fadeinable">
+                                <img alt="Natalie's avatar" src="assets/image/avatar/avatar3.jpg" width="48" class="p-2px border-2 brc-primary-tp2 radius-round" />
+                            </div>
+
+                            <div class="fadeable hideable">
+                                <div class="py-2 d-flex flex-column align-items-center">
+                                    <img alt="Natalie's avatar" src="assets/image/avatar/avatar3.jpg" class="p-2px border-2 brc-primary-m2 radius-round" />
+
+                                    <div class="text-center mt-1" id="id-user-info">
+                                        <a href="#id-user-menu" class="d-style pos-rel collapsed text-orange-l2 accordion-toggle no-underline bgc-h-white-tp9 radius-1 px-1 py-2px" data-toggle="collapse" aria-expanded="false">
+                                            <span class="text-95 font-bolder">User Name</span>
+                                            <i class="fa fa-caret-down text-90 d-collapsed"></i>
+                                            <i class="fa fa-caret-up text-90 d-n-collapsed"></i>
+                                        </a>
+                                        <div class="text-white text-85">Admin</div>
+                                    </div><!-- /#id-user-info -->
+
+                                    <div class="collapse" id="id-user-menu">
+                                    </div><!-- /.collapse -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- optional `nav` tag -->
+                        <nav aria-label="Main">
+                            <ul class="nav flex-column mt-2 has-active-border active-on-top">
+
+                                <li class="nav-item active">
+
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fa fa-tachometer-alt"></i>
+                                        <span class="nav-text fadeable">
+                                            <span>Dashboard</span>
+                                        </span>
+                                    </a>
+
+                                    <b class="sub-arrow"></b>
+
+                                </li>
+
+                                <li class="nav-item ">
+
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fa fa-tachometer-alt"></i>
+                                        <span class="nav-text fadeable">
+                                            <span>Customer</span>
+                                        </span>
+                                    </a>
+
+                                    <b class="sub-arrow"></b>
+
+                                </li>
+
+
+                                <li class="nav-item">
+
+                                    <a href="#" class="nav-link dropdown-toggle collapsed">
+                                        <i class="nav-icon fa fa-cube"></i>
+                                        <span class="nav-text fadeable">
+                                            <span>Inventory</span>
+                                        </span>
+
+                                        <b class="caret fa fa-angle-left rt-n90"></b>
+                                    </a>
+
+                                    <div class="hideable submenu collapse">
+                                        <ul class="submenu-inner">
+
+                                            <li class="nav-item">
+
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>Item</span>
+                                                    </span>
+                                                </a>
+
+
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>Item Price</span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>Vendor</span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <b class="sub-arrow"></b>
+
+                                </li>
+
+                                <li class="nav-item">
+
+                                    <a href="#" class="nav-link dropdown-toggle collapsed">
+                                        <i class="nav-icon fa fa-cube"></i>
+                                        <span class="nav-text fadeable">
+                                            <span>Order</span>
+                                        </span>
+
+                                        <b class="caret fa fa-angle-left rt-n90"></b>
+                                    </a>
+
+                                    <div class="hideable submenu collapse">
+                                        <ul class="submenu-inner">
+
+                                            <li class="nav-item">
+
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>PO</span>
+                                                    </span>
+                                                </a>
+
+
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>Orders</span>
+                                                    </span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>Invoice</span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <b class="sub-arrow"></b>
+
+                                </li>
+
+                                <li class="nav-item">
+
+                                    <a href="#" class="nav-link dropdown-toggle collapsed">
+                                        <i class="nav-icon fa fa-cube"></i>
+                                        <span class="nav-text fadeable">
+                                            <span>User Setting</span>
+                                        </span>
+
+                                        <b class="caret fa fa-angle-left rt-n90"></b>
+                                    </a>
+
+                                    <div class="hideable submenu collapse">
+                                        <ul class="submenu-inner">
+
+                                            <li class="nav-item">
+
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>Roles</span>
+                                                    </span>
+                                                </a>
+
+
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="#" class="nav-link">
+
+                                                    <span class="nav-text">
+                                                        <span>Users</span>
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <b class="sub-arrow"></b>
+
+                                </li>
+
+                            </ul>
+                        </nav>
+
+                    </div><!-- /.ace-scroll -->
+                </div>
+            </div>
+
+            <div role="main" class="main-content">
+                <nav class="navbar navbar-sm navbar-expand-lg navbar-fixed navbar-white">
+                    <div class="navbar-inner shadow-md">
+
+                        <button type="button" class="btn btn-burger align-self-center ml-25 mr-2 d-none d-xl-flex btn-h-lighter-blue" data-toggle="sidebar" data-target="#sidebar" aria-controls="sidebar" aria-expanded="true" aria-label="Toggle sidebar">
+                            <span class="bars text-default"></span>
+                        </button><!-- sidebar toggler button -->
+
+
+                        <div class="d-flex h-100 justify-content-xl-between align-items-center">
+                            <button type="button" class="btn btn-burger burger-arrowed static collapsed ml-2 d-flex d-xl-none btn-h-lighter-blue" data-toggle-mobile="sidebar" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">
+                                <span class="bars text-default"></span>
+                            </button><!-- mobile sidebar toggler button -->
+
+                            <a class="navbar-brand d-xl-none mx-1 text-dark-m3 text-130" href="#">
+                                <i class="fa fa-leaf mr-2px text-success-m2 text-105"></i>
+                                FS App
+                            </a>
+
+                            <!-- the small Dashboard selection menu -->
+
+                        </div>
+
+
+
+
+
+
+                        <div class="ml-auto navbar-menu collapse navbar-collapse navbar-backdrop" id="navbarMenu2">
+
+                            <div class="navbar-nav navbar-links">
+                                <ul class="nav">
+                                    <li class="nav-item mx-2">
+                                        <a href="#" class="active btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
+                                            Dashboard
+                                            <!--
+                                            Or use these along with `d-style` on parent 'A' for a different highlight color
+                                            <div class="d-none d-lg-block v-active position-bl w-100 border-t-3 brc-primary-m1 mb-n3px"></div>
+                                            <div class="d-lg-none v-active position-tl h-100 border-l-4 brc-primary-m1 ml-n3px"></div>
+                                            -->
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item mx-2">
+                                        <a href="#" class="btn btn-a-bold btn-outline-secondary btn-h-lighter-secondary btn-a-lighter-secondary btn-brc-tp px-4 px-lg-2">
+                                            Orders
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item mx-2">
+                                        <a href="#" class="btn btn-a-bold btn-outline-secondary btn-h-lighter-secondary btn-a-lighter-secondary btn-brc-tp px-4 px-lg-2">
+                                            Members
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item mx-2">
+                                        <a href="#" class="btn btn-a-bold btn-outline-secondary btn-h-lighter-secondary btn-a-lighter-secondary btn-brc-tp px-4 px-lg-2">
+                                            Users
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+
+
+
+
+                        <!-- #navbarMenu toggler -->
+                        <button class="navbar-toggler ml-1 mr-2 px-1" type="button" data-toggle="collapse" data-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navbar menu 1">
+                            <img class="radius-round border-2 brc-primary-tp3 p-1px" src="assets/image/avatar/avatar3.jpg" width="36" alt="Natalie's Photo">
+                        </button>
+
+
+                        <div class="ml-auto mr-xl-3 navbar-menu collapse navbar-collapse navbar-backdrop" id="navbarMenu">
+
+                            <div class="navbar-nav">
+                                <ul class="nav has-active-border">
+
+                                    <!-- search box for desktop view -->
+                                    <!-- it's a .dropdown-menu with custom position and width, etc -->
+                                    <li class="nav-item dd-backdrop dropdown dropdown-mega">
+                                        <a class="nav-link dropdown-toggle pl-lg-3 pr-lg-4" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fa fa-flask text-110 icon-animated-vertical mr-lg-1"></i>
+
+                                            <span class="d-inline-block d-lg-none ml-2">Tasks</span><!-- show only on mobile -->
+                                            <span id="id-navbar-badge2" class="badge badge-sm text-90 text-danger-m2">+2</span>
+
+                                            <i class="caret fa fa-angle-left d-block d-lg-none"></i>
+                                            <div class="dropdown-caret brc-warning-l2"></div>
+                                        </a>
+                                        <div class="shadow dropdown-menu dropdown-animated animated-1 dropdown-xs p-0 bg-white brc-warning-l1">
+                                            <div class="bgc-orange-l2 py-25 px-4 border-b-1 brc-orange-l2">
+                                                <span class="text-dark-tp4 text-600 text-90 text-uppercase">
+                                                    <i class="fa fa-check mr-2px text-warning-d2 text-120"></i>
+                                                    4 Tasks to complete
+                                                </span>
+                                            </div>
+
+
+                                            <div class="px-4 py-2">
+                                                <div class="text-95">
+                                                    <span class="text-grey-d1">Software update</span>
+                                                </div>
+                                                <div class="progress mt-2">
+                                                    <div class="progress-bar bgc-info" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60%</div>
+                                                </div>
+                                            </div>
+
+                                            <hr class="my-1 mx-4" />
+                                            <div class="px-4 py-2">
+                                                <div class="text-95">
+                                                    <span class="text-grey-d1">Hardware upgrade</span>
+                                                </div>
+                                                <div class="progress mt-2">
+                                                    <div class="progress-bar bgc-warning" role="progressbar" style="width: 40%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">40%</div>
+                                                </div>
+                                            </div>
+
+                                            <hr class="my-1 mx-4" />
+                                            <div class="px-4 py-2">
+                                                <div class="text-95">
+                                                    <span class="text-grey-d1">Customer support</span>
+                                                </div>
+                                                <div class="progress mt-2">
+                                                    <div class="progress-bar bgc-danger" role="progressbar" style="width: 30%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">30%</div>
+                                                </div>
+                                            </div>
+
+                                            <hr class="my-1 mx-4" />
+                                            <div class="px-4 py-2">
+                                                <div class="text-95">
+                                                    <span class="text-grey-d1">Fixing bugs</span>
+                                                </div>
+                                                <div class="progress mt-2">
+                                                    <div class="progress-bar bgc-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 85%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">85%</div>
+                                                </div>
+                                            </div>
+
+
+
+
+                                            <hr class="my-1px mx-2 brc-info-l2 " />
+                                            <a href="#" class="d-block bgc-h-primary-l4 py-3 border-0 text-center text-blue-m2">
+                                                <span class="text-85 text-600 text-uppercase">See All Tasks</span>
+                                                <i class="ml-2 fa fa-arrow-right text-muted"></i>
+                                            </a>
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item ">
+                                        <a class="nav-link "  href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                         <span class="text-primary-d1">LogOut</span>
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </nav>
+
+                @RenderBody()
+
+                <!-- this footer is shown in device width above `sm` -->
+                <footer class="footer d-none d-sm-block">
+                    <div class="footer-inner">
+                        <div class="h-100 pt-3 border-t-1 brc-secondary-l2 bgc-white-tp1 shadow">
+                            <span class="text-primary-m1 font-bolder text-120">Field Service</span>
+                            <span class="text-secondary-d2">Application &copy; 2020</span>
+                        </div>
+                    </div><!-- .footer-inner -->
+                </footer>
+
+
+                <!-- scroll to top button -->
+                <div class="footer-tools mb-5 mb-sm-0">
+                    <a id="btn-scroll-up" href="#" class="btn-scroll-up btn btn-white brc-black-tp6 px-25 py-2 text-95 border-2 radius-round mb-25 mr-2">
+                        <i class="fa fa-angle-double-up w-2 h-2"></i>
+                    </a>
+                </div>
+
+
+                <!-- this footer is shown in mobile devices below `sm` -->
+                <footer class="d-sm-none footer footer-sm footer-fixed">
+                    <div class="footer-inner">
+                        <div class="btn-group d-flex justify-content-between h-100 px-2 py-2px bgc-white shadow-lg border-t-1 brc-secondary-l2">
+
+                            <button class="d-style btn btn-white btn-h-light-primary btn-a-outline-primary btn-a-bold active border-0 radius-1 px-25 mx-1">
+                                <span class="pos-rel">
+                                    <i class="fa fa-home text-120 opacity-1 mr-2px"></i>
+                                    Home
+                                    <span class="d-active position-tl mt-n3 w-100 border-t-3 radius-2 brc-primary-m1"></span>
+                                </span>
+                            </button>
+
+                            <button class="btn btn-outline-lightgrey btn-h-light-primary btn-a-lighter-primary border-0 radius-1" data-toggle="modal" data-target="#id-ace-settings-modal">
+                                <i class="fa fa-cog text-120"></i>
+                            </button>
+
+                            <button data-toggle="collapse" data-target="#navbarSearch" aria-controls="navbarSearch" aria-expanded="false" aria-label="Toggle navbar search" class="btn btn-outline-lightgrey btn-h-light-primary btn-a-lighter-primary border-0 radius-1">
+                                <i class="fa fa-search text-120"></i>
+                            </button>
+
+                            <button class="btn btn-outline-lightgrey btn-h-light-primary btn-a-lighter-primary border-0 radius-1">
+                                <span class="pos-rel">
+                                    <i class="fa fa-bell text-120"></i>
+                                    <span class="badge badge-dot bgc-red position-tr mt-n1 mr-n2px"></span>
+                                </span>
+                            </button>
+
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+
+    <environment names="Development">
+        <script src="~/js/jquery.js"></script>
+        <script src="~/js/popper.js"></script>
+        <script src="~/js/bootstrap.js"></script>
+        <script src="~/js/ace.js"></script>
+        <!-- Only for demo purpose -->
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/js/jquery.js"></script>
+        <script src="~/js/popper.js"></script>
+        <script src="~/js/bootstrap.js"></script>
+        <script src="~/js/ace.js"></script>
+    </environment>
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+﻿@model FieldServiceApp.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+}
+@using Microsoft.Extensions.Options;
+@inject IOptions<Appsettings> Settings
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - In-Service Compliance</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <environment names="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.css" />
+        <link rel="stylesheet" href="~/css/animate.css" />
+        <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+    <environment names="Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="~/css/animate.css" />
+        <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+
+    <environment names="Staging,Production,Development">
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+    </environment>
+    <link rel="icon" href="~/favicon.ico" type="image/svg" sizes="16x16">
+    <script type="text/javascript">
+         window.localStorage.clear();
+        $(document).ready(function () {
+
+
+
+            var SuccessMessage = '@ViewBag.SuccessMessage';
+        var ErrorMessage = '@ViewBag.ErrorMessage';
+        if (SuccessMessage) {
+            swal(SuccessMessage, "", "success");
+           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Account/Login"; }, 1000);
+
+        }
+          if (ErrorMessage) {
+            swal(ErrorMessage, "", "error");
+        }
+        });
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+</head>
+<body class="gray-bg">
+
+    <div class="middle-box text-center loginscreen   animated fadeInDown">
+        <div>
+            <p style="font-size: 15px;font-weight: 600;color: #337ab7;">Create account to start test</p>
+            <div>
+
+
+                <a href="#">
+                    <img src="~/images/logo.jpg" class="hlogo" />
+                </a>
+
+            </div>
+            <form class="m-t" role="form" method="post" action="@Settings.Value.WebBaseURL/Account/Register">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email", required = "true" })
+
+                </div>
+                <div class="form-group">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password", required = "true" })
+                </div>
+                <div class="form-group">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm Password", required = "true" })
+                </div>
+                <button type="submit" class="btn btn-primary block full-width m-b">Register</button>
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                <h4 class="text-primary text-center" style="font-weight: 600;color: #1ab394!important;">Already have an account?</h4>
+                <a class="btn btn-sm btn-info btn-block" style="background-color:#1ab394;border-color:#1ab394" href="@Url.Action("Login", "Account")">Login</a>
+            </form>
+            <p class="m-t"> <small>In-Service Compliance &copy; 2020-@DateTime.Now.Year</small> </p>
+        </div>
+    </div>
+
+</body>
+</html>
