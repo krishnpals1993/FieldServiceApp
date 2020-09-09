@@ -1,0 +1,40 @@
+﻿@model FieldServiceApp.Models.DashboardOrderViewModel
+
+<div class="modal fade">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Job Detail</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-orange-d3 text-125 text-center" style="margin-bottom:0px">OrderNo: #@Model.OrderId</p>
+                <p class="text-primary text-105 mt-1 text-center" style="margin-bottom:0px">Customer: @Model.EmployeeName <br />Address: (@Model.CustomerShipAddress)</p>
+                <p class="text-primary text-105 mt-1 text-center" style="margin-bottom:0px">Item: @Model.ItemName (@Model.ItemDescription)</p>
+                <form class="m-2">
+                    <div class="input-group">
+                        <div class="input-groupp-repend align-self-center mr-2">
+                        </div>
+                        @Html.DropDownListFor(model => model.EmployeeId,
+                     new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"),
+                     "Select Employee", new
+                          {
+                              @class = "form-control",
+                              @placeholder = "Select Employee",
+                              style = "margin-right:10px;max-width:300px"
+                     })
+                        <div class="input-group-append">
+                            <button type="button" onclick="updateOrder('@Model.OrderId')" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
+                            <button type="submit" style="display:none" id="btnSumbit" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px"  data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

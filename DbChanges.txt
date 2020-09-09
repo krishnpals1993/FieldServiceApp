@@ -143,11 +143,13 @@ CREATE TABLE "Cities"
 (
     "CityId" serial PRIMARY KEY, 
     "CityName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "StateId" int ,
     "IsActive" bit(1) DEFAULT NULL::"bit",
     "CreatedBy" integer,
     "CreatedDate" timestamp without time zone,
     "ModifiedBy" integer,
-    "ModifiedDate" timestamp without time zone
+    "ModifiedDate" timestamp without time zone,
+
 );
 
 CREATE TABLE "States"
@@ -228,7 +230,127 @@ CREATE TABLE "CustmoerShipping"
 );
 
 
- 
+------------------------------------------------------------------------------------------
+Alter table "Cities" Add "StateId" int;
 
+INSERT INTO public."States"("StateName", "IsActive", "CreatedBy", "CreatedDate") VALUES ('Florida', '1', 1,now());
+	
+INSERT INTO public."Cities"(
+	 "CityName", "IsActive", "CreatedBy", "CreatedDate","StateId")
+	VALUES ('Miami', '1', 1,now(),1);
+
+INSERT INTO public."Cities"(
+	 "CityName", "IsActive", "CreatedBy", "CreatedDate","StateId")
+	VALUES ('Orlando', '1', 1,now(),1);
+	
+INSERT INTO public."Units"(
+	 "UnitName", "IsActive", "CreatedBy", "CreatedDate")
+	VALUES ('Unit-1', '1', 1,now());
+
+INSERT INTO public."ItemMaster"(
+	  "ItemCd", "ItemDescription", "ItemUnitId", "ItemQOH", "ItemCost", "ItemPrice",
+	"IsActive", "CreatedBy", "CreatedDate")
+	VALUES ('001','Service', 1, 1,10, 15, '1', 1, now());
+
+INSERT INTO public."EmployeeMaster"(
+	"FirstName", "MiddleName", "LastName", "Email",
+	"Phone", "IsActive", "CreatedBy", "CreatedDate")
+	VALUES ( 'John', '', 'Doe', 'Johndoe@gmail.com', '9999999999', '1', 1, 'now');
+
+INSERT INTO public."CustomerMaster"(
+	"CompanyName", "Address", "CityId", "StateId", "FirstName", 
+	"IsActive", "CreatedBy", "CreatedDate")
+	VALUES ('Test Company', '508 Pheasant Road De Pere, WI 54115',
+			1, 1, '', '1', 1, now());
+
+INSERT INTO public."CustmoerContact"(
+	"ShipId", "CustmoerId", "FirstName",
+	"MiddleName", "LastName", "Email", "Phone", "IsActive", "CreatedBy", 
+	"CreatedDate")
+	VALUES (1, 1, 'Test First', '', 'Test Last', 'test@gmail.com', 
+			'9999999999', '1', 1, now());
+
+INSERT INTO public."CustmoerShipping"(
+	 "CustmoerId", "FirstName", "MiddleName", "LastName", "Email", "Phone",
+	"Address", "CityId", "StateId", "IsActive", "CreatedBy", "CreatedDate" )
+	VALUES (1, 'Ship First', '', 'Ship Last', 'shipemail@gmail.com', '9999999999',
+			'Ship Address', 1, 1, '1', 1,now());
+
+INSERT INTO public."Roles"(
+	  "RoleName", "IsActive", "CreatedBy", "CreatedDate"  )
+	VALUES ('Admin', '1', 1, now());
+
+
+INSERT INTO public."Users"(
+	"Email", "UserName", "Password", "RoleId", "IsActive",
+	"CreatedBy", "CreatedDate")
+	VALUES ('krishnpalsingh1993@gmail.com', 'krishnpalsingh1993@gmail.com',
+			'Pass@word1', 1, '1', 1, now());
+   
+
+
+--------------------------------------------------------------------------------------------------------------
+
+Alter table "OrderMaster" Add "ShipStartDate" timestamp;
+Alter table "OrderMaster" Add "ShipEndDate" timestamp;
+Alter table "OrderMaster" Drop  column "ShipDate";
+
+--------------------------------------------------------------------------------------------------------------
+
+
+Alter table "ItemMaster" Add "Taxable" varchar(1);
+Alter table "ItemMaster" Add "Sellable" varchar(1);
+Alter table "ItemMaster" Add "Service" varchar(1);
+
+Alter table "EmployeeMaster" Add "UserId"  int;
+
+
+----------------------------------------------------------------------------------------------------------------
+
+
+CREATE TABLE "ItemCategories"
+(
+    "CategoryId" serial PRIMARY KEY, 
+    "CategoryName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+	"RoleIds" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+Alter table "ItemMaster" Add  "CategoryId" int;
+
+
+CREATE TABLE "ServiceFormLogs"
+(
+    "ServiceFormLogId" serial PRIMARY KEY, 
+    "OrderId" int,
+	"DateOfService" timestamp,
+	"ItemCategoryId" int,
+	"ItemId" int,
+	"Qty" decimal(6,2),
+	"Locations" varchar(150),
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+
+
+
+
+
+
+
+
+
+	
+	
 
 

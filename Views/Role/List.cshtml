@@ -21,17 +21,34 @@
                                 <th>
                                     Name
                                 </th>
+                                <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                                    Status
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Rolename)
-                                    </td>
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Rolename)
+                                </td>
+                                <td>
+                                    @if (item.IsActive == 1)
+                                    {
+                                        <span class="badge badge-success mr-1">
+                                            Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger mr-1">
+                                            In Active
+                                        </span>
 
-                                </tr>
+                                    }
+                                </td>
+                            </tr>
                             }
                         </tbody>
                     </table>

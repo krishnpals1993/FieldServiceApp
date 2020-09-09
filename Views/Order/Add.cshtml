@@ -1,0 +1,336 @@
+﻿@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@model FieldServiceApp.Models.OrderMasterViewModel
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = "New Order";
+}
+<div role="main" class="page-content container container-plus">
+    <div class="card bcard mt-2 mt-lg-3">
+        <div class="card-header">
+            <h3 class="card-title text-125">
+                New Order
+            </h3>
+        </div>
+
+        <div class="card-body px-3 pb-1">
+            <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Order/Add" method="post">
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Order Date
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="input-group date">
+                            @Html.TextBoxFor(m => m.OrderDate,
+                            new { id = "id-date-1", @placeholder = "Order Date", @class = "form-control" })
+                            <div class="input-group-addon input-group-append">
+                                <div class="input-group-text">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Customer
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.CustomerId, new SelectList(Model.CustomerList.Select(x => new { Value = x.CustmoerId, Text = x.CompanyName }), "Value", "Text"), "Select Customer", new { @class = "form-control", @placeholder = "Select Company" })
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Ship Address
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.ShipId, new SelectList(Model.CustomerShipingAddressList.Select(x => new { Value = x.ShipId, Text = x.Address }), "Value", "Text"), "Select Ship Address", new { @class = "form-control", @placeholder = "Select Ship Address" })
+                        <span asp-validation-for="ShipId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Ship Date
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="input-group date" id="id-timepicker">
+                            @Html.TextBoxFor(m => m.ShipStartDate,
+                            new { @placeholder = "Ship Date", @class = "form-control" })
+
+                            <div class="input-group-addon input-group-append">
+                                <div class="input-group-text">
+                                    <i class="far fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <h3 class="card-title text-125">
+                    Item detail
+                </h3>
+                <hr />
+
+                <div class="form-group row">
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Item
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DropDownListFor(model => model.ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control", @placeholder = "Select Item" })
+                        <span asp-validation-for="ItemId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Price
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.PerUnitPrice,
+                           new { @placeholder = "Price", @class = "form-control", @readonly = "@readonly" })
+                        <span asp-validation-for="PerUnitPrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Quantity
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Quantity,
+                         new { @placeholder = "Quantity", @class = "form-control" })
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Total Price
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.TotalPrice,
+                       new { @placeholder = "Total Price", @class = "form-control", @readonly = "@readonly" })
+                        <span asp-validation-for="TotalPrice" class="text-danger"></span>
+                        @*<a href="#" class="btn btn-link text-primary-d1">Add More</a>*@
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Description
+                        </label>
+                    </div>
+                    <div class="col-sm-5">
+                        @Html.TextBoxFor(m => m.Description,
+                         new { @placeholder = "Description", @class = "form-control" })
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr />
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Assigned To
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.AssigneeId, 
+                       new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"), 
+                       "Select Employee", new { @class = "form-control", @placeholder = "Select Employee"  })
+                        <span asp-validation-for="AssigneeId" class="text-danger"></span>
+                    </div>
+
+
+
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Total Amount
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.TotalAmount,
+                       new { @placeholder = "Total Amount", @class = "form-control", @readonly = "@readonly" })
+                        <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                    </div>
+                </div>
+
+
+
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-3 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
+
+                        <a href="~/Order/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+    </environment>
+    <style>
+        hr {
+            /*margin-bottom: 2rem !important;*/
+        }
+    </style>
+}
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+        <script src="~/pages/form-basic/@@page-script.js"></script>
+    </environment>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            setTimeout(function () {
+                $("input").each(function (index, element) {
+                    $(element).val('');
+                 
+                });
+                  $("#id-date-1").val(new moment().format("MM/DD/YYYY"));   
+            }, 0);
+
+
+
+
+
+          window.itemList = '@Json.Serialize(Model.ItemList)';
+          window.itemList = JSON.parse(itemList);
+        var SuccessMessage = '@ViewBag.SuccessMessage';
+        var ErrorMessage = '@ViewBag.ErrorMessage';
+        if (SuccessMessage) {
+            swal(SuccessMessage, "", "success");
+           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Order/Add"; }, 500);
+
+        }
+        if (ErrorMessage) {
+            swal(ErrorMessage, "", "error");
+        }
+
+            $("#ItemId").on("change", function () {
+                if ($("#ItemId").val()) {
+                    var price = getItemPrice($("#ItemId").val());
+
+                  $("#PerUnitPrice").val(price);
+                  if ($("#Quantity").val()) {
+                  var quantity = Number($("#Quantity").val());
+                  var perUnitPrice = Number($("#PerUnitPrice").val());
+                  $("#TotalPrice").val(quantity * perUnitPrice);
+                  $("#TotalAmount").val(quantity * perUnitPrice);
+              }
+              else {
+                  $("#TotalPrice").val('');
+                  $("#TotalAmount").val('');
+              }
+              }
+              else {
+                  $("#PerUnitPrice").html('');
+              }
+
+
+          });
+
+            $("#Quantity").on("change", function () {
+              if ($("#Quantity").val()) {
+                  var quantity = Number($("#Quantity").val());
+                  var perUnitPrice = Number($("#PerUnitPrice").val());
+                  $("#TotalPrice").val(quantity * perUnitPrice);
+                  $("#TotalAmount").val(quantity * perUnitPrice);
+              }
+              else {
+                  $("#TotalPrice").val('');
+                  $("#TotalAmount").val('');
+              }
+
+
+          });
+
+
+      });
+
+        function getItemPrice(itemId) {
+            var price = 0;
+            for (var i = 0; i <  window.itemList.length; i++) {
+                if (window.itemList[i]["ItemId"].toString()== itemId) {
+                    price = window.itemList[i]["ItemPrice"];
+                    i = window.itemList.length;
+                    break;
+                }
+            }
+            return price;
+        }
+
+        $("#CustomerId").on("change", function () {
+            $("#ShipId").html('');
+             var data = {
+                'CustomerId':  $("#CustomerId").val(), 
+            };
+            console.log(data);
+            $.ajax({
+                url: "/Order/GetCustomerShippingAddress",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+                    debugger;
+                   if (response.length > 0) {  
+                $('#ShipId').html('');  
+                var options = '';  
+                options += '<option value="">Select Ship Address</option>';  
+                for (var i = 0; i < response.length; i++) {  
+                    options += '<option value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';  
+                }  
+                $('#ShipId').append(options);  
+            }  
+                }
+            })
+        });
+
+
+    </script>
+}

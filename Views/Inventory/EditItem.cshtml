@@ -1,0 +1,244 @@
+﻿@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@model FieldServiceApp.Models.ItemMasterViewModel
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = "Edit Item";
+    List<string> CheckboxSelectionList = new List<string>();
+    CheckboxSelectionList.Add("Y");
+    CheckboxSelectionList.Add("N");
+}
+<div role="main" class="page-content container container-plus">
+    <div class="card bcard mt-2 mt-lg-3">
+        <div class="card-header">
+            <h3 class="card-title text-125">
+                Edit Item
+            </h3>
+        </div>
+
+        <div class="card-body px-3 pb-1">
+            <form class="mt-lg-3" autocomplete="off" novalidate
+                  action="@Settings.Value.WebBaseURL/Inventory/EditItem" method="post">
+
+                @Html.HiddenFor(h=>h.ItemId)
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Item Code
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.ItemCd,
+                           new { @placeholder = "Item Code", @class = "form-control", maxlength = "20" })
+                        <span asp-validation-for="ItemCd" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Unit
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.ItemUnitId, new SelectList(Model.UnitList.Select(x => new { Value = x.UnitId, Text = x.UnitName }), "Value", "Text"), "Select unit", new { @class = "form-control", @placeholder = "Select unit" })
+                        <span asp-validation-for="ItemUnitId" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Category
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.CategoryId, new SelectList(Model.ItemCategoryList.Select(x => new { Value = x.CategoryId, Text = x.CategoryName }), "Value", "Text"), "Select item category", new { @class = "form-control", @placeholder = "Select unit" })
+                        <span asp-validation-for="ItemUnitId" class="text-danger"></span>
+                    </div>
+
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            QOH
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.ItemQOH,
+                           new { @placeholder = "QOH", @class = "form-control", maxlength = "5" })
+                        <span asp-validation-for="ItemQOH" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Cost
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.ItemCost,
+                           new { @placeholder = "Cost", @class = "form-control", maxlength = "20" })
+                        <span asp-validation-for="ItemCost" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Price
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.ItemPrice,
+                           new { @placeholder = "Price", @class = "form-control", maxlength = "5" })
+                        <span asp-validation-for="ItemPrice" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="form-group row">
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Taxable
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.Taxable, new SelectList(CheckboxSelectionList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select unit" })
+                        <span asp-validation-for="Taxable" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Sellable
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.Sellable, new SelectList(CheckboxSelectionList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select unit" })
+                        <span asp-validation-for="Sellable" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Service
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.Service, new SelectList(CheckboxSelectionList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select unit" })
+                        <span asp-validation-for="Service" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Description
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.ItemDescription,
+                           new { @placeholder = "Description", @class = "form-control", maxlength = "250" })
+                        <span asp-validation-for="ItemDescription" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <p class="text-danger">
+                    @ViewBag.ErrorMessage
+                </p>
+
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-3 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
+
+                        <a href="~/Inventory/ItemList" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+    </environment>
+    <style>
+        hr {
+            /*margin-bottom: 2rem !important;*/
+        }
+    </style>
+}
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+        <script src="~/pages/form-basic/@@page-script.js"></script>
+    </environment>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+         if ($("#Service").val()=="Y") {
+                $("#ItemQOH").val('0');
+                $("#ItemQOH").attr("readonly","readonly");
+            }
+            else {
+                $("#ItemQOH").removeAttr("readonly");
+            }
+
+
+        var SuccessMessage = '@ViewBag.SuccessMessage';
+        var ErrorMessage = '@ViewBag.ErrorMessage';
+        if (SuccessMessage) {
+            swal(SuccessMessage, "", "success");
+           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Inventory/ItemList"; }, 750);
+
+        }
+        if (ErrorMessage) {
+            swal(ErrorMessage, "", "error");
+            }
+
+        })
+
+        $("#Service").on("change", function () {
+            if ($("#Service").val()=="Y") {
+                $("#ItemQOH").val('0');
+                $("#ItemQOH").attr("readonly","readonly");
+            }
+            else {
+                $("#ItemQOH").removeAttr("readonly");
+            }
+
+        });
+
+
+
+    </script>
+}

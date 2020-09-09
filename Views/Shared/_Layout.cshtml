@@ -1,4 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@using  Newtonsoft.Json;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+
+    String RoleName = Convert.ToString(@HttpContextAccessor.HttpContext.Session.GetString("RoleName"));
+    String Username = Convert.ToString(@HttpContextAccessor.HttpContext.Session.GetString("Username"));
+    var routeData = this.ViewContext.RouteData;
+    var routeAction = (string)routeData.Values["action"];
+    var routeControl = (string)routeData.Values["controller"];
+}
+<!DOCTYPE html>
 <html style="font-size:0.850rem">
 <head>
     <meta charset="utf-8" />
@@ -18,6 +29,7 @@
         <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/solid.css" />
         <link rel="stylesheet" href="~/css/ace-font.css" />
         <link rel="stylesheet" href="~/css/ace.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
     </environment>
     <environment names="Staging,Production">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -27,8 +39,9 @@
         <link rel="stylesheet" href="~/css//@@fortawesome/fontawesome-free/css/solid.css" />
         <link rel="stylesheet" href="~/css/ace-font.css" />
         <link rel="stylesheet" href="~/css/ace.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
     </environment>
-    <link rel="icon" href="~/favicon.ico" type="image/svg" sizes="16x16">
+    <link rel="icon" type="image/png" href="./assets/favicon.png" />
 
 </head>
 <body>
@@ -65,20 +78,20 @@
                         <!-- the user avatar and image -->
                         <div class="sidebar-section-item pt-2 fadeable-left fadeable-top">
                             <div class="fadeinable">
-                                <img alt="Natalie's avatar" src="assets/image/avatar/avatar3.jpg" width="48" class="p-2px border-2 brc-primary-tp2 radius-round" />
+                                <img alt="Natalie's avatar" src="~/assets/image/avatar/avatar4.jpg" width="48" class="p-2px border-2 brc-primary-tp2 radius-round" />
                             </div>
 
                             <div class="fadeable hideable">
                                 <div class="py-2 d-flex flex-column align-items-center">
-                                    <img alt="Natalie's avatar" src="assets/image/avatar/avatar3.jpg" class="p-2px border-2 brc-primary-m2 radius-round" />
+                                    <img alt="Natalie's avatar" src="~/assets/image/avatar/profile_small.png" class="p-2px border-2 brc-primary-m2 radius-round" />
 
                                     <div class="text-center mt-1" id="id-user-info">
                                         <a href="#id-user-menu" class="d-style pos-rel collapsed text-orange-l2 accordion-toggle no-underline bgc-h-white-tp9 radius-1 px-1 py-2px" data-toggle="collapse" aria-expanded="false">
-                                            <span class="text-95 font-bolder">User Name</span>
+                                            <span class="text-95 font-bolder">@Username</span>
                                             <i class="fa fa-caret-down text-90 d-collapsed"></i>
                                             <i class="fa fa-caret-up text-90 d-n-collapsed"></i>
                                         </a>
-                                        <div class="text-white text-85">Admin</div>
+                                        <div class="text-white text-85">@RoleName</div>
                                     </div><!-- /#id-user-info -->
 
                                     <div class="collapse" id="id-user-menu">
@@ -91,9 +104,9 @@
                         <nav aria-label="Main">
                             <ul class="nav flex-column mt-2 has-active-border active-on-top">
 
-                                <li class="nav-item active">
+                                <li class="nav-item @(routeControl=="Home" ?"active":"" )">
 
-                                    <a href="#" class="nav-link">
+                                    <a href="~/Home/Dashboard" class="nav-link">
                                         <i class="nav-icon fa fa-tachometer-alt"></i>
                                         <span class="nav-text fadeable">
                                             <span>Dashboard</span>
@@ -103,159 +116,221 @@
                                     <b class="sub-arrow"></b>
 
                                 </li>
+                                @if (RoleName != "Admin")
+                                {
+                                    <li class="nav-item @(routeControl=="Service" ?"active":"" )">
 
-                                <li class="nav-item ">
+                                        <a href="~/Service/List" class="nav-link">
+                                            <i class="nav-icon fa fa-user-tie"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Service</span>
+                                            </span>
+                                        </a>
 
-                                    <a href="#" class="nav-link">
-                                        <i class="nav-icon fa fa-tachometer-alt"></i>
-                                        <span class="nav-text fadeable">
-                                            <span>Customer</span>
-                                        </span>
-                                    </a>
+                                        <b class="sub-arrow"></b>
 
-                                    <b class="sub-arrow"></b>
+                                    </li>
 
-                                </li>
+                                }
 
+                                @if (RoleName == "Admin")
+                                {
 
-                                <li class="nav-item">
+                                    <li class="nav-item @(routeControl=="Customer" ?"active":"" )">
 
-                                    <a href="#" class="nav-link dropdown-toggle collapsed">
-                                        <i class="nav-icon fa fa-cube"></i>
-                                        <span class="nav-text fadeable">
-                                            <span>Inventory</span>
-                                        </span>
+                                        <a href="~/Customer/List" class="nav-link">
+                                            <i class="nav-icon fa fa-user-tie"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Customer</span>
+                                            </span>
+                                        </a>
 
-                                        <b class="caret fa fa-angle-left rt-n90"></b>
-                                    </a>
+                                        <b class="sub-arrow"></b>
 
-                                    <div class="hideable submenu collapse">
-                                        <ul class="submenu-inner">
-
-                                            <li class="nav-item">
-
-                                                <a href="#" class="nav-link">
-
-                                                    <span class="nav-text">
-                                                        <span>Item</span>
-                                                    </span>
-                                                </a>
+                                    </li>
 
 
-                                            </li>
+                                    <li class="nav-item @(routeControl=="Inventory" ?"active open":"" )">
 
-                                            <li class="nav-item">
-                                                <a href="#" class="nav-link">
+                                        <a href="#" class="nav-link dropdown-toggle  @(routeControl!="Inventory" ?"collapsed":"" )">
+                                            <i class="nav-icon fa fa-box-open"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Inventory</span>
+                                            </span>
 
-                                                    <span class="nav-text">
-                                                        <span>Item Price</span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="#" class="nav-link">
+                                            <b class="caret fa fa-angle-left rt-n90"></b>
+                                        </a>
 
-                                                    <span class="nav-text">
-                                                        <span>Vendor</span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                        <div class="hideable submenu  @(routeControl!="Inventory" ?"collapse":"" )">
+                                            <ul class="submenu-inner">
 
-                                    <b class="sub-arrow"></b>
+                                                <li class="nav-item @((routeControl=="Inventory" &&
+                                        (routeAction=="ItemCategoryList" || routeAction=="AddItemCategory" || routeAction=="EditItemCategory" ))  ?"active":"" )">
 
-                                </li>
+                                                    <a href="~/Inventory/ItemCategoryList" class="nav-link">
 
-                                <li class="nav-item">
-
-                                    <a href="#" class="nav-link dropdown-toggle collapsed">
-                                        <i class="nav-icon fa fa-cube"></i>
-                                        <span class="nav-text fadeable">
-                                            <span>Order</span>
-                                        </span>
-
-                                        <b class="caret fa fa-angle-left rt-n90"></b>
-                                    </a>
-
-                                    <div class="hideable submenu collapse">
-                                        <ul class="submenu-inner">
-
-                                            <li class="nav-item">
-
-                                                <a href="#" class="nav-link">
-
-                                                    <span class="nav-text">
-                                                        <span>PO</span>
-                                                    </span>
-                                                </a>
+                                                        <span class="nav-text">
+                                                            <span>Item Category</span>
+                                                        </span>
+                                                    </a>
 
 
-                                            </li>
+                                                </li>
+                                                <li class="nav-item @((routeControl=="Inventory" &&
+                                        (routeAction=="ItemList" || routeAction=="AddItem" || routeAction=="EditItem" ))  ?"active":"" )">
 
-                                            <li class="nav-item">
-                                                <a href="#" class="nav-link">
+                                                    <a href="~/Inventory/ItemList" class="nav-link">
 
-                                                    <span class="nav-text">
-                                                        <span>Orders</span>
-                                                    </span>
-                                                </a>
-                                            </li>
-
-                                            <li class="nav-item">
-                                                <a href="#" class="nav-link">
-
-                                                    <span class="nav-text">
-                                                        <span>Invoice</span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <b class="sub-arrow"></b>
-
-                                </li>
-
-                                <li class="nav-item">
-
-                                    <a href="#" class="nav-link dropdown-toggle collapsed">
-                                        <i class="nav-icon fa fa-cube"></i>
-                                        <span class="nav-text fadeable">
-                                            <span>User Setting</span>
-                                        </span>
-
-                                        <b class="caret fa fa-angle-left rt-n90"></b>
-                                    </a>
-
-                                    <div class="hideable submenu collapse">
-                                        <ul class="submenu-inner">
-
-                                            <li class="nav-item">
-
-                                                <a href="#" class="nav-link">
-
-                                                    <span class="nav-text">
-                                                        <span>Roles</span>
-                                                    </span>
-                                                </a>
+                                                        <span class="nav-text">
+                                                            <span>Item</span>
+                                                        </span>
+                                                    </a>
 
 
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="#" class="nav-link">
+                                                </li>
 
-                                                    <span class="nav-text">
-                                                        <span>Users</span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                                <li class="nav-item @((routeControl=="Inventory" &&
+                                        (routeAction=="ItemPriceList" || routeAction=="ItemPrice" ))  ?"active":"" )">
+                                                    <a href="~/Inventory/ItemPriceList" class="nav-link">
 
-                                    <b class="sub-arrow"></b>
+                                                        <span class="nav-text">
+                                                            <span>Item Price</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item @((routeControl=="Inventory" &&
+                                        (routeAction=="UnitList" ))  ?"active":"" )">
 
-                                </li>
+                                                    <a href="~/Inventory/UnitList" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Unit</span>
+                                                        </span>
+                                                    </a>
+
+
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a href="#" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Vendor</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <b class="sub-arrow"></b>
+
+                                    </li>
+
+                                    <li class="nav-item @((routeControl=="Order")  ?"active open":"" )">
+
+                                        <a class="nav-link dropdown-toggle @(routeControl!="Order" ?"collapsed":"" )">
+                                            <i class="nav-icon fa fa-first-order-alt"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Order</span>
+                                            </span>
+
+                                            <b class="caret fa fa-angle-left rt-n90"></b>
+                                        </a>
+
+                                        <div class="hideable submenu @(routeControl!="Order" ?"collapse":"" )">
+                                            <ul class="submenu-inner">
+
+                                                <li class="nav-item">
+
+                                                    <a href="#" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>PO</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+
+                                                <li class="nav-item @((routeControl=="Order" &&
+                                        (routeAction=="Add" || routeAction=="Edit" || routeAction=="List" ))  ?"active":"" )">
+                                                    <a href="~/Order/List" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Orders</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+
+                                                <li class="nav-item">
+                                                    <a href="#" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Invoice</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <b class="sub-arrow"></b>
+
+                                    </li>
+
+                                    <li class="nav-item @((routeControl=="User")  ?"active open":"" )">
+
+                                        <a href="#" class="nav-link dropdown-toggle @(routeControl!="User" ?"collapsed":"" )">
+                                            <i class="nav-icon fa fa-cogs"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>User Setting</span>
+                                            </span>
+
+                                            <b class="caret fa fa-angle-left rt-n90"></b>
+                                        </a>
+
+                                        <div class="hideable submenu @(routeControl!="User" ?"collapse":"" )">
+                                            <ul class="submenu-inner">
+
+                                                <li class="nav-item @((routeControl=="User" &&
+                                        (routeAction=="RoleList"))  ?"active":"" )">
+
+                                                    <a href="~/User/RoleList" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Roles</span>
+                                                        </span>
+                                                    </a>
+
+
+                                                </li>
+                                                <li class="nav-item @((routeControl=="User" &&
+                                        (routeAction=="UserList") || (routeAction=="AddUser"))  ?"active":"" )">
+                                                    <a href="~/User/UserList" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Users</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <b class="sub-arrow"></b>
+
+                                    </li>
+
+                                    <li class="nav-item @((routeControl=="Employee" &&
+                                        (routeAction=="Add") || (routeAction=="Edit"))  ?"active":"" )">
+
+                                        <a href="~/Employee/List" class="nav-link">
+                                            <i class="nav-icon fa fa-users"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Emplyoee</span>
+                                            </span>
+                                        </a>
+
+                                        <b class="sub-arrow"></b>
+
+                                    </li>
+
+                                }
 
                             </ul>
                         </nav>
@@ -265,7 +340,7 @@
             </div>
 
             <div role="main" class="main-content">
-                <nav class="navbar navbar-sm navbar-expand-lg navbar-fixed navbar-white">
+                <nav class="navbar navbar-sm navbar-expand-lg navbar-fixed navbar-white ">
                     <div class="navbar-inner shadow-md">
 
                         <button type="button" class="btn btn-burger align-self-center ml-25 mr-2 d-none d-xl-flex btn-h-lighter-blue" data-toggle="sidebar" data-target="#sidebar" aria-controls="sidebar" aria-expanded="true" aria-label="Toggle sidebar">
@@ -292,41 +367,45 @@
 
 
 
-                        <div class="ml-auto navbar-menu collapse navbar-collapse navbar-backdrop" id="navbarMenu2">
+                        <div class="ml-auto navbar-menu collapse navbar-collapse navbar-backdrop " id="navbarMenu2">
+                            @*style="display:none"*@
+                            @if (RoleName == "Admin")
+                            {
 
-                            <div class="navbar-nav navbar-links">
-                                <ul class="nav">
-                                    <li class="nav-item mx-2">
-                                        <a href="#" class="active btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
-                                            Dashboard
-                                            <!--
-                                            Or use these along with `d-style` on parent 'A' for a different highlight color
-                                            <div class="d-none d-lg-block v-active position-bl w-100 border-t-3 brc-primary-m1 mb-n3px"></div>
-                                            <div class="d-lg-none v-active position-tl h-100 border-l-4 brc-primary-m1 ml-n3px"></div>
-                                            -->
-                                        </a>
-                                    </li>
+                                <div class="navbar-nav navbar-links topBar">
+                                    <ul class="nav">
+                                        <li class="nav-item mx-2 ">
+                                            <a href="~/Home/Dashboard" class="@(routeAction=="Dashboard" && routeControl=="Home" ?"active":"" ) btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
+                                                Dashboard
+                                                <!--
+                                                Or use these along with `d-style` on parent 'A' for a different highlight color
+                                                <div class="d-none d-lg-block v-active position-bl w-100 border-t-3 brc-primary-m1 mb-n3px"></div>
+                                                <div class="d-lg-none v-active position-tl h-100 border-l-4 brc-primary-m1 ml-n3px"></div>
+                                                -->
+                                            </a>
+                                        </li>
 
-                                    <li class="nav-item mx-2">
-                                        <a href="#" class="btn btn-a-bold btn-outline-secondary btn-h-lighter-secondary btn-a-lighter-secondary btn-brc-tp px-4 px-lg-2">
-                                            Orders
-                                        </a>
-                                    </li>
+                                        <li class="nav-item mx-2">
+                                            <a href="~/Order/List" class=" @(routeControl=="Order" ?"active":"" ) btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
+                                                Orders
+                                            </a>
+                                        </li>
 
-                                    <li class="nav-item mx-2">
-                                        <a href="#" class="btn btn-a-bold btn-outline-secondary btn-h-lighter-secondary btn-a-lighter-secondary btn-brc-tp px-4 px-lg-2">
-                                            Members
-                                        </a>
-                                    </li>
+                                        <li class="nav-item mx-2">
+                                            <a href="~/Employee/List" class=" @(routeControl=="Employee" ?"active":"" ) btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
+                                                Members
+                                            </a>
+                                        </li>
 
-                                    <li class="nav-item mx-2">
-                                        <a href="#" class="btn btn-a-bold btn-outline-secondary btn-h-lighter-secondary btn-a-lighter-secondary btn-brc-tp px-4 px-lg-2">
-                                            Users
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                                        <li class="nav-item mx-2">
+                                            <a href="~/User/UserList" class=" @(routeControl=="User" ?"active":"" ) btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
+                                                Users
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
 
+                            }
                         </div>
 
 
@@ -334,7 +413,7 @@
 
                         <!-- #navbarMenu toggler -->
                         <button class="navbar-toggler ml-1 mr-2 px-1" type="button" data-toggle="collapse" data-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navbar menu 1">
-                            <img class="radius-round border-2 brc-primary-tp3 p-1px" src="assets/image/avatar/avatar3.jpg" width="36" alt="Natalie's Photo">
+                            <img class="radius-round border-2 brc-primary-tp3 p-1px" src="~/assets/image/avatar/profile_small.png" width="36" alt="Natalie's Photo">
                         </button>
 
 
@@ -414,11 +493,39 @@
                                         </div>
                                     </li>
 
-                                    <li class="nav-item ">
-                                        <a class="nav-link "  href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                         <span class="text-primary-d1">LogOut</span>
+                                    <li class="nav-item dropdown order-first order-lg-last">
+                                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                            <img id="id-navbar-user-image"
+                                                 class="d-none d-lg-inline-block radius-round border-2 brc-primary-tp4 p-1px mr-2 w-6"
+                                                 src="/assets/image/avatar/profile_small.png" alt="User" />
+                                            <span class="d-inline-block d-lg-none d-xl-inline-block">
+                                                <span class="text-90" id="id-user-welcome">Welcome</span>
+                                                <span class="nav-user-name">@Username</span>
+                                            </span>
+
+                                            <i class="caret fa fa-angle-down d-none d-xl-block"></i>
+                                            <i class="caret fa fa-angle-left d-block d-lg-none"></i>
                                         </a>
-                                    </li>
+
+                                        <div class="dropdown-menu dropdown-caret dropdown-menu-right dropdown-animated brc-secondary-l1 py-1">
+                                            <div class="d-none d-lg-block d-xl-none">
+                                                <div class="dropdown-header">
+                                                    Welcome @Username
+                                                </div>
+                                                <div class="dropdown-divider"></div>
+                                            </div>
+
+                                            <a class="dropdown-item btn btn-outline-grey btn-h-lighter-orange btn-h-bold btn-a-light-orange"
+                                               href="~/Account/Login">
+                                                <i class="fa fa-power-off text-orange text-105 mr-1 w-2"></i>
+                                                Logout
+                                            </a>
+                                        </div>
+                                    </li><!-- /.nav-item:last -->
+
+
+
+
 
                                 </ul>
                             </div>
@@ -491,6 +598,7 @@
         <script src="~/js/popper.js"></script>
         <script src="~/js/bootstrap.js"></script>
         <script src="~/js/ace.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
         <!-- Only for demo purpose -->
     </environment>
     <environment names="Staging,Production">
@@ -498,6 +606,7 @@
         <script src="~/js/popper.js"></script>
         <script src="~/js/bootstrap.js"></script>
         <script src="~/js/ace.js"></script>
+        <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
     </environment>
 
     @RenderSection("scripts", required: false)

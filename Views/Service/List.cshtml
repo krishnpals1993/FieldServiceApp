@@ -1,0 +1,430 @@
+﻿@model IEnumerable<FieldServiceApp.Models.ServiceFormViewModel>
+@using Microsoft.Extensions.Options;
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = " Service Form Log(s)";
+}
+<div role="main" class="page-content container container-plus">
+    <div class="page-header mb-2 pb-2 flex-column flex-sm-row align-items-start align-items-sm-center py-25 px-1">
+        <h1 class="page-title text-primary-d2 text-140">
+            @ViewData["Title"]
+        </h1>
+
+        <div class="page-tools mt-3 mt-sm-0 mb-sm-n1">
+            <!-- dataTables search box will be inserted here dynamically -->
+        </div>
+    </div>
+
+    <div class="card bcard h-auto">
+        <form autocomplete="off" class="border-t-3 brc-blue-m2">
+
+            <table id="datatable" class="d-style w-100 table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed">
+                <!-- add `collapsed` by default ... it will be removed by default -->
+                <!-- thead with .sticky-nav -->
+                <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
+                    <tr>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Customer
+                        </th>
+
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Order
+                        </th>
+
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Date Of Service
+                        </th>
+
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Item Category
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Item
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Quantity
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Locations
+                        </th>
+
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Status
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="pos-rel">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="d-style bgc-h-default-l4">
+                            <td>
+                                @item.CustomerName
+                            </td>
+
+                            <td class="text-grey">
+                                #@item.OrderId
+                            </td>
+
+                            <td class="text-grey">
+                                @item.DateOfService?.ToString("MM/dd/yyyy")
+                            </td>
+
+                            <td class="text-grey">
+                                @item.CategoryName
+                            </td>
+
+                            <td class="text-grey">
+                                @item.ItemCd
+                            </td>
+
+                            <td class="text-grey">
+                                @item.Quantity
+                            </td>
+
+                            <td class="text-grey">
+                                @item.Locations
+                            </td>
+                            <td>
+                                @if (item.IsActive == 1)
+                                {
+                                    <span class="badge badge-success mr-1">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger mr-1">
+                                        In Active
+                                    </span>
+
+                                }
+                            </td>
+
+                            <td class="text-grey">
+                                @if (item.IsActive == 1)
+                                {
+                                    @Html.ActionLink("Edit", "Edit", "Service", new { id = item.ServiceFormLogId })
+                                    <span>|</span>
+                                    <a href="#" onclick="deleteFun('@item.ServiceFormLogId')">Delete</a>
+                                }
+
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+        </form>
+    </div>
+</div>
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib//datatable/dataTables.bootstrap4.css" />
+        <link rel="stylesheet" href="~/lib//datatable/buttons.bootstrap4.css" />
+        <link rel="stylesheet" href="~/pages/datatable/@@page-style.css" />
+    </environment>
+
+}
+
+@section scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib//datatable/jquery.dataTables.js"></script>
+        <script src="~/lib//datatable/dataTables.bootstrap4.js"></script>
+        <script src="~/lib//datatable/dataTables.colReorder.js"></script>
+        <script src="~/lib//datatable/dataTables.select.js"></script>
+        <script src="~/lib//datatable/dataTables.buttons.js"></script>
+        <script src="~/lib//datatable/buttons.bootstrap4.js"></script>
+        <script src="~/lib//datatable/buttons.colVis.js"></script>
+        <script src="~/lib//datatable/buttons.html5.js"></script>
+        <script src="~/lib//datatable/buttons.print.js"></script>
+
+
+        <script>
+            jQuery(function ($) {
+                var tableId = '#datatable'
+
+                var tableHead = document.querySelector('.sticky-nav')
+                tableHead.addEventListener('sticky-change', function (e) {
+                    // when  thead becomes sticky, add is-stuck class to it (which adds a border-bottom to it)
+                    this.classList.toggle('is-stuck', e.detail.isSticky)
+                })
+
+
+
+                $.extend(true, $.fn.dataTable.defaults, {
+                    dom:
+                        "<'row'<'col-12 col-sm-6'l><'col-12 col-sm-6 text-right table-tools-col'f>>" +
+                        "<'row'<'col-12'tr>>" +
+                        "<'row'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
+                    renderer: 'bootstrap'
+                })
+
+                var $_table = $(tableId).DataTable({
+                    responsive: true,
+
+                    /** optional scrolling **/
+                    // scrollY: "300px",
+                    // scrollCollapse: true,
+
+                    colReorder: {
+                        //disable column reordering for first and last columns
+                        fixedColumnsLeft: 1,
+                        fixedColumnsRight: 1
+                    },
+
+                    // sDom: 'BRfrtlip',
+
+                    classes: {
+                        sLength: "dataTables_length text-left w-auto",
+                    },
+
+
+                    buttons: {
+                        dom: {
+                            button: {
+                                className: 'btn' //remove the default 'btn-secondary'
+                            },
+                            container: {
+                                className: 'dt-buttons btn-group bgc-white-tp2 text-right w-auto'
+                            }
+                        },
+
+                        buttons: [
+
+                            {
+                                "extend": "copy",
+                                "title": 'Service Form Logs',
+                                "text": "<i class='far fa-copy text-125 text-purple'></i> <span class='d-none'>Copy to clipboard</span>",
+                                "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                            },
+
+                            {
+                                "extend": "csv",
+                                "title": 'Service Form Logs',
+                                "text": "<i class='fa fa-database text-125 text-success-m1'></i> <span class='d-none'>Export to CSV</span>",
+                                "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary",
+                                exportOptions: {
+                                    columns: 'th:not(:last-child)'
+                                }
+                            },
+
+                            {
+                                "extend": "print",
+                                "title": 'Service Form Logs',
+                                "text": "<i class='fa fa-print text-125 text-orange-d1'></i> <span class='d-none'>Print</span>",
+                                "className": "btn-light-default btn-bgc-white  btn-h-outline-primary btn-a-outline-primary",
+                                autoPrint: false,
+                                message: 'This print was produced using the Print button for DataTables'
+                            }
+                        ]
+                    },
+
+
+                    // first and last column are not sortable
+                    columnDefs: [
+                        //{
+                        //  orderable: false,
+                        //  className: null,
+                        //  targets:   0
+                        //},
+                        //{
+                        //  orderable: false,
+                        //  className: null,
+                        //  targets:   1
+                        //},
+                        //{
+                        //  orderable: false,
+                        //  className: null,
+                        //  targets:   -1
+                        //},
+                        //{
+                        //  responsivePriority: 1,
+                        //  targets: 2
+                        //}
+                    ],
+
+
+                    // multiple row selection
+                    select: {
+                        style: 'multis'
+                    },
+
+                    // no specific initial ordering
+                    order: [],
+
+                    language: {
+                        search: '<i class="fa fa-search pos-abs mt-2 pt-3px ml-25 text-blue-m2"></i>',
+                        searchPlaceholder: " Search ..."
+                    }
+                })
+
+
+                // specify position of table buttons
+                $('.table-tools-col')
+                    .append($_table.buttons().container())
+                    // move searchbox into table header
+                    .find('.dataTables_filter').appendTo('.page-tools').find('input').addClass('pl-45 radius-round').removeClass('form-control-sm')
+                    // and add a "+" button
+                    .end().append('<button data-rel="tooltip" id="btnAdd" onclick="add()" type="button" class="btn radius-round btn-outline-primary border-2 btn-sm ml-2" title="Add New"><i class="fa fa-plus"></i></button>')
+
+
+
+                // helper methods to add/remove bgc-h-* class when selecting/deselecting rows
+                var _highlightSelectedRow = function (row) {
+                    row.querySelector('input[type=checkbox]').checked = true
+                    row.classList.add('bgc-success-l3')
+                    row.classList.remove('bgc-h-default-l4')
+                }
+                var _unhighlightDeselectedRow = function (row) {
+                    row.querySelector('input[type=checkbox]').checked = false
+                    row.classList.remove('bgc-success-l3')
+                    row.classList.add('bgc-h-default-l4')
+                }
+
+                // listen to select/deselect event to highlight rows
+                $_table
+                    .on('select', function (e, dt, type, index) {
+                        if (type == 'row') {
+                            var row = $_table.row(index).node()
+                            _highlightSelectedRow(row)
+                        }
+                    })
+                    .on('deselect', function (e, dt, type, index) {
+                        if (type == 'row') {
+                            var row = $_table.row(index).node()
+                            _unhighlightDeselectedRow(row)
+                        }
+                    })
+
+                // when clicking the checkbox in table header, select/deselect all rows
+                $(tableId)
+                    .on('click', 'th input[type=checkbox]', function () {
+                        if (this.checked) {
+                            $_table.rows().select().every(function () {
+                                _highlightSelectedRow(this.node())
+                            });
+                        }
+                        else {
+                            $_table.rows().deselect().every(function () {
+                                _unhighlightDeselectedRow(this.node())
+                            })
+                        }
+                    })
+
+                // don't select row if we click on the "show details" `plus` sign (td)
+                $(tableId).on('click', 'td.dtr-control', function (e) {
+                    e.stopPropagation()
+                })
+
+
+                // add/remove bgc-h-* class to TH when soring columns
+                var previousTh = null
+                var toggleTH_highlight = function (th) {
+                    th.classList.toggle('bgc-yellow-l2')
+                    th.classList.toggle('bgc-h-yellow-l3')
+                    th.classList.toggle('text-blue-d2')
+                }
+
+                $(tableId)
+                    .on('click', 'th:not(.sorting_disabled)', function () {
+                        if (previousTh != null) toggleTH_highlight(previousTh)// unhighlight previous TH
+                        toggleTH_highlight(this)
+                        previousTh = this
+                    })
+
+                // don't select row when clicking on the edit icon
+                $('a[data-action=edit').on('click', function (e) {
+                    e.preventDefault()
+                    e.stopPropagation()// don't select
+                })
+
+                // add a dark border
+                $('.dataTables_wrapper')
+                    .addClass('border-b-1 border-x-1 brc-dark-l2')
+
+                    // highlight DataTable header
+                    // also already done in CSS, but you can use custom colors here
+                    .find('.row:first-of-type')
+                    .addClass('border-b-1 brc-default-l3 bgc-blue-l4')
+                    .next().addClass('mt-n1px')// move the next `.row` up by 1px to go below header's border
+
+                // highlight DataTable footer
+                $('.dataTables_wrapper')
+                    .find('.row:last-of-type')
+                    .addClass('border-t-1 brc-default-l3 mt-n1px bgc-default-l4')
+
+
+                // if the table has scrollbars, add ace styling to it
+                $('.dataTables_scrollBody').aceScroll({ color: "grey" })
+
+
+                //enable tooltips
+                setTimeout(function () {
+                    $('.dt-buttons button')
+                        .each(function () {
+                            var div = $(this).find('span').first()
+                            if (div.length == 1) $(this).tooltip({ container: 'body', title: div.parent().text() })
+                            else $(this).tooltip({ container: 'body', title: $(this).text() })
+                        })
+                    $('[data-rel=tooltip').tooltip({ container: 'body' })
+                }, 0)
+
+            })
+        </script>
+        <script type="text/javascript">
+            window.baseUrl = '@Settings.Value.WebBaseURL';
+
+            function add() {
+                window.location = window.baseUrl + "/Service/Work";
+            }
+            function deleteFun(id) {
+
+            swal({
+                title: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "No",
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            },
+                function (isConfirm) {
+                    if (!isConfirm)
+                        return;
+
+                      $.ajax({
+                    url: "/Service/DeleteWork",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.Status=="1") {
+                            swal(data.Message, "", "success")
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 750);
+
+                        }
+                        else {
+                              swal(data.Message, "", "error")
+                        }
+                    }
+                })
+
+                });
+
+        }
+        </script>
+    </environment>
+}

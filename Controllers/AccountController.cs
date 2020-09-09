@@ -16,7 +16,7 @@ namespace FieldServiceApp.Controllers
         private readonly IOptions<Appsettings> _appSettings;
         private readonly IOptions<EmailSettings> _emailSettings;
         private readonly DBContext _dbContext;
-
+        
         public AccountController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext)
         {
             _appSettings = appSettings;
@@ -29,7 +29,8 @@ namespace FieldServiceApp.Controllers
             HttpContext.Session.SetString("UserId", "");
             HttpContext.Session.SetString("RoleId", "");
             HttpContext.Session.SetString("Username", "");
-            HttpContext.Session.SetString("UserMenus", "");
+
+            
 
             return View();
         }
@@ -47,8 +48,10 @@ namespace FieldServiceApp.Controllers
                     var checkUser = _dbContext.tbl_Roles.ToList();
 
                     DbfunctionUtility dbfunction = new DbfunctionUtility(_appSettings);
-                    DataSet ds = dbfunction.GetDataset("select * from users join roles on users.roleid = roles.roleid  where username ='" + model.Username + "' and Password ='" + model.Password + "'");
-
+                    DataSet ds = dbfunction.GetDataset(@"select * from ""Users"" u join ""Roles"" r on u.""RoleId"" = r.""RoleId""
+                                                        where ""Email"" = '" + model.Username+ "' " +
+                                                        "and \"Password\"  = '" + model.Password + "' ");
+                    
                     if (ds.Tables[0].Rows.Count == 0)
                     {
                         ViewBag.ErrorMessage = "Incorrect username or password";
@@ -56,21 +59,12 @@ namespace FieldServiceApp.Controllers
                     else
                     {
                         CommanUtility commanUtility = new CommanUtility(_appSettings);
-                        var userMenus = commanUtility.GetUserMenus(Convert.ToString(ds.Tables[0].Rows[0]["RoleId"]));
-                        HttpContext.Session.SetString("UserMenus", JsonConvert.SerializeObject(userMenus));
-                        HttpContext.Session.SetString("UserId", Convert.ToString(ds.Tables[0].Rows[0]["Userid"]));
+                        //var userMenus = commanUtility.GetUserMenus(Convert.ToString(ds.Tables[0].Rows[0]["RoleId"]));
+                        //HttpContext.Session.SetString("UserMenus", JsonConvert.SerializeObject(userMenus));
+                        HttpContext.Session.SetString("UserId", Convert.ToString(ds.Tables[0].Rows[0]["UserId"]));
                         HttpContext.Session.SetString("RoleName", Convert.ToString(ds.Tables[0].Rows[0]["RoleName"]));
-                        HttpContext.Session.SetString("HrGroupId", Convert.ToString(ds.Tables[0].Rows[0]["HrGroupId"]));
                         HttpContext.Session.SetString("Username", model.Username);
-                        if (Convert.ToString(ds.Tables[0].Rows[0]["RoleName"]) != "CareGiver")
-                        {
-                            return RedirectToAction("List", "CareGiver");
-                        }
-                        else
-                        {
-                            HttpContext.Session.SetString("ShowTest", "True");
-                            return RedirectToAction("Exam", "Attendant");
-                        }
+                        return RedirectToAction("Dashboard", "Home");
 
                     }
                 }
@@ -104,7 +98,7 @@ namespace FieldServiceApp.Controllers
                         UserName = model.Email,
                         Password = model.Password,
                         Email = model.Email,
-                        IsActive = true,
+                        IsActive = 1,
                         RoleId = roleId,
                         CreatedDate = DateTime.Now,
 

@@ -26,6 +26,8 @@ namespace FieldServiceApp.Models
         public DbSet<City> tbl_Cities { get; set; }
         public DbSet<Unit> tbl_Units { get; set; }
         public DbSet<EmployeeMaster> tbl_EmployeeMaster { get; set; }
+        public DbSet<ItemCategory> tbl_ItemCategory { get; set; }
+        public DbSet<ServiceFormLog> tbl_ServiceFormLogs { get; set; }
 
     }
 
@@ -39,7 +41,7 @@ namespace FieldServiceApp.Models
         public string UserName { get; set; }
         public string Password { get; set; }
         public int RoleId { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -55,7 +57,7 @@ namespace FieldServiceApp.Models
 
         public string RoleName { get; set; }
 
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -82,7 +84,7 @@ namespace FieldServiceApp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ClaimId { get; set; }
         public int MenuId { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -102,7 +104,7 @@ namespace FieldServiceApp.Models
         public int CityId { get; set; }
         public int StateId { get; set; }
         public string FirstName { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -123,7 +125,7 @@ namespace FieldServiceApp.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -145,7 +147,7 @@ namespace FieldServiceApp.Models
         public string Address { get; set; }
         public int CityId { get; set; }
         public int StateId { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -158,18 +160,21 @@ namespace FieldServiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ItemId { get; set; }
-
+        public int ? CategoryId { get; set; }
         public string ItemCd { get; set; }
         public string ItemDescription { get; set; }
         public int ItemUnitId { get; set; }
         public int ItemQOH { get; set; }
         public decimal ItemCost { get; set; }
         public decimal ItemPrice { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string Taxable { get; set; }
+        public string Sellable { get; set; }
+        public string Service { get; set; }
     }
 
     [Table("ItemPrice")]
@@ -196,10 +201,11 @@ namespace FieldServiceApp.Models
         public decimal TotalAmount { get; set; }
         public int CustomerId { get; set; }
         public int ShipId { get; set; }
-        public DateTime ShipDate { get; set; }
+        public DateTime ? ShipStartDate { get; set; }
+        public DateTime ? ShipEndDate { get; set; }
         public DateTime? CancelDate { get; set; }
         public string CancelReason { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -220,7 +226,7 @@ namespace FieldServiceApp.Models
         public int Quantity { get; set; }
         public decimal PerUnitPrice { get; set; }
         public decimal TotalPrice { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -251,11 +257,12 @@ namespace FieldServiceApp.Models
 
         public string CityName { get; set; }
 
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public int StateId { get; set; }
     }
 
     [Table("States")]
@@ -267,7 +274,7 @@ namespace FieldServiceApp.Models
 
         public string StateName { get; set; }
 
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -283,7 +290,7 @@ namespace FieldServiceApp.Models
 
         public string UnitName { get; set; }
 
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -301,7 +308,45 @@ namespace FieldServiceApp.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public bool? IsActive { get; set; }
+        public Int16  IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public int UserId { get; set; }
+    }
+
+
+    [Table("ItemCategories")]
+    public class ItemCategory
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int CategoryId { get; set; }
+
+        public string CategoryName { get; set; }
+        public string RoleIds { get; set; }
+
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("ServiceFormLogs")]
+    public class ServiceFormLog
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ServiceFormLogId { get; set; }
+        public int OrderId { get; set; }
+        public DateTime DateOfService { get; set; }
+        public int ItemCategoryId { get; set; }
+        public int ItemId { get; set; }
+        public decimal Qty { get; set; }
+        public string Locations { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
