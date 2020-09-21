@@ -16,12 +16,19 @@ namespace FieldServiceApp.Controllers
         private readonly IOptions<Appsettings> _appSettings;
         private readonly IOptions<EmailSettings> _emailSettings;
         private readonly DBContext _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OrderController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext)
+        private ISession _session => _httpContextAccessor.HttpContext.Session;
+        private string _rolename = "";
+        private int _userId = 0;
+        public OrderController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext, IHttpContextAccessor HttpContextAccessor)
         {
             _appSettings = appSettings;
             _emailSettings = emailSettings;
             _dbContext = dbContext;
+            _httpContextAccessor = HttpContextAccessor;
+            _rolename = _session.GetString("RoleName");
+            int.TryParse(_session.GetString("UserId"), out _userId);
         }
 
 
@@ -78,12 +85,15 @@ namespace FieldServiceApp.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    CommanUtility _commanUtility = new CommanUtility(_appSettings);
+                    var shipDate = _commanUtility.RoundUp(model.ShipStartDate.Value, TimeSpan.FromMinutes(15));
 
                     OrderMaster orderMaster = new OrderMaster()
                     {
                         OrderDate = model.OrderDate,
-                        ShipStartDate = model.ShipStartDate,
+                        ShipStartDate = shipDate,
                         ShipEndDate = model.ShipEndDate,
+                        ShipDate = model.ShipStartDate,
                         ShipId = model.ShipId,
                         CustomerId = model.CustomerId,
                         TotalAmount = model.TotalAmount,
@@ -170,24 +180,25 @@ namespace FieldServiceApp.Controllers
         [HttpPost]
         public JsonResult UpdateOrderDate(int orderId, DateTime? start, DateTime? end)
         {
-            ResponseModel response = new ResponseModel();
+            DashboardOrderViewModel model = new DashboardOrderViewModel();
             try
             {
                 var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == orderId).FirstOrDefault();
                 if (checkOrder != null)
                 {
                     checkOrder.ShipStartDate = start;
+                    checkOrder.ShipDate = start;
                     checkOrder.ShipEndDate = end;
                     _dbContext.SaveChanges();
                 }
-                response.Status = "1";
-                response.Message = "Detail updated successfully";
+                DashboardUtility _dashboardUtility = new DashboardUtility(_dbContext);
+                model  = _dashboardUtility.getOrderDetail(orderId);
             }
             catch (Exception ex)
             {
             }
 
-            return Json(response);
+            return Json(model);
         }
 
         [HttpPost]

@@ -5,6 +5,10 @@
 @{
 
     ViewData["Title"] = "New Customer";
+     List<string> CompanyTypeList = new List<string>();
+    CompanyTypeList.Add("Business");
+    CompanyTypeList.Add("Residential");
+
 }
 <div role="main" class="page-content container container-plus">
     <div class="card bcard mt-2 mt-lg-3">
@@ -17,6 +21,19 @@
         <div class="card-body px-3 pb-1">
             <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Customer/Add" method="post">
                 <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Company Code
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.Code,
+                        new { @placeholder = "Code", @class = "form-control" })
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             Company Name
@@ -29,7 +46,17 @@
                         <span asp-validation-for="CompanyName" class="text-danger"></span>
                     </div>
 
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Company Type
+                        </label>
+                    </div>
 
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.CompanyType, new SelectList(CompanyTypeList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select company type" })
+                    </div>
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             State
@@ -42,7 +69,6 @@
                     </div>
 
                 </div>
-
                 <div class="form-group row">
 
 
@@ -68,9 +94,38 @@
                         new { @placeholder = "Address", @class = "form-control" })
                         <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
+
+
                 </div>
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Zip 1
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.Zip1,
+                        new { @placeholder = "Zip 1", @class = "form-control" })
+                        <span asp-validation-for="Zip1" class="text-danger"></span>
+                    </div>
 
 
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Zip 2
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.Zip2,
+                        new { @placeholder = "Zip 2", @class = "form-control" })
+                        <span asp-validation-for="Zip2" class="text-danger"></span>
+                    </div>
+
+
+                </div>
+         
 
                 <h3 class="card-title text-125">
                     Contact detail
@@ -142,12 +197,12 @@
                                 <span asp-validation-for="Contacts[i].Phone" class="text-danger"></span>
                             </div>
                             @*<div class="col-lg-2">
-                                <button onclick="addContacts()" type="button"
-                                        class="btnAddContact btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                                    Add
-                                    <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                                </button>
-                            </div>*@
+                                    <button onclick="addContacts()" type="button"
+                                            class="btnAddContact btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                                        Add
+                                        <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                                    </button>
+                                </div>*@
                         </div>
 
                         <hr />
@@ -155,7 +210,7 @@
                 </div>
 
 
-               
+
 
                 <h3 class="card-title text-125">
                     Shipping detail
@@ -272,11 +327,11 @@
                         </div>
 
                         <hr />
-                        }
+                    }
 
                 </div>
 
-                
+
 
 
                 <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
@@ -338,7 +393,7 @@
         });
 
         function addContacts() {
-           
+
             var index = $(".btnAddContact").length;
 
             $.ajax({
@@ -358,7 +413,7 @@
             })
         }
 
-         function addShipping() {
+        function addShipping() {
              var index = $(".btnAddShipping").length;
 
             $.ajax({
@@ -377,11 +432,22 @@
                         if ($(ele).attr('name1')) {
                             $(ele).attr('name', $(ele).attr('name1'));
                         }
-                        
+
                     })
                 }
             })
         }
+
+        $("#CompanyName").on("change", function () {
+            if ($("#CompanyName").val()) {
+                $("#CompanyType").val("Business");
+                $("#CompanyType").attr("readonly","readonly"); 
+            }
+            else {
+                   $("#CompanyType").removeAttr("readonly");
+            }
+        });
+
 
     </script>
 }

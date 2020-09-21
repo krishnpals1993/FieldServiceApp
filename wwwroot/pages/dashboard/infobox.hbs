@@ -1,0 +1,130 @@
+<div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
+    <div class="bcard h-100 d-flex align-items-center p-3">
+        <div>
+            <span class="d-inline-block bgc-green-d1 p-3 radius-round text-center border-4 brc-green-l2">
+                <i class="fa fa-dollar-sign text-white text-180 w-4 h-4"></i>
+            </span>
+        </div>
+        
+        <div class="ml-3">
+            <div class="pos-rel">
+                <span class="text-dark-tp4 text-140">$</span>
+                <span class="text-dark-tp3 text-180">85k</span>
+
+                <span class="text-blue-m1 text-600 text-90 ml-2 text-nowrap">
+                    8%
+                    <i class="fa fa-arrow-up"></i>
+                </span>
+            </div>
+            <div class="text-dark-tp4">today's earnings</div>
+        </div>
+
+        <div class="position-tr m-1">
+            {{> page/default-dropdown}}
+        </div>
+    </div>
+</div>
+
+
+
+<div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
+    <div class="bcard h-100 d-flex align-items-center p-3">
+
+        <div>
+            <span class="d-inline-block bgc-warning-d1 p-3 radius-round text-center border-4 brc-warning-l2">
+                <i class="fa fa-shopping-cart text-white text-170 w-4 h-4"></i>
+            </span>
+        </div>
+        
+        <div class="ml-3">
+            <div class="pos-rel">
+                <span class="text-dark-tp3 text-180">369</span>
+                <span class="text-danger-m2 text-600 text-90 ml-2 text-nowrap">
+                    2%
+                    <i class="fa fa-arrow-down"></i>
+                </span>
+            </div>
+            <div class="text-dark-tp4 text-110">new orders</div>
+        </div>
+
+        <!-- this is a dropdown with tooltips -->
+        <div class="position-tr m-1 dropdown dd-backdrop dd-backdrop-none-md">
+            <button type="button" class="btn btn-sm btn-brc-tp btn-bgc-tp btn-text-pale btn-light-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+            </button>
+
+            <div class="dropdown-menu p-3px mw-auto shadow-sm dropdown-menu-right dropdown-caret dropdown-animated dd-appear-center dd-slide-none-md radius-1 brc-secondary-l1">
+                <div class="dropdown-inner">
+                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#" title="Some action" data-toggle="tooltip">
+                        <i class="fa fa-cog mr-1 text-blue"></i>
+                        <span class="d-md-none">Some action</span>
+                    </a>
+
+                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#" title="Another action" data-toggle="tooltip">
+                        <i class="fas fa-tools text-orange mr-1"></i>
+                        <span class="d-md-none">Another action</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
+    <div class="bcard h-100 d-flex align-items-center p-3">
+
+        <div>
+            <span class="d-inline-block bgc-primary p-3 radius-round text-center border-4 brc-primary-l2">
+                <i class="fas fa-chart-line text-white text-170 w-4 h-4"></i>
+            </span>
+        </div>
+
+        <div class="ml-3 flex-grow-1">
+            <div>
+                <span class="text-dark-tp3 text-180">520k</span>
+
+                <span class="text-blue-m1 text-600 text-90 ml-2 text-nowrap">
+                    3%
+                    <i class="fa fa-arrow-up"></i>
+                </span>
+            </div>
+            <div class="text-dark-tp4 text-110">page views</div>
+        </div>
+
+        <div class="mr-auto">
+            <canvas id="infobox-chart1" style="width: 70px;"></canvas>
+        </div>
+
+        <div class="position-tr m-1">
+            {{> page/default-dropdown}}
+        </div>
+
+    </div>
+</div>
+
+
+<div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
+    <div class="bcard h-100 d-flex align-items-center p-3">
+
+        <div class="text-center pos-rel ml-1">
+            <canvas id="task-progress-piechart" style="height: 75px; width: 75px; max-height: 75px; max-width: 75px;"></canvas>
+
+            <span class="position-center text-dark-tp3 text-600">71%</span>
+        </div>
+
+        <div class="ml-3 flex-grow-1">
+            <div>
+                <span class="text-dark-tp3 text-125">Task Progress</span>
+            </div>
+            <div class="text-dark-tp4 text-110">3 remaining</div>
+        </div>
+
+        <div class="position-tr m-1">
+            {{> page/default-dropdown}}
+        </div>
+
+   </div>
+</div>

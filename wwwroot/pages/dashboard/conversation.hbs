@@ -1,0 +1,135 @@
+<div class="bcard card pt-1 pt-lg-2 h-100" id="conversations">
+
+    <div class="card-header bg-transparent brc-default-l3">
+        <h5 class="card-title text-dark-m2 pl-1 text-110">
+            Conversation
+        </h5>
+
+        <div class="card-toolbar align-self-center">
+            <a href="#" data-action="expand" class="card-toolbar-btn text-orange-d2 text-110 d-style">
+                <i class="fa fa-expand d-n-active"></i>
+                <i class="fa fa-compress d-active"></i>
+            </a>
+            <a href="#" data-action="close" class="card-toolbar-btn text-danger-m1 text-110 ml-3">
+                <i class="fa fa-times"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body p-0 border-0">
+      <div class="ace-scroll px-2" data-ace-scroll='{"height": 320, "smooth":true}'>
+
+        {{#each (get "conversation")}}
+            {{#if left}}<!-- if conversation item is on left -->
+                <div class="d-flex px-3 mb-1">
+                    <div>
+                        {{#if avatar}}
+                        <div class="mb-1 mt-4">
+                            <span class="pos-rel">
+                                <img alt="{{name}}'s avatar" src="assets/image/avatar/{{avatar}}" class="radius-round w-4 h-4" />
+                                <span class="radius-round position-tr bgc-{{status}}-d1 brc-white border-2 p-1 mt-n1"></span><!-- the small green dot -->
+                            </span>
+                            <span class="text-600 text-90 ml-1">
+                                <a href="#" class="btn-text-dark btn-h-text-primary">
+                                {{name}}
+                                </a>
+                            </span>
+                            <span class="text-80 text-grey-m2 ml-1">{{time}}</span>
+                        </div>
+                        {{/if}}
+
+                        <div class="py-2 px-3 radius-1 bgc-grey-l4 text-dark-m1 border-1 brc-grey-l2">
+                            <div class="text-90">
+                                {{{message}}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/if}}
+
+            {{#if right}}<!-- if conversation item is on left -->
+                <div class="d-flex flex-row-reverse px-3 text-right mb-1">
+                    <div>
+                        {{#if avatar}}
+                        <div class="mb-1 mt-4">
+                            <span class="pos-rel">
+                                <img alt="{{name}}'s avatar" src="assets/image/avatar/{{avatar}}" class="radius-round w-4 h-4" />
+                                <span class="radius-round position-tr bgc-{{status}}-d1 brc-white border-2 p-1 mt-n1"></span><!-- the small orange dot -->
+                            </span>
+                            <span class="text-600 text-90 ml-1">
+                                <a href="#" class="btn-text-dark btn-h-text-primary">
+                                {{name}}
+                                </a>
+                            </span>
+                            <span class="text-80 text-grey-m2 ml-1">{{time}}</span>
+                        </div>
+                        {{/if}}
+
+                        <div class="py-2 px-3 radius-1 bgc-green-d3 border-1 brc-black-tp11 text-white pos-rel">
+                            <!-- add this dark layer for a darker background -->
+                            <!-- <div class="position-tl w-100 h-100 bgc-black-tp10 radius-1"></div> -->
+                            <div class="text-90 pos-rel">
+                                {{{message}}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/if}}
+        {{/each}}
+
+
+      </div>
+    </div>
+
+
+    <div class="card-footer p-0 bgc-white border-t-1 brc-default-l1 radius-b-1">      
+        <div class="input-group flex-wrap p-3">
+            <input type="text" class="shadow-none form-control form-control-lg brc-on-focus brc-primary-m2 border-0 border-b-1 pl-1 text-100" placeholder="Type your message ..." />
+
+            <div class="input-group-append">
+                <!-- the emoji icon and popup -->
+                <div class="btn-group dropup">
+                    <button type="button" class="btn btn-sm btn-white bg-transparent border-0 py-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="fa-stack w-auto">
+                            <i class="fas fa-circle text-dark fa-stack-1x text-140"></i>
+                            <i class="fas fa-smile text-warning-m3 text-160 fa-stack-1x pos-rel"></i>
+                        </span>
+                    </button>
+
+                    <div class="dropdown-menu dropdown-caret dropdown-menu-right p-1">
+                        <div class="d-flex ">
+                            <a class="dropdown-item px-25" href="#">
+                                <span class="fa-stack w-auto">
+                                    <i class="fas fa-circle text-dark fa-stack-1x"></i>
+                                    <i class="fas fa-smile text-warning-m3 text-125 fa-stack-1x pos-rel"></i>
+                                </span>
+                            </a>
+
+                            <a class="dropdown-item px-25" href="#">
+                                <span class="fa-stack w-auto">
+                                    <i class="fas fa-circle text-dark fa-stack-1x"></i>
+                                    <i class="fas fa-smile-beam text-warning-m3 text-125 fa-stack-1x pos-rel"></i>
+                                </span>
+                            </a>
+
+                            <a class="dropdown-item px-25" href="#">
+                                <span class="fa-stack w-auto">
+                                    <i class="fas fa-circle text-dark fa-stack-1x"></i>
+                                    <i class="fas fa-smile-wink text-warning-m3 text-125 fa-stack-1x pos-rel"></i>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group-append d-block">
+                <button class="btn btn-blue radius-round py-2 text-90 text-600" type="button">
+                    Send
+                    <i class="ml-1 ml-md-2 fa fa-paper-plane text-90"></i>
+                </button>
+            </div>
+        </div><!-- /.input-group -->
+    </div><!-- /.card-footer -->
+
+</div>

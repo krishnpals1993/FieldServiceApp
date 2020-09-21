@@ -1,0 +1,151 @@
+﻿@model IEnumerable<FieldServiceApp.Models.StateViewModel>
+@using Microsoft.Extensions.Options;
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = "State List";
+}
+<div role="main" class="page-content container container-plus">
+    <div class="page-header mb-2 pb-2 flex-column flex-sm-row align-items-start align-items-sm-center py-25 px-1">
+        <h1 class="page-title text-primary-d2 text-140">
+            State(s)
+        </h1>
+
+        <div class="page-tools mt-3 mt-sm-0 mb-sm-n1">
+            <!-- dataTables search box will be inserted here dynamically -->
+        </div>
+    </div>
+
+    <div class="card bcard h-auto">
+        <form autocomplete="off" class="border-t-3 brc-blue-m2">
+
+            <table id="datatable" class="d-style w-100 table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed">
+                <!-- add `collapsed` by default ... it will be removed by default -->
+                <!-- thead with .sticky-nav -->
+                <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
+                    <tr>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            State Name
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Status
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="pos-rel">
+                    @foreach (var item in Model)
+                    {
+                    <tr class="d-style bgc-h-default-l4">
+                        <td>
+                            @item.StateName
+                        </td>
+                        <td>
+                            @if (item.IsActive == 1)
+                            {
+                                <span class="badge badge-success mr-1">
+                                    Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger mr-1">
+                                    In Active
+                                </span>
+
+                            }
+                        </td>
+                        <td class="text-grey">
+                            @if (item.IsActive == 1)
+                            {
+                                @Html.ActionLink("Edit", "EditState", "Master", new { id = item.StateId }) <span>|</span>
+                                <a href="#" onclick="deleteFun('@item.StateId')">Delete</a>
+                            }
+
+                        </td>
+
+                    </tr>
+                    }
+
+                </tbody>
+            </table>
+
+        </form>
+    </div>
+</div>
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib//datatable/dataTables.bootstrap4.css" />
+        <link rel="stylesheet" href="~/lib//datatable/buttons.bootstrap4.css" />
+        <link rel="stylesheet" href="~/pages/datatable/@@page-style.css" />
+    </environment>
+
+}
+
+@section scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib//datatable/jquery.dataTables.js"></script>
+        <script src="~/lib//datatable/dataTables.bootstrap4.js"></script>
+        <script src="~/lib//datatable/dataTables.colReorder.js"></script>
+        <script src="~/lib//datatable/dataTables.select.js"></script>
+        <script src="~/lib//datatable/dataTables.buttons.js"></script>
+        <script src="~/lib//datatable/buttons.bootstrap4.js"></script>
+        <script src="~/lib//datatable/buttons.colVis.js"></script>
+        <script src="~/lib//datatable/buttons.html5.js"></script>
+        <script src="~/lib//datatable/buttons.print.js"></script>
+        <script src="~/pages/datatable/@@page-script.js"></script>
+    </environment>
+    <script type="text/javascript">
+
+            window.baseUrl = '@Settings.Value.WebBaseURL';
+
+            function add() {
+                window.location = window.baseUrl + "/Master/AddState";
+        }
+
+            function deleteFun(id) {
+
+            swal({
+                title: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "No",
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            },
+                function (isConfirm) {
+                    if (!isConfirm)
+                        return;
+
+                  $.ajax({
+                    url: "/Master/DeleteState",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.Status=="1") {
+                            swal(data.Message, "", "success")
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 750);
+
+                        }
+                        else {
+                              swal(data.Message, "", "error")
+                        }
+                    }
+                })
+
+                });
+
+        }
+
+    </script>
+}

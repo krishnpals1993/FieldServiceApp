@@ -196,17 +196,16 @@ namespace FieldServiceApp.Models
         }
 
         public int CustmoerId { get; set; }
-
-        [Required(ErrorMessage = "Please enter company name")]
         public string CompanyName { get; set; }
 
-       
+        [Required(ErrorMessage = "Please enter code")]
+        public string Code { get; set; }
         public string Address { get; set; }
-
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string CompanyType { get; set; } 
         public int ? CityId { get; set; }
-
         public int ?  StateId { get; set; }
-
         public string FirstName { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
@@ -360,6 +359,7 @@ namespace FieldServiceApp.Models
         //[Required(ErrorMessage = "Please select ship date")]
         public DateTime? ShipStartDate { get; set; }
         public DateTime? ShipEndDate { get; set; }
+        public DateTime? ShipDate { get; set; }
         public DateTime? CancelDate { get; set; }
         public string CancelReason { get; set; }
         public Int16 IsActive { get; set; }
@@ -428,22 +428,31 @@ namespace FieldServiceApp.Models
     }
     public class CityViewModel
     {
+        public CityViewModel()
+        {
+            StateList = new List<StateViewModel>();
+        }
         public int CityId { get; set; }
 
+        [Required(ErrorMessage = "Please enter city name")]
         public string CityName { get; set; }
 
+        [Required(ErrorMessage = "Please select state")]
         public int StateId { get; set; }
+        public string StateName { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public List<StateViewModel> StateList { get; set; }
     }
     public class StateViewModel
     {
 
         public int StateId { get; set; }
 
+        [Required(ErrorMessage = "Please select state name")]
         public string StateName { get; set; }
 
         public Int16 IsActive { get; set; }
@@ -502,7 +511,6 @@ namespace FieldServiceApp.Models
         public string ConfirmPassword { get; set; }
 
     }
-
     public class EmployeeMasterEditViewModel
     {
         public int EmployeeId { get; set; }
@@ -529,7 +537,6 @@ namespace FieldServiceApp.Models
        
 
     }
-
     public class DashboardViewModel
     {
         public List<OrderMasterViewModel> OrderList { get; set; }
@@ -542,7 +549,6 @@ namespace FieldServiceApp.Models
         }
 
     }
-
     public class DashboardOrderViewModel
     {
         public DashboardOrderViewModel()
@@ -562,7 +568,6 @@ namespace FieldServiceApp.Models
         public string ItemDescription { get; set; }
         public List<EmployeeMasterViewModel> EmployeeList { get; set; }
     }
-
     public class ServiceFormViewModel
     {
         public ServiceFormViewModel()
@@ -601,13 +606,11 @@ namespace FieldServiceApp.Models
         public List<ServiceFormOrderViewModel> OrderList { get; set; }
         public List<ItemCategoryViewModel> ItemCategoryList { get; set; }
     }
-
     public class ServiceFormOrderViewModel
     {
         public int OrderId { get; set; }
         public string CustomerName { get; set; }
     }
-
     public class ItemCategoryViewModel
     {
         public int CategoryId { get; set; }

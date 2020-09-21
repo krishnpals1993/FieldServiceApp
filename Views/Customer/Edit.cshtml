@@ -5,6 +5,10 @@
 @{
 
     ViewData["Title"] = "Edit Customer";
+    List<string> CompanyTypeList = new List<string>();
+    CompanyTypeList.Add("Business");
+    CompanyTypeList.Add("Residential");
+
 }
 <div role="main" class="page-content container container-plus">
     <div class="card bcard mt-2 mt-lg-3">
@@ -17,7 +21,21 @@
         <div class="card-body px-3 pb-1">
             <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Customer/Edit" method="post">
                 @Html.HiddenFor(h => h.CustmoerId)
+
                 <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Company Code
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.Code,
+                        new { @placeholder = "Code", @class = "form-control" })
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             Company Name
@@ -30,7 +48,17 @@
                         <span asp-validation-for="CompanyName" class="text-danger"></span>
                     </div>
 
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Company Type
+                        </label>
+                    </div>
 
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.CompanyType, new SelectList(CompanyTypeList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select company type" })
+                    </div>
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             State
@@ -43,7 +71,6 @@
                     </div>
 
                 </div>
-
                 <div class="form-group row">
 
 
@@ -69,6 +96,35 @@
                         new { @placeholder = "Address", @class = "form-control" })
                         <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Zip 1
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.Zip1,
+                        new { @placeholder = "Zip 1", @class = "form-control" })
+                        <span asp-validation-for="Zip1" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Zip 2
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.Zip2,
+                        new { @placeholder = "Zip 2", @class = "form-control" })
+                        <span asp-validation-for="Zip2" class="text-danger"></span>
+                    </div>
+
+
                 </div>
 
 
@@ -392,6 +448,16 @@
                 }
             })
         }
+
+             $("#CompanyName").on("change", function () {
+            if ($("#CompanyName").val()) {
+                $("#CompanyType").val("Business");
+                $("#CompanyType").attr("readonly","readonly"); 
+            }
+            else {
+                   $("#CompanyType").removeAttr("readonly");
+            }
+        });
 
     </script>
 }

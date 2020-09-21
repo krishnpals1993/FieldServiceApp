@@ -1,0 +1,85 @@
+<div class="bcard card h-100 pt-1 pt-lg-2">
+
+    <div class="card-header brc-secondary-l3">
+        <h5 class="card-title text-dark-m2 pl-1 text-110">
+            Popular Products
+        </h5>
+
+        <div class="card-toolbar align-self-center no-border">
+            <span class="badge badge-pill bgc-secondary-l3 text-secondary-d3 mr-1">10+ more</span>
+        </div>
+
+        <div class="card-toolbar align-self-center">
+            <div class="dropdown dd-backdrop dd-backdrop-none-md">
+                <a href="#" class="card-toolbar-btn text-grey-l1 text-110 dropdown-toggle" role="button" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-ellipsis-h"></i>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-right dropdown-caret dropdown-animated dd-appear-center dd-slide-none-md p-3px mr-n2 mw-auto shadow-sm radius-1 brc-secondary-l1">
+                    <div class="dropdown-inner">
+                        <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
+                            <i class="fa fa-cog mr-1 text-blue"></i>
+                            Some action
+                        </a>
+                        <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
+                            <i class="fas fa-tools text-blue mr-1"></i>
+                            Another action
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card-body p-0">
+       <div class="table-responsive-md">
+
+        <table class="table table-striped-primary table-borderless border-0 mb-0">
+            <tbody>
+                <tr></tr><!-- empty tr, so table-striped color starts from second row -->
+
+                {{#each (get "products")}}
+                <tr>
+                    <td class="text-secondary pl-2 pl-lg-4 w-3">
+                        <img alt="{{title}}'s image" src="assets/image/product/{{image}}" class="radius-1 mr-2 w-6" />
+                    </td>
+
+                    <td class="font-bolder">
+                        <span class="text-dark-m2 text-90">
+                            <a href="#" class="text-95 btn-text-dark btn-h-text-pink no-underline">
+                            {{title}}
+                            </a>
+                        </span>
+                        <br />
+                        <span class="text-secondary-m2 text-80">
+                            {{description}}
+                        </span>
+                    </td>
+                    
+                    <td class="text-80">
+                        {{#if 3star}}
+                            <i class="fa fa-star text-orange-m2"></i>
+                            <i class="fa fa-star text-orange-m2"></i>
+                            <i class="fa fa-star text-orange-m2"></i>
+                        {{/if}}
+                        {{#unless 3star}}
+                            <i class="fa fa-star text-orange-m2"></i>
+                            <i class="fa fa-star text-orange-m2"></i>
+                            <i class="fa fa-star text-grey-l1"></i>
+                        {{/unless}}
+                    </td>
+
+                    <td class="font-bolder text-80 text-grey-d2 text-right pr-2 pr-lg-3">
+                        {{price}}
+                    </td>
+                </tr>
+                {{/each}}
+
+            </tbody>
+        </table>
+
+       </div><!-- /.table-responsive-md -->
+    </div><!-- /.card-body -->
+
+</div>

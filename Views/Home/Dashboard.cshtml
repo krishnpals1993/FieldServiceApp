@@ -253,7 +253,7 @@
                 </div>
 
                 <div class="col-12 col-md-3 mt-3 mt-md-0" id='external-events'>
-                    <div class="bgc-white shadow-sm p-35 radius-1" >
+                    <div class="bgc-white shadow-sm p-35 radius-1">
                         <p class="text-120 text-primary-d2">
                             Order (Without Ship Date)
                         </p>
@@ -266,7 +266,7 @@
                             @foreach (var item in Model.OrderList.Where(w => w.ShipStartDate == null))
                             {
 
-                                <div style="cursor:pointer" onclick="showOrderDetail(@item.OrderId)" 
+                                <div style="cursor:pointer" onclick="showOrderDetail(@item.OrderId)"
                                      class="fc-event badge bgc-blue-d1 text-white border-0 py-2 text-90 mb-1 radius-2px"
                                      data-class="bgc-blue-d1 text-white text-95">
                                     Order #<span>@item.OrderId</span> <br />
@@ -372,6 +372,10 @@
         .topBar {
             display: block !important;
         }
+
+        #calendar .extEvt {
+            display: none !important;
+        }
     </style>
 }
 
@@ -397,17 +401,18 @@
                 for (var i = 0; i <  window.orderList.length; i++) {
                     arr.push({
                         id: window.orderList[i]['OrderId'],
-                    resourceId: window.orderList[i]['EmployeeId'],
-                title: window.orderList[i]['CustomerName']  + '<br/>' +  window.orderList[i]['EmployeeName'],
-                start: new Date(window.orderList[i]['ShipStartDate']),
-                end: window.orderList[i]['ShipEndDate'] == null ? null : new Date( window.orderList[i]['ShipEndDate']),
+                        resourceId: window.orderList[i]['EmployeeId'],
+                        title: window.orderList[i]['CustomerName'] + '<br/>' + window.orderList[i]['EmployeeName'],
+                        start: new Date(window.orderList[i]['ShipStartDate']),
+                        end: window.orderList[i]['ShipEndDate'] == null ? null : new Date(window.orderList[i]['ShipEndDate']),
                         allDay: false,
-                extendedProps:window.orderList[i],
-                className: 'bgc-info text-white text-75'})
+                        extendedProps: window.orderList[i],
+                        className: 'bgc-info text-white text-75'
+                    });
             }
             }
             }
-            console.log(arr);
+            window.calenderEvents = arr;
             return arr;
 
         }
@@ -451,10 +456,9 @@
         }
 
         function updateOrderDate(orderId,start,end,callback) {
-
             var data = {
-                'orderId': orderId, 'start': (start==null ? null : new moment(start).format("MM/DD/YYYY HH:MM")) ,
-                'end': (end==null ? null : new moment(end).format("MM/DD/YYYY HH:MM"))
+                'orderId': orderId, 'start': (start==null ? null : new moment(start).format("MM/DD/YYYY HH:mm")) ,
+                'end': (end==null ? null : new moment(end).format("MM/DD/YYYY HH:mm"))
             };
             console.log(data);
             $.ajax({
@@ -463,21 +467,19 @@
                 dataType: "json",
                 data: data,
                 success: function (data) {
-                    if (data.Status == "1") {
-                        callback()
-                        //alert(data.Message)
-                    }
-                    else {
-                        callback();
-                        //alert(data.Message)
-                    }
+                     callback(data)
+                },
+                error: function (data) {
+                    debugger;
+
                 }
             })
 
         }
- 
+
+
         function updateOrder(orderId) {
-          
+
             var employeeId = $("#EmployeeId").val();
 
             if (!employeeId) {
@@ -487,7 +489,7 @@
 
 
               var data = {
-                  'orderId': orderId, 
+                  'orderId': orderId,
                    'employeeId': employeeId
                 };
             console.log(data);

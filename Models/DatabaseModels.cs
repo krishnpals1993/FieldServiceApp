@@ -104,6 +104,10 @@ namespace FieldServiceApp.Models
         public int CityId { get; set; }
         public int StateId { get; set; }
         public string FirstName { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string Code { get; set; }
+        public string CompanyType { get; set; }
         public Int16  IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
@@ -203,6 +207,7 @@ namespace FieldServiceApp.Models
         public int ShipId { get; set; }
         public DateTime ? ShipStartDate { get; set; }
         public DateTime ? ShipEndDate { get; set; }
+        public DateTime? ShipDate { get; set; }
         public DateTime? CancelDate { get; set; }
         public string CancelReason { get; set; }
         public Int16  IsActive { get; set; }

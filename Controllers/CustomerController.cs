@@ -118,6 +118,10 @@ namespace FieldServiceApp.Controllers
                         CityId = model.CityId == null ? 0 : model.CityId.Value,
                         StateId = model.StateId == null ? 0 : model.StateId.Value,
                         Address = model.Address,
+                        CompanyType = model.CompanyType,
+                        Zip1 = model.Zip1,
+                        Zip2= model.Zip2,
+                        Code = model.Code,
                         IsActive = 1,
                         CreatedBy = 1,
                         CreatedDate = DateTime.Now
@@ -231,7 +235,10 @@ namespace FieldServiceApp.Controllers
                     model.CityId = checkCustomer.CityId;
                     model.StateId = checkCustomer.StateId;
                     model.CustmoerId = checkCustomer.CustmoerId;
-
+                    model.Zip1 = checkCustomer.Zip1;
+                    model.Zip2 = checkCustomer.Zip2;
+                    model.CompanyType = checkCustomer.CompanyType;
+                    model.Code = checkCustomer.Code;
 
                     var checkCustomerContacts = _dbContext.tbl_CustmoerContact.Where(w => w.CustmoerId == _customerId).ToList();
 
@@ -325,12 +332,13 @@ namespace FieldServiceApp.Controllers
 
                     checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustmoerId == model.CustmoerId).FirstOrDefault();
 
-
-
                     checkCustomer.CompanyName = model.CompanyName;
                     checkCustomer.CityId = model.CityId == null ? 0 : model.CityId.Value;
                     checkCustomer.StateId = model.StateId == null ? 0 : model.StateId.Value;
                     checkCustomer.Address = model.Address;
+                    checkCustomer.Zip1 = model.Zip1;
+                    checkCustomer.Zip2 = model.Zip2;
+                    checkCustomer.Code = model.Code;
                     checkCustomer.ModifiedBy = 1;
                     checkCustomer.ModifiedDate = DateTime.Now;
 

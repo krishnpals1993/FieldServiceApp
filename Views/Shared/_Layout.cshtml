@@ -220,7 +220,6 @@
                                                 </li>
                                             </ul>
                                         </div>
-
                                         <b class="sub-arrow"></b>
 
                                     </li>
@@ -228,7 +227,7 @@
                                     <li class="nav-item @((routeControl=="Order")  ?"active open":"" )">
 
                                         <a class="nav-link dropdown-toggle @(routeControl!="Order" ?"collapsed":"" )">
-                                            <i class="nav-icon fa fa-first-order-alt"></i>
+                                            <i class="nav-icon fab fa-first-order-alt"></i>
                                             <span class="nav-text fadeable">
                                                 <span>Order</span>
                                             </span>
@@ -306,6 +305,48 @@
 
                                                         <span class="nav-text">
                                                             <span>Users</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <b class="sub-arrow"></b>
+
+                                    </li>
+
+                                    <li class="nav-item @((routeControl=="Master")  ?"active open":"" )">
+
+                                        <a href="#" class="nav-link dropdown-toggle @(routeControl!="Master" ?"collapsed":"" )">
+                                            <i class="nav-icon fa fa-cogs"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Master</span>
+                                            </span>
+
+                                            <b class="caret fa fa-angle-left rt-n90"></b>
+                                        </a>
+
+                                        <div class="hideable submenu @(routeControl!="Master" ?"collapse":"" )">
+                                            <ul class="submenu-inner">
+
+                                                <li class="nav-item @((routeControl=="Master" &&
+                                        (routeAction=="StateList" || routeAction=="AddState" || routeAction=="EditState"))  ?"active":"" )">
+
+                                                    <a href="~/User/StateList" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>States</span>
+                                                        </span>
+                                                    </a>
+
+
+                                                </li>
+                                                <li class="nav-item @((routeControl=="Master" &&
+                                        (routeAction=="CityList") || (routeAction=="AddCity")|| (routeAction=="EditCity"))  ?"active":"" )">
+                                                    <a href="~/User/CityList" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>City</span>
                                                         </span>
                                                     </a>
                                                 </li>
