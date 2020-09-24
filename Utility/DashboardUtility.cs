@@ -43,7 +43,7 @@ namespace FieldServiceApp.Utility
                          ShipStartDate = order.ShipStartDate,
                          ShipEndDate = order.ShipEndDate,
                          CustomerName = customer.CompanyName,
-                         EmployeeName = employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName,
+                         EmployeeName = (employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName)??"",
                          EmployeeId = orderAssign1.EmployeeId,
                          CustomerShipAddress = city.CityName + " " + state.StateName + " " + shipping.Address,
                          ItemName = item.ItemCd,
@@ -93,12 +93,13 @@ namespace FieldServiceApp.Utility
                                        join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                                        select new OrderMasterViewModel
                                        {
+                                           OrderNo = order.OrderNo,
                                            OrderId = order.OrderId,
                                            OrderDate = order.OrderDate,
                                            ShipStartDate = order.ShipStartDate,
                                            ShipEndDate = order.ShipEndDate,
                                            CustomerName = customer.CompanyName,
-                                           EmployeeName = employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName,
+                                           EmployeeName = (employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName)??"",
                                            TotalAmount = order.TotalAmount,
                                            EmployeeId = orderAssign1.EmployeeId,
                                            CustomerShipAddress = city.CityName + " " + state.StateName + " " + shipping.Address,

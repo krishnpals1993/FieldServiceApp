@@ -297,7 +297,7 @@
                                 <table class="table table-border-x brc-secondary-l3 mb-0">
                                     <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
                                         <tr class="text-80 text-white bgc-blue">
-                                            <th class="pl-2 pl-lg-4">ID</th>
+                                            <th class="pl-2 pl-lg-4">No</th>
                                             <th>Order Date</th>
                                             <th>Customer</th>
                                             <th>Ship Date</th>
@@ -313,7 +313,7 @@
                                             <tr class="bgc-h-secondary-l4">
                                                 <td class="pl-2 pl-lg-4">
                                                     <a href="#" class="text-95 text-primary text-600">
-                                                        #@item.OrderId
+                                                        #@item.OrderNo
                                                     </a>
                                                 </td>
 
@@ -376,6 +376,12 @@
         #calendar .extEvt {
             display: none !important;
         }
+
+        #calendar .bgc-blue-d1
+        {
+            display:none !important;
+
+        }
     </style>
 }
 
@@ -418,15 +424,16 @@
         }
 
         function getResource() {
-
+            console.log(window.employeeList);
             var arr = [];
              var filterArray = [];
-            for (var i = 0; i < window.orderList.length; i++) {
-                if (window.orderList[i]['ShipStartDate'] != null) {
-                    arr.push(window.orderList[i]['EmployeeId']);
-                    filterArray.push(window.orderList[i]);
+            for (var i = 0; i <  window.employeeList.length; i++) {
+                {
+                    arr.push(window.employeeList[i]['EmployeeId']);
+                    filterArray.push(window.employeeList[i]);
                 }
             }
+            arr.push(0);
 
             arr = $.unique(arr);
             var resourceArray = [];
@@ -447,12 +454,39 @@
             var name = "";
             for (var i = 0; i < filterArray.length; i++) {
                 if (filterArray[i]["EmployeeId"] == id) {
-                    name = filterArray[i]["EmployeeName"];
+                    name = filterArray[i]["FirstName"] +" "+filterArray[i]["LastName"];
                     break;
                 }
 
             }
             return name;
+        }
+
+        
+
+         function updateOrderAssignee(orderId,start,end,employeeId,callback) {
+            var data = {
+                'orderId': orderId,
+                'start': (start==null ? null : new moment(start).format("MM/DD/YYYY HH:mm")) ,
+                'end': (end==null ? null : new moment(end).format("MM/DD/YYYY HH:mm")),
+                'employeeId': employeeId,
+                'status' : "day"
+            };
+            console.log(data);
+            $.ajax({
+                url: "/Order/UpdateOrderDate",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (data) {
+                     callback(data)
+                },
+                error: function (data) {
+                    debugger;
+
+                }
+            })
+
         }
 
         function updateOrderDate(orderId,start,end,callback) {

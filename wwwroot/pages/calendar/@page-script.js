@@ -84,30 +84,61 @@ jQuery(function ($) {
         selectLongPressDelay: 200,
         editable: true,
         droppable: true,
-        drop: function (info) {
+        drop: function (info, event, a, b) {
+            if (info.draggedEl.parentNode) {
                 updateOrderDate(info.draggedEl.children[0].innerHTML, info.date, null,
-                function (data) {
-                    window.calendar.addEvent({
-                        id: data['OrderId'],
-                        resourceId: data['EmployeeId'],
-                        title: data.CustomerName + '<br/>' + data['EmployeeName'],
-                        start: new Date(data['ShipStartDate']),
-                        end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
-                        allDay: false,
-                        extendedProps: data,
-                        className: 'bgc-info text-white text-75'
+                    function (data) {
+
+                        window.calendar.addEvent({
+                            id: data['OrderId'],
+                            resourceId: data['EmployeeId'],
+                            title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                            start: new Date(data['ShipStartDate']),
+                            end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
+                            allDay: false,
+                            extendedProps: data,
+                            className: 'bgc-info text-white text-75'
+                        });
                     });
-               });
-            info.draggedEl.parentNode.removeChild(info.draggedEl);
-            if (info) {
-                info.event.remove();
+                info.draggedEl.parentNode.removeChild(info.draggedEl);
+                return false;
             }
+                
+            //if (info) {
+            //    if (info.event) {
+            //        info.event.remove();
+            //    }
+               
+            //}
 
         },
         eventDrop: function (info) {
-            updateOrderDate(info.event.id, info.event.start, info.event.end, function () {
+            if (info.view.type =="resourceTimeGridDay") {
+                updateOrderAssignee(info.event.id, info.event.start, info.event.end, info.event._def.resourceIds.toString(),
+                    function (data) {
+                        window.calendar.addEvent({
+                            id: data['OrderId'],
+                            resourceId: data['EmployeeId'],
+                            title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                            start: new Date(data['ShipStartDate']),
+                            end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
+                            allDay: false,
+                            extendedProps: data,
+                            className: 'bgc-info text-white text-75'
+                        });
 
-            });
+                    });
+                if (info.event) {
+                    info.event.remove();
+                }
+                
+            }
+            else {
+                updateOrderDate(info.event.id, info.event.start, info.event.end, function () {
+
+                });
+            }
+            
         },
         slotDuration: '00:15:00',
         eventResize: function (info) {

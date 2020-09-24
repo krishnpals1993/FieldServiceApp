@@ -28,6 +28,7 @@ namespace FieldServiceApp.Models
         public DbSet<EmployeeMaster> tbl_EmployeeMaster { get; set; }
         public DbSet<ItemCategory> tbl_ItemCategory { get; set; }
         public DbSet<ServiceFormLog> tbl_ServiceFormLogs { get; set; }
+        public DbSet<CustomerShippingApartment> tbl_CustomerShippingApartments { get; set; }
 
     }
 
@@ -200,7 +201,7 @@ namespace FieldServiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int OrderId { get; set; }
-
+        public int OrderNo { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
         public int CustomerId { get; set; }
@@ -215,6 +216,7 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string ApartmentIds { get; set; }
     }
 
     [Table("OrderDetail")]
@@ -356,8 +358,23 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public int? ApartmentId { get; set; }
     }
 
-
+    [Table("CustomerShippingApartment")]
+    public class CustomerShippingApartment
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ApartmentId { get; set; }
+        public int ShipId { get; set; }
+        public string ApartmentNo { get; set; }
+        public string ApartmentName { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
 
 }

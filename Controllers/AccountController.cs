@@ -71,6 +71,7 @@ namespace FieldServiceApp.Controllers
             }
             catch (Exception ex)
             {
+                var a = "";
 
             }
 

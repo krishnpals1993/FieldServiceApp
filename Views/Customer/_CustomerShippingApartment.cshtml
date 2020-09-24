@@ -1,0 +1,35 @@
+﻿@model FieldServiceApp.Models.CustomerShippingApartmentViewModel
+    <div class="form-group row">
+
+        <div class="col-sm-2 col-form-label text-sm-right pr-0">
+            <label for="id-form-field-1" class="mb-0">
+                Apartment No
+            </label>
+        </div>
+        <div class="col-sm-3">
+            @Html.TextBoxFor(m => m.ApartmentNo,
+            new { @placeholder = "ApartmentNo", @class = "form-control", id = "Shippings_" + ViewBag.parentIndex + "__ApartmentList_" + ViewBag.index + "__ApartmentNo", @name1 = "Shippings[" + ViewBag.parentIndex + "].ApartmentList[" + ViewBag.index + "].ApartmentNo" })
+            <span asp-validation-for="ApartmentNo" class="text-danger"></span>
+        </div>
+
+        <div class="col-sm-2 col-form-label text-sm-right pr-0">
+            <label for="id-form-field-1" class="mb-0">
+                Apartment Name
+            </label>
+        </div>
+        <div class="col-sm-3">
+            @Html.TextBoxFor(m => m.ApartmentName,
+               new { @placeholder = "Apartment Name", @class = "form-control", id = "Shippings_" + ViewBag.parentIndex + "__ApartmentList_" + ViewBag.index + "__ApartmentName", @name1 = "Shippings[" + ViewBag.parentIndex + "].ApartmentList[" + ViewBag.index + "].ApartmentName" })
+            <span asp-validation-for="ApartmentName" class="text-danger"></span>
+        </div>
+        <div class="col-lg-2">
+            <button onclick="addShippingApartment('@ViewBag.parentIndex')" type="button"
+                    class="btnAddApartment btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                Add
+                <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+            </button>
+        </div>
+    </div>
+
+ 
+<hr class="border-dashed" />

@@ -340,17 +340,35 @@ CREATE TABLE "ServiceFormLogs"
     "ModifiedDate" timestamp without time zone
 );
 
+-----------------------------------------------------------
+
+Alter table "OrderMaster" Add "OrderNo" int;
 
 
+CREATE TABLE "CustomerShippingApartment"
+(
+    "ApartmentId" serial PRIMARY KEY, 
+	"ShipId" int ,
+    "ApartmentNo" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "ApartmentNo" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+	"IsActive" smallint DEFAULT NULL::"bit",
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
 
 
+Alter table  "ServiceFormLogs" Add "ApartmentId" int ;
+
+Alter table "OrderMaster" Add "ShipDate" timestamp;
 
 
+Alter table "CustomerMaster" Alter column "Code" type varchar(45);
 
-
-
-
+ALter table "OrderMaster" Add "ApartmentIds" varchar(250);
 	
 	
+
 
 

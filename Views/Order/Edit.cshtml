@@ -16,7 +16,24 @@
 
         <div class="card-body px-3 pb-1">
             <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Order/Edit" method="post">
-                @Html.HiddenFor(h=>h.OrderId)
+                @Html.HiddenFor(h => h.OrderId)
+                @Html.HiddenFor(h => h.ApartmentIds)
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Order No
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="input-group date">
+                            @Html.TextBoxFor(m => m.OrderNo,
+                            new { @placeholder = "Order No", min = "1", type = "number", @class = "form-control" })
+                            <span asp-validation-for="OrderNo" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
                 <div class="form-group row">
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
@@ -32,6 +49,7 @@
                                     <i class="far fa-calendar"></i>
                                 </div>
                             </div>
+                            <span asp-validation-for="OrderNo" class="text-danger"></span>
                         </div>
 
                     </div>
@@ -80,7 +98,19 @@
                     </div>
                 </div>
 
+                <div class="form-group row" id="ApartmentIdPenal" style="display:none">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Apartment
+                        </label>
+                    </div>
 
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.ApartmentId, new SelectList(Model.ApartmentList.Select(x => new { Value = x.ApartmentId, Text = x.ApartmentNo }), "Value", "Text"),
+                       "Select Apartment", new { @class = "form-control chosen-select", @multiple = "", @placeholder = "Select Apartment" })
+                        <span asp-validation-for="ApartmentId" class="text-danger"></span>
+                    </div>
+                </div>
 
                 <h3 class="card-title text-125">
                     Item detail
@@ -141,7 +171,7 @@
                     </div>
                     <div class="col-sm-5">
                         @Html.TextBoxFor(m => m.Description,
-                         new { @placeholder = "Description", @class = "form-control" })
+                         new { @placeholder = "Description", @class = "form-control", @readonly = "@readonly" })
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                 </div>
@@ -155,9 +185,9 @@
                     </div>
 
                     <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.AssigneeId, 
-                       new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"), 
-                       "Select Employee", new { @class = "form-control", @placeholder = "Select Employee"  })
+                        @Html.DropDownListFor(model => model.AssigneeId,
+                       new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"),
+                       "Select Employee", new { @class = "form-control", @placeholder = "Select Employee" })
                         <span asp-validation-for="AssigneeId" class="text-danger"></span>
                     </div>
 
@@ -208,6 +238,7 @@
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+        <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
     </environment>
     <style>
         hr {
@@ -218,17 +249,55 @@
 
 @section scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <environment names="Development,Staging,Production">
-        <script src="~/lib/moment/moment.js"></script>
-        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
-        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
-        <script src="~/pages/form-basic/@@page-script.js"></script>
-    </environment>
+<environment names="Development,Staging,Production">
+    <script src="~/lib/moment/moment.js"></script>
+    <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+    <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+    <script src="~/pages/form-basic/@@page-script.js"></script>
+    <script src="~/lib/chosen-js/chosen.jquery.js"></script>
+</environment>
+    <script type="text/javascript">
+        // Restricts input for each element in the set of matched elements to the given inputFilter.
+        (function ($) {
+            $.fn.inputFilter = function (inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            };
+        }(jQuery));
+    </script>
     <script type="text/javascript">
         $(document).ready(function () {
+
+             $("#OrderNo").inputFilter(function(value) {
+                 return /^-?\d*[.,]?\d*$/.test(value);
+             });
+
+             var checkHrGroupVal = $("#ApartmentIds").val();
+            if (checkHrGroupVal) {
+                var arr = checkHrGroupVal.split(",");
+                for (var i = 0; i < arr.length; i++) {
+                    arr[i] = arr[i].trim(); 
+                }
+                $("#ApartmentId").val(arr);
+                debugger;
+                $("#ApartmentIdPenal").show();
+                    //.trigger("chosen:updated");
+            }
+
+
             var shipId = '@Model.ShipId';
             setTimeout(function () {
-                  $("#id-date-1").val(new moment().format("MM/DD/YYYY"));   
+                  $("#id-date-1").val(new moment().format("MM/DD/YYYY"));
             }, 0);
 
             // ship date
@@ -236,7 +305,7 @@
 
              $("#ShipId").html('');
              var data = {
-                'CustomerId':  $("#CustomerId").val(), 
+                'CustomerId':  $("#CustomerId").val(),
             };
             console.log(data);
             $.ajax({
@@ -245,16 +314,16 @@
                 dataType: "json",
                 data: data,
                 success: function (response) {
-                if (response.length > 0) {  
-                $('#ShipId').html('');  
-                var options = '';  
-                options += '<option value="">Select Ship Address</option>';  
-                for (var i = 0; i < response.length; i++) {  
-                    options += '<option value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';  
-                }  
-                    $('#ShipId').append(options);  
+                if (response.length > 0) {
+                $('#ShipId').html('');
+                var options = '';
+                options += '<option value="">Select Ship Address</option>';
+                for (var i = 0; i < response.length; i++) {
+                    options += '<option value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
+                }
+                    $('#ShipId').append(options);
                     $('#ShipId').val(shipId);
-            }  
+            }
                 }
             })
 
@@ -277,8 +346,9 @@
             $("#ItemId").on("change", function () {
                 if ($("#ItemId").val()) {
                     var price = getItemPrice($("#ItemId").val());
-
-                  $("#PerUnitPrice").val(price);
+                      var description = getItemDescription($("#ItemId").val());
+                    $("#PerUnitPrice").val(price);
+                    $("#Description").val(description);
                   if ($("#Quantity").val()) {
                   var quantity = Number($("#Quantity").val());
                   var perUnitPrice = Number($("#PerUnitPrice").val());
@@ -291,7 +361,9 @@
               }
               }
               else {
-                  $("#PerUnitPrice").html('');
+                      $("#PerUnitPrice").val('');
+                    $("#Description").val('');
+              
               }
 
 
@@ -327,10 +399,22 @@
             return price;
         }
 
+           function getItemDescription(itemId) {
+            var description = 0;
+            for (var i = 0; i <  window.itemList.length; i++) {
+                if (window.itemList[i]["ItemId"].toString()== itemId) {
+                    description = window.itemList[i]["ItemDescription"];
+                    i = window.itemList.length;
+                    break;
+                }
+            }
+            return description;
+        }
+
         $("#CustomerId").on("change", function () {
             $("#ShipId").html('');
              var data = {
-                'CustomerId':  $("#CustomerId").val(), 
+                'CustomerId':  $("#CustomerId").val(),
             };
             console.log(data);
             $.ajax({
@@ -340,15 +424,49 @@
                 data: data,
                 success: function (response) {
                     debugger;
-                   if (response.length > 0) {  
-                $('#ShipId').html('');  
-                var options = '';  
-                options += '<option value="">Select Ship Address</option>';  
-                for (var i = 0; i < response.length; i++) {  
-                    options += '<option value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';  
-                }  
-                $('#ShipId').append(options);  
-            }  
+                   if (response.length > 0) {
+                $('#ShipId').html('');
+                var options = '';
+                options += '<option value="">Select Ship Address</option>';
+                for (var i = 0; i < response.length; i++) {
+                    options += '<option value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
+                }
+                $('#ShipId').append(options);
+            }
+                }
+            })
+        });
+
+           $("#ShipId").on("change", function () {
+            $("#ApartmentId").html('');
+             var data = {
+                'ShipId':  $("#ShipId").val(),
+            };
+
+            if ($("#ShipId").val()) {
+                $("#ApartmentIdPenal").show();
+            } else {
+                $("#ApartmentIdPenal").hide();
+            }
+
+            console.log(data);
+            $.ajax({
+                url: "/Order/GetCustomerShippingApartment",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+                    debugger;
+                   if (response.length > 0) {
+                $('#ApartmentId').html('');
+                var options = '';
+                options += '<option value="">Select Apartment Address</option>';
+                for (var i = 0; i < response.length; i++) {
+                    options += '<option value="' + response[i]['ApartmentId'] + '">' + response[i]['ApartmentNo'] + '</option>';
+                }
+                       $('#ApartmentId').append(options);
+                       //$('#ApartmentId').val('').trigger('chosen:updated');
+            }
                 }
             })
         });

@@ -33,6 +33,10 @@
                         </th>
 
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Apartment
+                        </th>
+
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                             Date Of Service
                         </th>
 
@@ -61,62 +65,66 @@
                 <tbody class="pos-rel">
                     @foreach (var item in Model)
                     {
-                        <tr class="d-style bgc-h-default-l4">
-                            <td>
-                                @item.CustomerName
-                            </td>
+                    <tr class="d-style bgc-h-default-l4">
+                        <td>
+                            @item.CustomerName
+                        </td>
 
-                            <td class="text-grey">
-                                #@item.OrderId
-                            </td>
+                        <td class="text-grey">
+                            #@item.OrderId
+                        </td>
 
-                            <td class="text-grey">
-                                @item.DateOfService?.ToString("MM/dd/yyyy")
-                            </td>
+                        <td class="text-grey">
+                            @item.ApartmentName
+                        </td>
 
-                            <td class="text-grey">
-                                @item.CategoryName
-                            </td>
+                        <td class="text-grey">
+                            @item.DateOfService?.ToString("MM/dd/yyyy")
+                        </td>
 
-                            <td class="text-grey">
-                                @item.ItemCd
-                            </td>
+                        <td class="text-grey">
+                            @item.CategoryName
+                        </td>
 
-                            <td class="text-grey">
-                                @item.Quantity
-                            </td>
+                        <td class="text-grey">
+                            @item.ItemCd
+                        </td>
 
-                            <td class="text-grey">
-                                @item.Locations
-                            </td>
-                            <td>
-                                @if (item.IsActive == 1)
-                                {
-                                    <span class="badge badge-success mr-1">
-                                        Active
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-danger mr-1">
-                                        In Active
-                                    </span>
+                        <td class="text-grey">
+                            @item.Quantity
+                        </td>
 
-                                }
-                            </td>
+                        <td class="text-grey">
+                            @item.Locations
+                        </td>
+                        <td>
+                            @if (item.IsActive == 1)
+                            {
+                                <span class="badge badge-success mr-1">
+                                    Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger mr-1">
+                                    In Active
+                                </span>
 
-                            <td class="text-grey">
-                                @if (item.IsActive == 1)
-                                {
-                                    @Html.ActionLink("Edit", "Edit", "Service", new { id = item.ServiceFormLogId })
-                                    <span>|</span>
-                                    <a href="#" onclick="deleteFun('@item.ServiceFormLogId')">Delete</a>
-                                }
+                            }
+                        </td>
+
+                        <td class="text-grey">
+                            @if (item.IsActive == 1)
+                            {
+                                @Html.ActionLink("Edit", "Edit", "Service", new { id = item.ServiceFormLogId })
+                                <span>|</span>
+                                <a href="#" onclick="deleteFun('@item.ServiceFormLogId')">Delete</a>
+                            }
 
 
-                            </td>
+                        </td>
 
-                        </tr>
+                    </tr>
                     }
 
                 </tbody>

@@ -203,9 +203,9 @@ namespace FieldServiceApp.Models
         public string Address { get; set; }
         public string Zip1 { get; set; }
         public string Zip2 { get; set; }
-        public string CompanyType { get; set; } 
-        public int ? CityId { get; set; }
-        public int ?  StateId { get; set; }
+        public string CompanyType { get; set; }
+        public int? CityId { get; set; }
+        public int? StateId { get; set; }
         public string FirstName { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
@@ -234,6 +234,7 @@ namespace FieldServiceApp.Models
 
         public string LastName { get; set; }
 
+        [EmailAddress(ErrorMessage ="Please enter valid email")]
         public string Email { get; set; }
 
         public string Phone { get; set; }
@@ -247,15 +248,18 @@ namespace FieldServiceApp.Models
     {
         public CustmoerShippingViewModel()
         {
-            
+
             StateList = new List<StateViewModel>();
             CityList = new List<CityViewModel>();
+            ApartmentList = new List<CustomerShippingApartmentViewModel>();
         }
         public int ShipId { get; set; }
         public int CustmoerId { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
         public string LastName { get; set; }
+
+        [EmailAddress(ErrorMessage = "Please enter valid email")]
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
@@ -268,6 +272,7 @@ namespace FieldServiceApp.Models
         public DateTime? ModifiedDate { get; set; }
         public List<StateViewModel> StateList { get; set; }
         public List<CityViewModel> CityList { get; set; }
+        public List<CustomerShippingApartmentViewModel> ApartmentList { get; set; }
     }
     public class ItemMasterViewModel
     {
@@ -335,12 +340,17 @@ namespace FieldServiceApp.Models
             EmployeeList = new List<EmployeeMasterViewModel>();
             CustomerList = new List<CustomerMasterViewModel>();
             CustomerShipingAddressList = new List<CustmoerShippingViewModel>();
+            CustomerDetail = new CustomerMasterViewModel();
+            CustomerShippingDetail = new CustmoerShippingViewModel();
+            ApartmentList = new List<CustomerShippingApartmentViewModel>();
         }
         public int OrderId { get; set; }
 
+        [Required(ErrorMessage = "Please enter order no")]
+        public int OrderNo { get; set; }
+
         [Display(Name = "Order Date")]
         [Required(ErrorMessage = "Please enter order date")]
-        [DataType(DataType.DateTime, ErrorMessage = "Please enter valid date")]
         public DateTime OrderDate { get; set; }
 
         [Display(Name = "Total Amount")]
@@ -392,10 +402,16 @@ namespace FieldServiceApp.Models
         public string EmployeeName { get; set; }
         public string CustomerShipAddress { get; set; }
         public string Status { get; set; }
+        public List<int> ApartmentId { get; set; }
+
+        public string ApartmentIds { get; set; }
+        public CustomerMasterViewModel CustomerDetail { get; set; }
+        public CustmoerShippingViewModel CustomerShippingDetail { get; set; }
         public List<ItemMasterViewModel> ItemList { get; set; }
         public List<EmployeeMasterViewModel> EmployeeList { get; set; }
         public List<CustomerMasterViewModel> CustomerList { get; set; }
         public List<CustmoerShippingViewModel> CustomerShipingAddressList { get; set; }
+        public List<CustomerShippingApartmentViewModel> ApartmentList { get; set; }
 
     }
     public class OrderDetailViewModel
@@ -534,7 +550,7 @@ namespace FieldServiceApp.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int? UserId { get; set; }
-       
+
 
     }
     public class DashboardViewModel
@@ -576,6 +592,7 @@ namespace FieldServiceApp.Models
             CustomerShipingAddressList = new List<CustmoerShippingViewModel>();
             OrderList = new List<ServiceFormOrderViewModel>();
             ItemCategoryList = new List<ItemCategoryViewModel>();
+            ApartmentList = new List<CustomerShippingApartmentViewModel>();
         }
         public int ServiceFormLogId { get; set; }
 
@@ -587,10 +604,10 @@ namespace FieldServiceApp.Models
         [Required(ErrorMessage = "Please select date of service")]
         public DateTime? DateOfService { get; set; }
         public string Apartment { get; set; }
-        
+
         [Display(Name = "Item")]
         public int? ItemId { get; set; }
-        
+
         [Display(Name = "Quantity")]
         public decimal? Quantity { get; set; }
         public string Signature { get; set; }
@@ -601,6 +618,10 @@ namespace FieldServiceApp.Models
         public string CategoryName { get; set; }
         public int IsActive { get; set; }
         public string CustomerName { get; set; }
+        public int ApartmentId { get; set; }
+        public string ApartmentName { get; set; }
+        public string ApartmentNo { get; set; }
+        public List<CustomerShippingApartmentViewModel> ApartmentList { get; set; }
         public List<ItemMasterViewModel> ItemList { get; set; }
         public List<CustmoerShippingViewModel> CustomerShipingAddressList { get; set; }
         public List<ServiceFormOrderViewModel> OrderList { get; set; }
@@ -615,7 +636,7 @@ namespace FieldServiceApp.Models
     {
         public int CategoryId { get; set; }
 
-        [Required(ErrorMessage ="Please enter category name")]
+        [Required(ErrorMessage = "Please enter category name")]
         public string CategoryName { get; set; }
         public string RoleIds { get; set; }
 
@@ -625,6 +646,36 @@ namespace FieldServiceApp.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+    public class CustomerShippingApartmentViewModel
+    {
+        public int ApartmentId { get; set; }
+        public int ShipId { get; set; }
+        public string ApartmentNo { get; set; }
+        public string ApartmentName { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
 
+    public class OrderListViewModel
+    {
+        public OrderListViewModel()
+        {
+
+            OrderList = new List<OrderMasterViewModel>();
+        }
+        public List<OrderMasterViewModel> OrderList { get; set; }
+
+        public DateTime? ShipDateFrom { get; set; }
+        public DateTime? ShipDateTo { get; set; }
+        public DateTime? OrderDateFrom { get; set; }
+        public DateTime? OrderDateTo { get; set; }
+        public string CustomerName { get; set; }
+        public string OrderNo { get; set; }
+        
+
+    }
 
 }

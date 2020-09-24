@@ -5,7 +5,7 @@
 @{
 
     ViewData["Title"] = "New Customer";
-     List<string> CompanyTypeList = new List<string>();
+    List<string> CompanyTypeList = new List<string>();
     CompanyTypeList.Add("Business");
     CompanyTypeList.Add("Residential");
 
@@ -30,7 +30,7 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.Code,
-                        new { @placeholder = "Code", @class = "form-control" })
+                        new { @placeholder = "Code", @class = "form-control", maxlength = "44" })
                         <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
 
@@ -42,7 +42,7 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.CompanyName,
-                        new { @placeholder = "Company Name", @class = "form-control" })
+                        new { @placeholder = "Company Name", @class = "form-control", maxlength = "250" })
                         <span asp-validation-for="CompanyName" class="text-danger"></span>
                     </div>
 
@@ -91,7 +91,7 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.Address,
-                        new { @placeholder = "Address", @class = "form-control" })
+                        new { @placeholder = "Address", @class = "form-control", maxlength = "298" })
                         <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
 
@@ -125,7 +125,7 @@
 
 
                 </div>
-         
+
 
                 <h3 class="card-title text-125">
                     Contact detail
@@ -220,16 +220,17 @@
 
                     @for (int i = 0; i < Model.Shippings.Count(); i++)
                     {
+                        @Html.HiddenFor(h => h.Shippings[i].ShipId)
                         <div class="form-group row">
 
                             <div class="col-sm-2 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
-                                    First Name
+                                    <span class="text-primary text-400">Shipping @(i + 1)- </span>   First Name 
                                 </label>
                             </div>
                             <div class="col-sm-3">
                                 @Html.TextBoxFor(m => m.Shippings[i].FirstName,
-                                new { @placeholder = "First Name", @class = "form-control" })
+                                new { @placeholder = "First Name", @class = "form-control", maxlength = "250" })
                                 <span asp-validation-for="Shippings[i].FirstName" class="text-danger"></span>
                             </div>
 
@@ -240,7 +241,7 @@
                             </div>
                             <div class="col-sm-3">
                                 @Html.TextBoxFor(m => m.Shippings[i].MiddleName,
-                                   new { @placeholder = "Middle Name", @class = "form-control" })
+                                   new { @placeholder = "Middle Name", @class = "form-control", maxlength = "250" })
                                 <span asp-validation-for="Shippings[i].MiddleName" class="text-danger"></span>
                             </div>
                         </div>
@@ -253,7 +254,7 @@
                             </div>
                             <div class="col-sm-3">
                                 @Html.TextBoxFor(m => m.Shippings[i].LastName,
-                                  new { @placeholder = "Last Name", @class = "form-control" })
+                                  new { @placeholder = "Last Name", @class = "form-control", maxlength = "250" })
                                 <span asp-validation-for="Shippings[i].MiddleName" class="text-danger"></span>
                             </div>
                             <div class="col-sm-2 col-form-label text-sm-right pr-0">
@@ -263,7 +264,7 @@
                             </div>
                             <div class="col-sm-3">
                                 @Html.TextBoxFor(m => m.Shippings[i].Email,
-                                  new { @placeholder = "Email", @class = "form-control" })
+                                  new { @placeholder = "Email", @class = "form-control", maxlength = "150" })
                                 <span asp-validation-for="Shippings[i].Email" class="text-danger"></span>
                             </div>
                         </div>
@@ -317,17 +318,70 @@
                                 new { @placeholder = "Address", @class = "form-control" })
                                 <span asp-validation-for="Shippings[i].Address" class="text-danger"></span>
                             </div>
-                            <div class="col-lg-2">
-                                <button onclick="addShipping()" type="button"
-                                        class="btnAddShipping btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                                    Add
-                                    <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                                </button>
-                            </div>
+
                         </div>
+
+                        <hr class="border-dashed" />
+                        @for (int j = 0; j < Model.Shippings[i].ApartmentList.Count(); j++)
+                        {
+                            @Html.HiddenFor(h => h.Shippings[i].ApartmentList[j].ApartmentId)
+
+                            <div id="apartmentPanel_@i">
+                                <div class="form-group row">
+
+                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                                        <label for="id-form-field-1" class="mb-0">
+                                           @(j+1)- Apartment No
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(m => m.Shippings[i].ApartmentList[j].ApartmentNo,
+                                        new { @placeholder = "Apartment No", @class = "form-control", maxlength = "150" })
+                                        <span asp-validation-for="Shippings[i].ApartmentList[j].ApartmentNo" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                                        <label for="id-form-field-1" class="mb-0">
+                                            Apartment Name
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(m => m.Shippings[i].ApartmentList[j].ApartmentName,
+                                           new { @placeholder = "Apartment Name", @class = "form-control", maxlength = "150" })
+                                        <span asp-validation-for="Shippings[i].ApartmentList[j].ApartmentName"
+                                              class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-lg-2">
+                                        <button onclick="addShippingApartment('@i')" type="button"
+                                                class="btnAddApartment btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                                            Add More
+                                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <hr class="border-dashed" />
+                            </div>
+
+
+                        }
+                       
+                        {
+                            <div class="form-group row">
+                                <div class="col-lg-3 offset-9">
+                                    <button onclick="addShipping()" type="button"
+                                            class="btnAddShipping btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                                        Add More Shipping Address
+                                        <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                                    </button>
+                                </div>
+                            </div>}
+
+
 
                         <hr />
                     }
+                    
 
                 </div>
 
@@ -375,10 +429,15 @@
         <script src="~/lib/moment/moment.js"></script>
         <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
         <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+        <script src="~/lib/inputmask/jquery.inputmask.js"></script>
         <script src="~/pages/form-basic/@@page-script.js"></script>
     </environment>
     <script type="text/javascript">
         $(document).ready(function () {
+            $("#Contacts_0__Phone").inputmask("(999) 999-9999")
+            $("#Zip1").inputmask("99999")
+            $("#Zip2").inputmask("99999")
+            $("#Shippings_0__Phone").inputmask("(999) 999-9999");
 
         var SuccessMessage = '@ViewBag.SuccessMessage';
         var ErrorMessage = '@ViewBag.ErrorMessage';
@@ -426,9 +485,39 @@
                 $(".btnAddShipping").each(function (ind, ele) {
                         if (ind != index) {
                             $(ele).hide();
-                        }
+                    }
+
+                    $("#Shippings_" + ind + "__Phone").inputmask("(999) 999-9999");
+
                     });
                 $("#shippingPanel .form-control").each(function (ind, ele) {
+                        if ($(ele).attr('name1')) {
+                            $(ele).attr('name', $(ele).attr('name1'));
+                        }
+
+                    })
+                }
+            })
+        }
+
+          function addShippingApartment(i) {
+              debugger;
+              var index = $("#apartmentPanel_"+i+" .btnAddApartment").length;
+              var data = i+"_"+index;
+            $.ajax({
+                url: "/Customer/GetCustomerShippingApartment/"+data,
+               
+                type: "POST",
+                 contentType: "application/json; charset=utf-8",
+                dataType: "html",
+                success: function (response) {
+                $("#apartmentPanel_"+i).append(response);
+                $("#apartmentPanel_"+i+" .btnAddApartment").each(function (ind, ele) {
+                        if (ind != index) {
+                            $(ele).hide();
+                        }
+                    });
+                $("#apartmentPanel_"+i+" .form-control").each(function (ind, ele) {
                         if ($(ele).attr('name1')) {
                             $(ele).attr('name', $(ele).attr('name1'));
                         }
@@ -441,7 +530,7 @@
         $("#CompanyName").on("change", function () {
             if ($("#CompanyName").val()) {
                 $("#CompanyType").val("Business");
-                $("#CompanyType").attr("readonly","readonly"); 
+                $("#CompanyType").attr("readonly","readonly");
             }
             else {
                    $("#CompanyType").removeAttr("readonly");

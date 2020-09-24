@@ -102,7 +102,7 @@ jQuery(function($) {
     },
 
     // no specific initial ordering
-    order: [],
+      "order": [[0, "desc"]],
 
     language: {
       search: '<i class="fa fa-search pos-abs mt-2 pt-3px ml-25 text-blue-m2"></i>',

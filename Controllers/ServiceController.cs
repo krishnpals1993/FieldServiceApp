@@ -41,6 +41,9 @@ namespace FieldServiceApp.Controllers
                          join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
                          join item in _dbContext.tbl_ItemMaster on servicelog.ItemId equals item.ItemId
                          join category in _dbContext.tbl_ItemCategory on item.CategoryId equals category.CategoryId
+                         join apartment in _dbContext.tbl_CustomerShippingApartments on servicelog.ApartmentId equals apartment.ApartmentId
+                         into apartment
+                         from apartment1 in apartment.DefaultIfEmpty()
                          where servicelog.CreatedBy == _userId
                          select new ServiceFormViewModel
                          {
@@ -53,7 +56,9 @@ namespace FieldServiceApp.Controllers
                              DateOfService = servicelog.DateOfService,
                              OrderId = order.OrderId,
                              CustomerName = customer.CompanyName,
-                             Locations = servicelog.Locations
+                             Locations = servicelog.Locations,
+                             ApartmentName = apartment1.ApartmentName,
+                             ApartmentNo = apartment1.ApartmentNo
 
                          }).ToList();
             return View(items);
@@ -127,7 +132,8 @@ namespace FieldServiceApp.Controllers
                         Locations = model.Locations,
                         IsActive = 1,
                         CreatedBy = _userId,
-                        CreatedDate = DateTime.Now
+                        CreatedDate = DateTime.Now,
+                        ApartmentId = model.ApartmentId
                     };
 
                     _dbContext.tbl_ServiceFormLogs.Add(ServiceFormLog);
@@ -190,11 +196,21 @@ namespace FieldServiceApp.Controllers
                     model.Quantity = checkServiceLog.Qty;
                     model.DateOfService = checkServiceLog.DateOfService;
                     model.ServiceFormLogId = checkServiceLog.ServiceFormLogId;
+                    model.ApartmentId = checkServiceLog.ApartmentId ?? 0;
                 }
 
                 var orderItemId = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == model.OrderId).Select(s => s.ItemId).FirstOrDefault();
 
                 var shipId = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).Select(s => s.ShipId).FirstOrDefault();
+
+                model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == shipId).
+                  Select(s => new CustomerShippingApartmentViewModel()
+                  {
+                      ApartmentId = s.ApartmentId,
+                      ApartmentNo = s.ApartmentNo,
+                      ApartmentName = s.ApartmentName
+                  }).ToList();
+
                 model.ShipAddress = (from shipping in _dbContext.tbl_CustmoerShipping
                                      join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                      join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
@@ -317,24 +333,45 @@ namespace FieldServiceApp.Controllers
         [HttpPost]
         public JsonResult GetCustomerShippingAddress(int OrderId)
         {
+            CustmoerShippingViewModel model = new CustmoerShippingViewModel();
             string CustomerShipingAddress = "";
             try
             {
-                var shipId = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == OrderId).Select(s => s.ShipId).FirstOrDefault();
+                var orderDetail = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == OrderId).FirstOrDefault();
                 CustomerShipingAddress = (from shipping in _dbContext.tbl_CustmoerShipping
                                           join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                           join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                          where shipping.ShipId == shipId
+                                          where shipping.ShipId == orderDetail.ShipId
                                           select city.CityName + " " + state.StateName + " " + shipping.Address ?? ""
                                            )
                                               .FirstOrDefault();
+               
+                model.Address = CustomerShipingAddress;
+                model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == orderDetail.ShipId).
+                    Select(s => new CustomerShippingApartmentViewModel()
+                    {
+                        ApartmentId = s.ApartmentId,
+                        ApartmentNo = s.ApartmentNo,
+                        ApartmentName = s.ApartmentName
+                    }).ToList();
+
+                orderDetail.ApartmentIds = orderDetail.ApartmentIds ?? "";
+                if (orderDetail.ApartmentIds!="")
+                {
+                    model.ApartmentList = model.ApartmentList.Where(w => orderDetail.ApartmentIds.Contains("/" + w.ApartmentId.ToString() + "/")).ToList();
+
+                }
+
+
+
+
             }
             catch (Exception ex)
             {
 
             }
 
-            return Json(CustomerShipingAddress);
+            return Json(model);
         }
 
 

@@ -70,6 +70,7 @@ namespace FieldServiceApp.Controllers
                             .ToList();
                 model.Contacts.Add(new CustmoerContactViewModel());
                 model.Shippings.Add(new CustmoerShippingViewModel());
+                model.Shippings.FirstOrDefault().ApartmentList.Add(new CustomerShippingApartmentViewModel());
 
             }
             catch (Exception ex)
@@ -87,8 +88,11 @@ namespace FieldServiceApp.Controllers
         {
             try
             {
+                
+
                 if (ModelState.IsValid)
                 {
+
                     var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName).FirstOrDefault();
                     if (checkCustomer != null)
                     {
@@ -120,7 +124,7 @@ namespace FieldServiceApp.Controllers
                         Address = model.Address,
                         CompanyType = model.CompanyType,
                         Zip1 = model.Zip1,
-                        Zip2= model.Zip2,
+                        Zip2 = model.Zip2,
                         Code = model.Code,
                         IsActive = 1,
                         CreatedBy = 1,
@@ -158,6 +162,45 @@ namespace FieldServiceApp.Controllers
                             };
                             _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                             _dbContext.SaveChanges();
+
+
+                            foreach (var apartment in item.ApartmentList)
+                            {
+                                if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
+                                Convert.ToString(apartment.ApartmentName ?? "") != "")
+                                {
+
+                                    try
+                                    {
+                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == custmoerShipping.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
+                                        if (checkAprtment ==null)
+                                        {
+                                            CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                            {
+                                                ShipId = custmoerShipping.ShipId,
+                                                ApartmentNo = apartment.ApartmentNo,
+                                                ApartmentName = apartment.ApartmentName,
+                                                IsActive = 1,
+                                                CreatedBy = 1,
+                                                CreatedDate = DateTime.Now
+                                            };
+                                            _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
+                                            _dbContext.SaveChanges();
+                                        }
+                                       
+                                    }
+                                    catch (Exception wx)
+                                    {
+
+                                        var a = "";
+                                    }
+
+                                    
+                                }
+
+
+                            }
+
 
                         }
                     }
@@ -277,18 +320,32 @@ namespace FieldServiceApp.Controllers
                             Address = s.Address,
                             ShipId = s.ShipId
 
-
                         }).ToList();
+                        foreach (var item in model.Shippings)
+                        {
+                            var checkApartment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == item.ShipId).ToList();
+                            if (checkApartment.Count() > 0)
+                            {
+                                item.ApartmentList = checkApartment.Select(s => new CustomerShippingApartmentViewModel
+                                {
+                                    ApartmentNo = s.ApartmentNo,
+                                    ApartmentName = s.ApartmentName,
+                                    ApartmentId = s.ApartmentId
+
+                                }).ToList();
+                            }
+                            else
+                            {
+                                item.ApartmentList.Add(new CustomerShippingApartmentViewModel());
+                            }
+                        }
                     }
                     else
                     {
                         model.Shippings.Add(new CustmoerShippingViewModel());
+                        model.Shippings.FirstOrDefault().ApartmentList.Add(new CustomerShippingApartmentViewModel());
                     }
-
-
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -362,6 +419,48 @@ namespace FieldServiceApp.Controllers
                             checkShipping.ModifiedDate = DateTime.Now;
                             _dbContext.SaveChanges();
 
+                            foreach (var apartment in item.ApartmentList)
+                            {
+                                if (apartment.ApartmentId != 0)
+                                {
+                                    var checkApartment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ApartmentId == apartment.ApartmentId).FirstOrDefault();
+
+                                    checkApartment.ApartmentName = apartment.ApartmentName;
+                                    checkApartment.ApartmentNo = apartment.ApartmentNo;
+                                    checkShipping.Address = item.Address;
+                                    checkShipping.ModifiedBy = 1;
+                                    checkShipping.ModifiedDate = DateTime.Now;
+                                    _dbContext.SaveChanges();
+                                }
+                                else
+                                {
+                                    if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
+                                        Convert.ToString(apartment.ApartmentName ?? "") != "")
+                                    {
+                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == item.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
+                                        if (checkAprtment != null)
+                                        {
+                                            CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                            {
+                                                ShipId = item.ShipId,
+                                                ApartmentNo = apartment.ApartmentNo,
+                                                ApartmentName = apartment.ApartmentName,
+                                                IsActive = 1,
+                                                CreatedBy = 1,
+                                                CreatedDate = DateTime.Now
+                                            };
+                                            _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
+                                            _dbContext.SaveChanges();
+                                        }
+                                        
+                                    }
+                                }
+
+
+
+
+                            }
+
                         }
                         else
                         {
@@ -391,6 +490,32 @@ namespace FieldServiceApp.Controllers
                                 };
                                 _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                                 _dbContext.SaveChanges();
+
+                                foreach (var apartment in item.ApartmentList)
+                                {
+                                    if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
+                                            Convert.ToString(apartment.ApartmentName ?? "") != "")
+                                    {
+                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == custmoerShipping.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
+                                        if (checkAprtment != null)
+                                        {
+                                            CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                            {
+                                                ShipId = custmoerShipping.ShipId,
+                                                ApartmentNo = apartment.ApartmentNo,
+                                                ApartmentName = apartment.ApartmentName,
+                                                IsActive = 1,
+                                                CreatedBy = 1,
+                                                CreatedDate = DateTime.Now
+                                            };
+                                            _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
+                                            _dbContext.SaveChanges();
+                                        }
+
+                                      
+                                    }
+
+                                }
 
                             }
                         }
@@ -487,7 +612,17 @@ namespace FieldServiceApp.Controllers
                             StateName = s.StateName
                         })
                         .ToList();
+            model.ApartmentList.Add(new CustomerShippingApartmentViewModel());
             return PartialView("_CustomerShipping", model);
+        }
+
+        public IActionResult GetCustomerShippingApartment(string id)
+        {
+            var model = new CustomerShippingApartmentViewModel();
+            var ids = id.Split("_");
+            ViewBag.parentIndex = ids[0];
+            ViewBag.index = ids[1];
+            return PartialView("_CustomerShippingApartment", model);
         }
 
 

@@ -10,7 +10,7 @@
     </div>
     <div class="col-sm-3">
         @Html.TextBoxFor(m => m.FirstName,
-        new { @placeholder = "First Name", @class = "form-control", id="Contacts_"+ViewBag.index+"__FirstName",@name1="Contacts["+ViewBag.index+"].FirstName" })
+        new { @placeholder = "First Name", @class = "form-control", id="Contacts_"+ViewBag.index+"__FirstName",@name1="Contacts["+ViewBag.index+"].FirstName",maxlength="250"  })
         <span asp-validation-for="FirstName" class="text-danger"></span>
     </div>
 
@@ -21,7 +21,7 @@
     </div>
     <div class="col-sm-3">
         @Html.TextBoxFor(m => m.MiddleName,
-           new { @placeholder = "Middle Name", @class = "form-control", id="Contacts_"+ViewBag.index+"__MiddleName",@name1="Contacts["+ViewBag.index+"].MiddleName" })
+           new { @placeholder = "Middle Name", @class = "form-control", id="Contacts_"+ViewBag.index+"__MiddleName",@name1="Contacts["+ViewBag.index+"].MiddleName" ,maxlength="250" })
         <span asp-validation-for="MiddleName" class="text-danger"></span>
     </div>
 </div>
@@ -34,7 +34,7 @@
     </div>
     <div class="col-sm-3">
         @Html.TextBoxFor(m => m.LastName,
-          new { @placeholder = "Last Name", @class = "form-control", id="Contacts_"+ViewBag.index+"__LastName",@name1="Contacts["+ViewBag.index+"].LastName" })
+          new { @placeholder = "Last Name", @class = "form-control", id="Contacts_"+ViewBag.index+"__LastName",@name1="Contacts["+ViewBag.index+"].LastName",maxlength="250"  })
         <span asp-validation-for="MiddleName" class="text-danger"></span>
     </div>
     <div class="col-sm-2 col-form-label text-sm-right pr-0">
@@ -44,7 +44,7 @@
     </div>
     <div class="col-sm-3">
         @Html.TextBoxFor(m => m.Email,
-          new { @placeholder = "Email", @class = "form-control", id="Contacts_"+ViewBag.index+"__Email" ,@name="Contacts["+ViewBag.index+"].Email" })
+          new { @placeholder = "Email", @class = "form-control", id="Contacts_"+ViewBag.index+"__Email" ,@name="Contacts["+ViewBag.index+"].Email",maxlength="150"  })
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 </div>
