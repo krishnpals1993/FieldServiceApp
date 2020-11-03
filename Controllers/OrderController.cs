@@ -17,6 +17,7 @@ namespace FieldServiceApp.Controllers
         private readonly IOptions<EmailSettings> _emailSettings;
         private readonly DBContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        OrderUtility _orderUtility ;
 
 
         private ISession _session => _httpContextAccessor.HttpContext.Session;
@@ -30,12 +31,14 @@ namespace FieldServiceApp.Controllers
             _httpContextAccessor = HttpContextAccessor;
             _rolename = _session.GetString("RoleName");
             int.TryParse(_session.GetString("UserId"), out _userId);
+            _orderUtility = new OrderUtility(_dbContext);
         }
 
 
         public IActionResult Add()
         {
             OrderMasterViewModel model = new OrderMasterViewModel();
+           
             try
             {
                 var checkTemData = TempData["NewCustomer"];
@@ -54,15 +57,7 @@ namespace FieldServiceApp.Controllers
                                 ItemDescription = s.ItemDescription
                             })
                             .ToList();
-                model.CustomerList = _dbContext.tbl_CustomerMaster
-                    .Where(w => w.IsActive == 1)
-                                .Select(s => new CustomerMasterViewModel
-                                {
-                                    CustmoerId = s.CustmoerId,
-                                    CompanyName = s.CompanyName
-                                })
-                                .ToList();
-
+                model.CustomerList = _orderUtility.GetCustomerListWithShipAddress();
 
 
                 model.EmployeeList = _dbContext.tbl_EmployeeMaster
@@ -97,12 +92,27 @@ namespace FieldServiceApp.Controllers
                 model.CustomerDetail.Contacts.Add(new CustmoerContactViewModel());
                 model.CustomerDetail.Shippings.Add(new CustmoerShippingViewModel());
 
+
+
                 model.OrderNo = _dbContext.tbl_OrderMaster.Max(m => m.OrderId) + 1;
+
+                model.OrderList = (from order in _dbContext.tbl_OrderMaster
+                                   join customer in _dbContext.tbl_CustomerMaster
+                                   on order.CustomerId equals customer.CustmoerId
+                                   where ((order.IsFollowUp ?? 0) == 1)
+                                   select new ServiceFormOrderViewModel
+                                   {
+                                       OrderId = order.OrderId,
+                                       CustomerName = customer.CompanyName + " (Order #" + order.OrderId + ")"
+
+                                   }).ToList();
+
 
             }
             catch (Exception ex)
             {
 
+                model.OrderNo = (model.OrderNo == 0 ? 1 : model.OrderNo);
                 var a = "";
             }
 
@@ -186,6 +196,19 @@ namespace FieldServiceApp.Controllers
                     if (model.ShipStartDate != null)
                     {
                         shipDate = _commanUtility.RoundUp(model.ShipStartDate.Value, TimeSpan.FromMinutes(15));
+                        var checkCalenderDate = _dbContext.tbl_CalenderWorkingHours.FirstOrDefault();
+                        if (checkCalenderDate != null)
+                        {
+                            var calenderStartDate = Convert.ToDateTime(shipDate.Value.ToString("MM/dd/yyyy") + " " + checkCalenderDate.StartTime.Value.ToString("HH:mm"));
+                            var calenderEndDate = Convert.ToDateTime(shipDate.Value.ToString("MM/dd/yyyy") + " " + checkCalenderDate.EndTime.Value.ToString("HH:mm"));
+                            if ((shipDate < calenderStartDate) || (shipDate > calenderEndDate))
+                            {
+                                shipDate = calenderStartDate;
+                                shipDate = _commanUtility.RoundUp(model.ShipStartDate.Value, TimeSpan.FromMinutes(15));
+
+                            }
+                        }
+
                     }
                     if (model.ApartmentId != null)
                     {
@@ -207,8 +230,28 @@ namespace FieldServiceApp.Controllers
                         IsActive = 1,
                         CreatedBy = 1,
                         CreatedDate = DateTime.Now,
-                        ApartmentIds = model.ApartmentIds
+                        ApartmentIds = model.ApartmentIds,
+                        ParentOrderId = model.ParentOrderId,
+                        ReOccurenceCycle = model.ReOccurenceCycle,
+                        ReOccurenceFrequency = model.ReOccurenceFrequency,
+                        ReOccurenceWeekday = model.ReOccurenceWeekday,
+                        ReOccurenceStartDate = model.ReOccurenceStartDate,
+                        ReOccurenceEndDate = model.ReOccurenceEndDate
+
                     };
+
+                    OrderDetail orderDetailReoccurence = new OrderDetail();
+                    OrderAssignment orderAssignmentReoccurence = new OrderAssignment();
+
+
+                    if (model.ReOccurence == "Yes")
+                    {
+                        orderMaster.ReOccurence = 1;
+                    }
+                    else
+                    {
+                        orderMaster.ReOccurence = 0;
+                    }
 
                     _dbContext.tbl_OrderMaster.Add(orderMaster);
                     _dbContext.SaveChanges();
@@ -228,6 +271,7 @@ namespace FieldServiceApp.Controllers
                     };
                     _dbContext.tbl_OrderDetail.Add(orderDetail);
                     _dbContext.SaveChanges();
+                    orderDetailReoccurence = orderDetail;
 
                     if (Convert.ToString(model.AssigneeId) != "")
                     {
@@ -243,11 +287,80 @@ namespace FieldServiceApp.Controllers
                             };
                             _dbContext.tbl_OrderAssignment.Add(orderAssignment);
                             _dbContext.SaveChanges();
+                            orderAssignmentReoccurence = orderAssignment;
                         }
 
                     }
 
+                    if (model.ReOccurence == "Yes")
+                    {
+                        OrderUtility _orderUtility = new OrderUtility(_dbContext);
+                        var orderId = orderMaster.OrderId;
+                        if (model.ReOccurenceCycle == "Days")
+                        {
+                            var count = 0;
+                            for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                            {
+                                count++;
+                                if (count == model.ReOccurenceFrequency)
+                                {
+                                    count = 0;
+                                    _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                }
+                            }
+                        }
 
+                        if (model.ReOccurenceCycle == "Weeks")
+                        {
+                            var count = 0;
+                            for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                            {
+                                count++;
+                                if (count == ((model.ReOccurenceFrequency * 7)))
+                                {
+                                    count = 0;
+                                    _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                }
+                            }
+                        }
+
+                        if (model.ReOccurenceCycle == "Months")
+                        {
+                            var count = 0;
+                            for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                            {
+                                count++;
+                                if (count == ((model.ReOccurenceFrequency * 30)))
+                                {
+                                    count = 0;
+                                    _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                }
+                            }
+                        }
+
+                        if (model.ReOccurenceCycle == "WeekDay")
+                        {
+                            for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                            {
+                                if (date.DayOfWeek.ToString() == model.ReOccurenceWeekday)
+                                {
+                                    _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                }
+                            }
+                        }
+
+                        if (model.ReOccurenceCycle == "Month's Day")
+                        {
+                            for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                            {
+                                if (date.Day == model.ReOccurenceFrequency)
+                                {
+                                    _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                }
+                            }
+                        }
+
+                    }
 
 
                     ViewBag.SuccessMessage = "Order added successfully";
@@ -269,14 +382,7 @@ namespace FieldServiceApp.Controllers
                          ItemDescription = s.ItemDescription
                      })
                      .ToList();
-            model.CustomerList = _dbContext.tbl_CustomerMaster
-                .Where(w => w.IsActive == 1)
-                            .Select(s => new CustomerMasterViewModel
-                            {
-                                CustmoerId = s.CustmoerId,
-                                CompanyName = s.CompanyName
-                            })
-                            .ToList();
+            model.CustomerList = _orderUtility.GetCustomerListWithShipAddress();
 
 
 
@@ -312,6 +418,16 @@ namespace FieldServiceApp.Controllers
             model.CustomerDetail.Contacts.Add(new CustmoerContactViewModel());
             model.CustomerDetail.Shippings.Add(new CustmoerShippingViewModel());
 
+            model.OrderList = (from order in _dbContext.tbl_OrderMaster
+                               join customer in _dbContext.tbl_CustomerMaster
+                               on order.CustomerId equals customer.CustmoerId
+                               where ((order.IsFollowUp ?? 0) == 1)
+                               select new ServiceFormOrderViewModel
+                               {
+                                   OrderId = order.OrderId,
+                                   CustomerName = customer.CompanyName + " (Order #" + order.OrderId + ")"
+
+                               }).ToList();
 
             return View(model);
         }
@@ -557,10 +673,36 @@ namespace FieldServiceApp.Controllers
                                        CustomerName = customer.CompanyName,
                                        EmployeeName = employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName,
                                        TotalAmount = order.TotalAmount,
-                                       IsActive = order.IsActive
+                                       IsActive = order.IsActive,
+                                       ScheduledOnNonWorkingDay = false
 
                                    })
                                                .ToList();
+
+                var checkWeekOffs = _dbContext.tbl_CalenderWorkingDays.Where(w => w.DayName != null).Select(s => s.DayName).ToList();
+                var checkHolidays = _dbContext.tbl_CalenderWorkingDays.Where(w => w.HolidayDate != null).Select(s => s.HolidayDate).ToList();
+
+
+                foreach (var order in model.OrderList)
+                {
+                    if (checkWeekOffs.Contains(order.ShipStartDate?.DayOfWeek.ToString()))
+                    {
+                        order.ScheduledOnNonWorkingDay = true;
+                    }
+                    else
+                    {
+                        var checkHoliday = checkHolidays.Where(w => w.Value.Day == order.ShipStartDate?.Day && w.Value.Month == order.ShipStartDate?.Month).Count();
+                        if (checkHoliday > 0)
+                        {
+                            order.ScheduledOnNonWorkingDay = true;
+                        }
+
+                    }
+                }
+
+
+
+
             }
             catch (Exception ex)
             {
@@ -622,6 +764,27 @@ namespace FieldServiceApp.Controllers
                     model.OrderList = model.OrderList.Where(w => w.OrderDate >= model.OrderDateFrom.Value && w.OrderDate <= model.OrderDateTo.Value).ToList();
                 }
 
+                var checkWeekOffs = _dbContext.tbl_CalenderWorkingDays.Where(w => w.DayName != null).Select(s => s.DayName).ToList();
+                var checkHolidays = _dbContext.tbl_CalenderWorkingDays.Where(w => w.HolidayDate != null).Select(s => s.HolidayDate).ToList();
+
+
+                foreach (var order in model.OrderList)
+                {
+                    if (checkWeekOffs.Contains(order.ShipStartDate?.DayOfWeek.ToString()))
+                    {
+                        order.ScheduledOnNonWorkingDay = true;
+                    }
+                    else
+                    {
+                        var checkHoliday = checkHolidays.Where(w => w.Value.Day == order.ShipStartDate?.Day && w.Value.Month == order.ShipStartDate?.Month).Count();
+                        if (checkHoliday > 0)
+                        {
+                            order.ScheduledOnNonWorkingDay = true;
+                        }
+
+                    }
+                }
+
 
             }
             catch (Exception ex)
@@ -642,11 +805,33 @@ namespace FieldServiceApp.Controllers
             try
             {
                 var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == orderId).FirstOrDefault();
+
                 if (checkOrder != null)
                 {
                     {
                         checkOrder.ShipStartDate = start;
+                        if (start != null)
+                        {
+                            if (start.Value.ToShortTimeString() == "12:00 AM")
+                            {
+
+                                var checkCalenderDate = _dbContext.tbl_CalenderWorkingHours.FirstOrDefault();
+                                if (checkCalenderDate != null)
+                                {
+                                    var calenderStartDate = Convert.ToDateTime(checkOrder.ShipStartDate.Value.ToString("MM/dd/yyyy") + " " + checkCalenderDate.StartTime.Value.ToString("HH:mm"));
+                                    start = checkCalenderDate.StartTime;
+                                    CommanUtility _commanUtility = new CommanUtility(_appSettings);
+                                    //start = _commanUtility.RoundUp(start.Value, TimeSpan.FromMinutes(15));
+
+                                }
+
+                            }
+
+
+
+                        }
                         checkOrder.ShipDate = start;
+                        checkOrder.ShipStartDate = start;
                         checkOrder.ShipEndDate = end;
                         _dbContext.SaveChanges();
                         if (status == "day")
@@ -757,6 +942,82 @@ namespace FieldServiceApp.Controllers
             return Json(CustomerShipingApartmentList);
         }
 
+        [HttpPost]
+        public JsonResult GetFollowUpOrderDetail(int OrderId)
+        {
+            OrderMasterViewModel model = new OrderMasterViewModel();
+            try
+            {
+                int orderId = OrderId;
+                var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == orderId).FirstOrDefault();
+                if (checkOrder != null)
+                {
+                    model.OrderId = orderId;
+                    model.OrderNo = checkOrder.OrderNo;
+                    model.OrderDate = checkOrder.OrderDate;
+                    model.ShipStartDate = checkOrder.ShipStartDate;
+                    model.ShipEndDate = checkOrder.ShipEndDate;
+                    model.ShipId = checkOrder.ShipId;
+                    model.CustomerId = checkOrder.CustomerId;
+                    model.TotalAmount = checkOrder.TotalAmount;
+                    model.ApartmentIds = checkOrder.ApartmentIds;
+
+                    if (model.ApartmentIds != null)
+                    {
+                        model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.
+                            Select(s => new CustomerShippingApartmentViewModel()
+                            {
+                                ApartmentId = s.ApartmentId,
+                                ApartmentNo = s.ApartmentNo,
+                                ApartmentName = s.ApartmentName
+                            }).Where(w => model.ApartmentIds.Contains("/" + w.ApartmentId.ToString() + "/")).ToList();
+                    }
+
+                    model.ApartmentIds = (checkOrder.ApartmentIds ?? "").Replace('/', ' ');
+
+                    var orderDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == orderId).FirstOrDefault();
+
+                    if (orderDetail != null)
+                    {
+                        model.ItemId = orderDetail.ItemId;
+                        model.Description = orderDetail.Description;
+                        model.PerUnitPrice = orderDetail.PerUnitPrice;
+                        model.Quantity = orderDetail.Quantity;
+                        model.TotalPrice = orderDetail.TotalPrice;
+                        model.UnitId = orderDetail.UnitId;
+
+                    }
+
+                    var orderAssignment = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == orderId).FirstOrDefault();
+
+                    if (orderAssignment != null)
+                    {
+                        model.AssigneeId = orderAssignment.EmployeeId.ToString();
+                    }
+
+                    model.CustomerShipingAddressList = (from shipping in _dbContext.tbl_CustmoerShipping
+                                                        join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                                        join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                                        where shipping.CustmoerId == model.CustomerId
+                                                        select new CustmoerShippingViewModel
+                                                        {
+                                                            ShipId = shipping.ShipId,
+                                                            Address = city.CityName + " " + state.StateName + " " + shipping.Address ?? ""
+                                                        })
+                                                 .ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                var a = "";
+            }
+
+            return Json(model);
+        }
+
 
         public IActionResult Edit(string id)
         {
@@ -773,14 +1034,7 @@ namespace FieldServiceApp.Controllers
                                 ItemDescription = s.ItemDescription
                             })
                             .ToList();
-                model.CustomerList = _dbContext.tbl_CustomerMaster
-                    .Where(w => w.IsActive == 1)
-                                .Select(s => new CustomerMasterViewModel
-                                {
-                                    CustmoerId = s.CustmoerId,
-                                    CompanyName = s.CompanyName
-                                })
-                                .ToList();
+                model.CustomerList = _orderUtility.GetCustomerListWithShipAddress();
 
                 model.EmployeeList = _dbContext.tbl_EmployeeMaster
                     .Where(w => w.IsActive == 1)
@@ -792,6 +1046,17 @@ namespace FieldServiceApp.Controllers
                                     MiddleName = s.MiddleName
                                 })
                                 .ToList();
+
+                model.OrderList = (from order in _dbContext.tbl_OrderMaster
+                                   join customer in _dbContext.tbl_CustomerMaster
+                                   on order.CustomerId equals customer.CustmoerId
+                                   where ((order.IsFollowUp ?? 0) == 1)
+                                   select new ServiceFormOrderViewModel
+                                   {
+                                       OrderId = order.OrderId,
+                                       CustomerName = customer.CompanyName + " (Order #" + order.OrderId + ")"
+
+                                   }).ToList();
 
                 int orderId = 0;
                 int.TryParse(id, out orderId);
@@ -807,6 +1072,20 @@ namespace FieldServiceApp.Controllers
                     model.CustomerId = checkOrder.CustomerId;
                     model.TotalAmount = checkOrder.TotalAmount;
                     model.ApartmentIds = checkOrder.ApartmentIds;
+                    model.ParentOrderId = checkOrder.ParentOrderId;
+
+                    model.ReOccurenceCycle = checkOrder.ReOccurenceCycle;
+                    model.ReOccurenceFrequency = checkOrder.ReOccurenceFrequency;
+                    model.ReOccurenceWeekday = checkOrder.ReOccurenceWeekday;
+                    model.ReOccurenceStartDate = checkOrder.ReOccurenceStartDate;
+                    model.ReOccurenceEndDate = checkOrder.ReOccurenceEndDate;
+
+                    if (checkOrder.ReOccurence == 1)
+                    {
+                        model.ReOccurence = "Yes";
+                        model.ReOccurenceOrderCount = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == model.OrderId).Count();
+                    }
+
 
                     if (model.ApartmentIds != null)
                     {
@@ -859,8 +1138,10 @@ namespace FieldServiceApp.Controllers
         {
             try
             {
-               // if (ModelState.IsValid)
+                // if (ModelState.IsValid)
                 {
+                    OrderAssignment orderAssignmentReoccurence = new OrderAssignment();
+                    OrderDetail orderDetailReoccurence = new OrderDetail();
                     var checkOrderNo = _dbContext.tbl_OrderMaster.Where(w => w.OrderNo == model.OrderNo && w.OrderId != model.OrderId).FirstOrDefault();
                     if (checkOrderNo != null)
                     {
@@ -875,14 +1156,7 @@ namespace FieldServiceApp.Controllers
                             ItemDescription = s.ItemDescription
                         })
                         .ToList();
-                        model.CustomerList = _dbContext.tbl_CustomerMaster
-                            .Where(w => w.IsActive == 1)
-                                        .Select(s => new CustomerMasterViewModel
-                                        {
-                                            CustmoerId = s.CustmoerId,
-                                            CompanyName = s.CompanyName
-                                        })
-                                        .ToList();
+                        model.CustomerList = _orderUtility.GetCustomerListWithShipAddress();
 
 
 
@@ -920,7 +1194,6 @@ namespace FieldServiceApp.Controllers
 
                         return View(model);
 
-
                     }
 
 
@@ -934,6 +1207,13 @@ namespace FieldServiceApp.Controllers
 
                         }
 
+                        var prevReOccurence = checkOrder.ReOccurence;
+                        var prevReOccurenceCycle = checkOrder.ReOccurenceCycle;
+                        var prevReOccurenceFrequency = checkOrder.ReOccurenceFrequency;
+                        var prevReOccurenceWeekday = checkOrder.ReOccurenceWeekday;
+                        var prevReOccurenceStartDate = checkOrder.ReOccurenceStartDate;
+                        var prevReOccurenceEndDate = checkOrder.ReOccurenceEndDate;
+
                         checkOrder.OrderDate = model.OrderDate;
                         checkOrder.ShipStartDate = model.ShipStartDate;
                         checkOrder.ShipEndDate = model.ShipEndDate;
@@ -944,6 +1224,21 @@ namespace FieldServiceApp.Controllers
                         checkOrder.ModifiedDate = DateTime.Now;
                         checkOrder.OrderNo = model.OrderNo;
                         checkOrder.ApartmentIds = model.ApartmentIds;
+                        checkOrder.ParentOrderId = model.ParentOrderId;
+                        if ((model.ReOccurence == "Yes"))
+                        {
+                            checkOrder.ReOccurence = 1;
+                        }
+                        else
+                        {
+                            checkOrder.ReOccurence = 0;
+                        }
+
+                        checkOrder.ReOccurenceCycle = model.ReOccurenceCycle;
+                        checkOrder.ReOccurenceFrequency = model.ReOccurenceFrequency;
+                        checkOrder.ReOccurenceWeekday = model.ReOccurenceWeekday;
+                        checkOrder.ReOccurenceStartDate = model.ReOccurenceStartDate;
+                        checkOrder.ReOccurenceEndDate = model.ReOccurenceEndDate;
                         _dbContext.SaveChanges();
 
                         var checkOrderDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
@@ -958,6 +1253,7 @@ namespace FieldServiceApp.Controllers
                             checkOrderDetail.UnitId = model.UnitId;
 
                             _dbContext.SaveChanges();
+                            orderDetailReoccurence = checkOrderDetail;
 
                             {
                                 var checkOrderAssignment = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
@@ -968,11 +1264,13 @@ namespace FieldServiceApp.Controllers
                                         model.EmployeeId = Convert.ToInt32(model.AssigneeId);
                                         checkOrderAssignment.EmployeeId = model.EmployeeId;
                                         _dbContext.SaveChanges();
+                                        orderAssignmentReoccurence = checkOrderAssignment;
                                     }
                                     else
                                     {
                                         checkOrderAssignment.EmployeeId = 0;
                                         _dbContext.SaveChanges();
+                                        orderAssignmentReoccurence = checkOrderAssignment;
                                     }
                                 }
                                 else
@@ -988,6 +1286,7 @@ namespace FieldServiceApp.Controllers
                                         };
                                         _dbContext.tbl_OrderAssignment.Add(orderAssignment);
                                         _dbContext.SaveChanges();
+                                        orderAssignmentReoccurence = orderAssignment;
 
                                     }
                                 }
@@ -999,6 +1298,270 @@ namespace FieldServiceApp.Controllers
 
                         }
 
+                        if (prevReOccurence == 0 && checkOrder.ReOccurence == 1)
+                        {
+                            OrderUtility _orderUtility = new OrderUtility(_dbContext);
+                            var orderId = checkOrder.OrderId;
+                            if (model.ReOccurenceCycle == "Days")
+                            {
+                                var count = 0;
+                                for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                {
+                                    count++;
+                                    if (count == model.ReOccurenceFrequency)
+                                    {
+                                        count = 0;
+                                        _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                    }
+                                }
+                            }
+
+                            if (model.ReOccurenceCycle == "Weeks")
+                            {
+                                var count = 0;
+                                for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                {
+                                    count++;
+                                    if (count == ((model.ReOccurenceFrequency * 7)))
+                                    {
+                                        count = 0;
+                                        _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                    }
+                                }
+                            }
+
+                            if (model.ReOccurenceCycle == "Months")
+                            {
+                                var count = 0;
+                                for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                {
+                                    count++;
+                                    if (count == ((model.ReOccurenceFrequency * 30)))
+                                    {
+                                        count = 0;
+                                        _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                    }
+                                }
+                            }
+
+                            if (model.ReOccurenceCycle == "WeekDay")
+                            {
+                                for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                {
+                                    if (date.DayOfWeek.ToString() == model.ReOccurenceWeekday)
+                                    {
+                                        _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                    }
+                                }
+                            }
+
+                            if (model.ReOccurenceCycle == "Month's Day")
+                            {
+                                for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                {
+                                    if (date.Day == model.ReOccurenceFrequency)
+                                    {
+                                        _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                    }
+                                }
+                            }
+
+                        }
+
+                        if (prevReOccurence == 1 && checkOrder.ReOccurence == 0)
+                        {
+
+                            var checkReOccurenceOrders = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == checkOrder.OrderId).ToList();
+                            foreach (var item in checkReOccurenceOrders)
+                            {
+                                item.IsActive = 0;
+                                item.ModifiedBy = _userId;
+                                item.ModifiedDate = DateTime.Now;
+                                _dbContext.SaveChanges();
+
+                            }
+
+                        }
+
+                        if (prevReOccurence == 1 && checkOrder.ReOccurence == 1)
+                        {
+                            var orderId = checkOrder.OrderId;
+                            if (!((prevReOccurence == checkOrder.ReOccurence) &&
+                                (prevReOccurenceCycle == checkOrder.ReOccurenceCycle) &&
+                                (prevReOccurenceStartDate == checkOrder.ReOccurenceStartDate) &&
+                                (prevReOccurenceEndDate == checkOrder.ReOccurenceEndDate) &&
+                                (prevReOccurenceFrequency == checkOrder.ReOccurenceFrequency)
+                                ))
+                            {
+                                if (model.ReOccurenceOrderCount != -1)
+                                {
+
+                                    var checkReOccurenceOrders = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == checkOrder.OrderId).ToList();
+                                    foreach (var item in checkReOccurenceOrders)
+                                    {
+                                        item.IsActive = 0;
+                                        item.ModifiedBy = _userId;
+                                        item.ModifiedDate = DateTime.Now;
+                                        _dbContext.SaveChanges();
+
+                                    }
+
+                                    OrderUtility _orderUtility = new OrderUtility(_dbContext);
+                                    if (model.ReOccurenceCycle == "Days")
+                                    {
+                                        var count = 0;
+                                        for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                        {
+                                            count++;
+                                            if (count == model.ReOccurenceFrequency)
+                                            {
+                                                count = 0;
+                                                _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                            }
+                                        }
+                                    }
+
+                                    if (model.ReOccurenceCycle == "Weeks")
+                                    {
+                                        var count = 0;
+                                        for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                        {
+                                            count++;
+                                            if (count == ((model.ReOccurenceFrequency * 7)))
+                                            {
+                                                count = 0;
+                                                _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                            }
+                                        }
+                                    }
+
+                                    if (model.ReOccurenceCycle == "Months")
+                                    {
+                                        var count = 0;
+                                        for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                        {
+                                            count++;
+                                            if (count == ((model.ReOccurenceFrequency * 30)))
+                                            {
+                                                count = 0;
+                                                _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                            }
+                                        }
+                                    }
+
+                                    if (model.ReOccurenceCycle == "WeekDay")
+                                    {
+                                        for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                        {
+                                            if (date.DayOfWeek.ToString() == model.ReOccurenceWeekday)
+                                            {
+                                                _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                            }
+                                        }
+                                    }
+
+                                    if (model.ReOccurenceCycle == "Month's Day")
+                                    {
+                                        for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
+                                        {
+                                            if (date.Day == model.ReOccurenceFrequency)
+                                            {
+                                                _orderUtility.SaveReOccurenceOrder(orderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                            }
+                        }
+                        if (model.ReOccurenceOrderCount != -1)
+                        {
+                            var checkReoccurenceOrders = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == checkOrder.OrderId).ToList();
+                            foreach (var item in checkReoccurenceOrders)
+                            {
+                                item.OrderDate = checkOrder.OrderDate;
+                                item.ShipStartDate = checkOrder.ShipStartDate;
+                                item.ShipEndDate = checkOrder.ShipEndDate;
+                                item.ShipId = checkOrder.ShipId;
+                                item.CustomerId = checkOrder.CustomerId;
+                                item.TotalAmount = checkOrder.TotalAmount;
+                                item.ModifiedBy = 1;
+                                item.ModifiedDate = DateTime.Now;
+                                item.OrderNo = checkOrder.OrderNo;
+                                item.ApartmentIds = checkOrder.ApartmentIds;
+                                item.ParentOrderId = checkOrder.ParentOrderId;
+                                item.ReOccurence = 1;
+                                item.ReOccurenceCycle = checkOrder.ReOccurenceCycle;
+                                item.ReOccurenceFrequency = checkOrder.ReOccurenceFrequency;
+                                item.ReOccurenceWeekday = checkOrder.ReOccurenceWeekday;
+                                item.ReOccurenceStartDate = checkOrder.ReOccurenceStartDate;
+                                item.ReOccurenceEndDate = checkOrder.ReOccurenceEndDate;
+                                _dbContext.SaveChanges();
+
+                                if (checkOrderDetail != null)
+                                {
+                                    var orderitemDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == item.OrderId).FirstOrDefault();
+                                    if (checkOrderDetail != null)
+                                    {
+                                        orderitemDetail.ItemId = checkOrderDetail.ItemId;
+                                        orderitemDetail.Description = model.Description;
+                                        orderitemDetail.OrderId = checkOrder.OrderId;
+                                        orderitemDetail.PerUnitPrice = model.PerUnitPrice;
+                                        orderitemDetail.Quantity = model.Quantity;
+                                        orderitemDetail.TotalPrice = model.TotalPrice;
+                                        orderitemDetail.UnitId = model.UnitId;
+
+                                        _dbContext.SaveChanges();
+
+                                        if (orderAssignmentReoccurence != null)
+                                        {
+                                            var checkOrderAssignmentDetail = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == item.OrderId).FirstOrDefault();
+                                            if (checkOrderAssignmentDetail != null)
+                                            {
+                                                if (Convert.ToString(model.AssigneeId) != "")
+                                                {
+                                                    model.EmployeeId = Convert.ToInt32(model.AssigneeId);
+                                                    checkOrderAssignmentDetail.EmployeeId = model.EmployeeId;
+                                                    _dbContext.SaveChanges();
+
+                                                }
+                                                else
+                                                {
+                                                    checkOrderAssignmentDetail.EmployeeId = 0;
+                                                    _dbContext.SaveChanges();
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (Convert.ToString(model.AssigneeId) != "")
+                                                {
+                                                    OrderAssignment orderAssignment = new OrderAssignment()
+                                                    {
+                                                        OrderId = item.OrderId,
+                                                        EmployeeId = model.EmployeeId,
+                                                        AssignmentDate = DateTime.Now,
+                                                        Status = "Assigned"
+                                                    };
+                                                    _dbContext.tbl_OrderAssignment.Add(orderAssignment);
+                                                    _dbContext.SaveChanges();
+
+
+                                                }
+                                            }
+
+
+                                        }
+
+
+
+
+                                    }
+                                }
+
+                            }
+                        }
                     }
 
                     ViewBag.SuccessMessage = "Order update successfully";
@@ -1046,6 +1609,43 @@ namespace FieldServiceApp.Controllers
             }
 
             return Json(response);
+        }
+
+        [HttpPost]
+        public JsonResult CheckNonworkingDay(DateTime date)
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+
+
+                var checkCount = 0;
+                var daysList = _dbContext.tbl_CalenderWorkingDays.ToList();
+                checkCount = daysList.Where(w => w.HolidayDate != null).Where(w => w.HolidayDate.Value.Day == date.Day && w.HolidayDate.Value.Month == date.Month).Count();
+                if (checkCount > 0)
+                {
+                    response.Status = "0";
+                    return Json(response);
+                }
+                checkCount = daysList.Where(w => w.DayName == date.DayOfWeek.ToString()).Count();
+                if (checkCount > 0)
+                {
+                    response.Status = "0";
+                    return Json(response);
+                }
+
+                response.Status = "1";
+                return Json(response);
+
+            }
+            catch (Exception ex)
+            {
+                response.Status = "0";
+                response.Message = "Error occurred";
+            }
+            response.Status = "1";
+            return Json(response);
+
         }
 
         [HttpPost]

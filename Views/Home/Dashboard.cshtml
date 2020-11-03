@@ -310,7 +310,7 @@
                                     <tbody>
                                         @foreach (var item in Model.OrderList)
                                         {
-                                            <tr class="bgc-h-secondary-l4">
+                                            <tr class="bgc-h-secondary-l4 @(item.ScheduledOnNonWorkingDay?"nonWkDayOrder":"")">
                                                 <td class="pl-2 pl-lg-4">
                                                     <a href="#" class="text-95 text-primary text-600">
                                                         #@item.OrderNo
@@ -321,7 +321,14 @@
 
                                                 <td class=" text-dark-m2 text-85"> @item.CustomerName</td>
 
-                                                <td class=" text-dark-m2 text-85"> @item.ShipStartDate?.ToString("MM/dd/yyyy HH:MM")</td>
+                                                <td class=" text-dark-m2 text-85">
+                                                    @if (item.ShipStartDate != null)
+                                                    {
+                                                        <span>@item.ShipStartDate?.DayOfWeek , </span>
+                                                    }
+                                                    @item.ShipStartDate?.ToString("MM/dd/yyyy hh:mm tt")
+
+                                                </td>
 
                                                 <td class="font-bolder text-75 text-dark-m2 pr-2 pr-lg-3">
                                                     @item.TotalAmount
@@ -377,15 +384,30 @@
             display: none !important;
         }
 
-        #calendar .bgc-blue-d1
-        {
-            display:none !important;
+        #calendar .bgc-blue-d1 {
+            display: none !important;
+        }
 
+        .nonWkDayOrder {
+            background-color: #ffbc002b;
         }
     </style>
 }
 
 @section scripts {
+    <script type="text/javascript">
+
+    window.calenderHourId = '@Model.CalenderWorkingHour.Id';
+    if (window.calenderHourId != '0') {
+        {
+
+                window.startTime = '@(Model.CalenderWorkingHour.StartTime != null ?Model.CalenderWorkingHour.StartTime.Value.ToString("HH:mm:ss") :"00:00:00") ';
+                window.endTime = '@(Model.CalenderWorkingHour.EndTime != null ?Model.CalenderWorkingHour.EndTime.Value.ToString("HH:mm:ss") :"23:30:00") ';
+          }
+    }
+
+
+    </script>
     <environment names="Development,Staging,Production">
         <script src="~/lib/moment/moment.js"></script>
         <script src="~/lib/fullcalendar/main.js"></script>
@@ -461,8 +483,6 @@
             }
             return name;
         }
-
-        
 
          function updateOrderAssignee(orderId,start,end,employeeId,callback) {
             var data = {

@@ -64,170 +64,477 @@ jQuery(function ($) {
     var day2 = Math.random() * 25 + 1;
 
     // initialize the calendar
-    window.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
-        themeSystem: 'bootstrap',
-        height: 650,
-        // initialView: 'resourceTimeGridDay',
-        //resourceGroupField: 'groupdId',
-        resources: getResource(),
-        headerToolbar: {
-            start: 'prev,next today',
-            center: 'title',
-            end: 'dayGridMonth,timeGridWeek,resourceTimeGridDay'
-        },
-        events: getEvents(),
-        eventDidMount: function (info) {
-            info.el.querySelector('.fc-event-title').innerHTML = info.el.querySelector('.fc-event-title').innerText;
-        },
-        selectable: true,
-        selectLongPressDelay: 200,
-        editable: true,
-        droppable: true,
-        drop: function (info, event, a, b) {
-            if (info.draggedEl.parentNode) {
-                updateOrderDate(info.draggedEl.children[0].innerHTML, info.date, null,
-                    function (data) {
 
-                        window.calendar.addEvent({
-                            id: data['OrderId'],
-                            resourceId: data['EmployeeId'],
-                            title: data.CustomerName + '<br/>' + data['EmployeeName'],
-                            start: new Date(data['ShipStartDate']),
-                            end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
-                            allDay: false,
-                            extendedProps: data,
-                            className: 'bgc-info text-white text-75'
+    if (window.calenderHourId == '0') {
+        window.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+            themeSystem: 'bootstrap',
+            height: 650,
+            // initialView: 'resourceTimeGridDay',
+            //resourceGroupField: 'groupdId',
+            resources: getResource(),
+            headerToolbar: {
+                start: 'prev,next today',
+                center: 'title',
+                end: 'dayGridMonth,timeGridWeek,resourceTimeGridDay'
+            },
+            events: getEvents(),
+            eventDidMount: function (info) {
+                info.el.querySelector('.fc-event-title').innerHTML = info.el.querySelector('.fc-event-title').innerText;
+            },
+            selectable: true,
+            selectLongPressDelay: 200,
+            editable: true,
+            droppable: true,
+            drop: function (info, event, a, b) {
+                if (info.draggedEl.parentNode) {
+                    updateOrderDate(info.draggedEl.children[0].innerHTML, info.date, null,
+                        function (data) {
+
+                            window.calendar.addEvent({
+                                id: data['OrderId'],
+                                resourceId: data['EmployeeId'],
+                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                start: new Date(data['ShipStartDate']),
+                                end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
+                                allDay: false,
+                                extendedProps: data,
+                                className: 'bgc-info text-white text-75'
+                            });
                         });
-                    });
-                info.draggedEl.parentNode.removeChild(info.draggedEl);
-                return false;
-            }
-                
-            //if (info) {
-            //    if (info.event) {
-            //        info.event.remove();
-            //    }
-               
-            //}
-
-        },
-        eventDrop: function (info) {
-            if (info.view.type =="resourceTimeGridDay") {
-                updateOrderAssignee(info.event.id, info.event.start, info.event.end, info.event._def.resourceIds.toString(),
-                    function (data) {
-                        window.calendar.addEvent({
-                            id: data['OrderId'],
-                            resourceId: data['EmployeeId'],
-                            title: data.CustomerName + '<br/>' + data['EmployeeName'],
-                            start: new Date(data['ShipStartDate']),
-                            end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
-                            allDay: false,
-                            extendedProps: data,
-                            className: 'bgc-info text-white text-75'
-                        });
-
-                    });
-                if (info.event) {
-                    info.event.remove();
+                    info.draggedEl.parentNode.removeChild(info.draggedEl);
+                    return false;
                 }
+
+                //if (info) {
+                //    if (info.event) {
+                //        info.event.remove();
+                //    }
+
+                //}
+
+            },
+            eventDrop: function (info) {
+                if (info.view.type == "resourceTimeGridDay") {
+                    updateOrderAssignee(info.event.id, info.event.start, info.event.end, info.event._def.resourceIds.toString(),
+                        function (data) {
+                            window.calendar.addEvent({
+                                id: data['OrderId'],
+                                resourceId: data['EmployeeId'],
+                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                start: new Date(data['ShipStartDate']),
+                                end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
+                                allDay: false,
+                                extendedProps: data,
+                                className: 'bgc-info text-white text-75'
+                            });
+
+                        });
+                    if (info.event) {
+                        info.event.remove();
+                    }
+
+                }
+                else {
+                    updateOrderDate(info.event.id, info.event.start, info.event.end, function () {
+
+                    });
+                }
+
+            },
+            slotDuration: '00:15:00',
+            eventResize: function (info) {
+                updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
+                });
+            },
+            eventDragStop: function (info) {
+                var event = info.event;
+                var jsEvent = info.jsEvent;
+                if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                    var el = $('<div style="cursor:pointer;margin-right:7px" onclick="showOrderDetail(' + info.event._def.extendedProps.OrderId + ')" ' +
+                        ' oid="' + info.event._def.extendedProps.OrderId + '" class= "fc-event badge bgc-blue-d1 text-white border-0 py-2 text-90 mb-1 radius-2px"' +
+                        'data-class="bgc-blue-d1 text-white text-95" >' +
+                        'Order #<span>' + info.event._def.extendedProps.OrderId + '</span> <br />' +
+                        '' + info.event._def.extendedProps.EmployeeName + '' +
+                        '</div >').appendTo('#external-events-listing');
+
+                    new FullCalendar.Draggable(document.getElementById('external-events'), {
+                        itemSelector: '.fc-event',
+                        longPressDelay: 50,
+                        eventData: function (eventEl) {
+                            return {
+                                title: eventEl.innerText,
+                                classNames: eventEl.getAttribute('data-class').split(' ')
+                            }
+                        },
+                        zIndex: 999,
+                        revert: true,
+                        revertDuration: 0
+                    });
+
+                    info.event.remove();
+                    updateOrderDate(info.event._def.extendedProps.OrderId, null, null, function () { });
+                }
+            },
+            eventClick: function (info) {
+                var inf = info;
+                var orderId = info.event._def.extendedProps.OrderId;
+                if (!orderId) {
+                    orderId = info.el.getAttribute('oid');
+                }
+
+                $.ajax({
+                    url: "/Home/GetOrderPopup/" + orderId,
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "html",
+                    success: function (response) {
+                        var modal = response;
+                        modal = $(modal).appendTo('body');
+                        modal.find('form').on('submit', function (ev) {
+                            ev.preventDefault();
+                            if (inf) {
+                                inf.event.remove();
+                            }
+                            window.calendar.addEvent({
+                                id: inf.event._def.extendedProps['OrderId'],
+                                resourceId: $("#EmployeeId").val(),
+                                title: inf.event._def.extendedProps.CustomerName + '<br/>' + $("#EmployeeId option:selected").text(),
+                                start: new Date(inf.event._def.extendedProps['ShipStartDate']),
+                                end: inf.event._def.extendedProps['ShipEndDate'] == null ? null : new Date(inf.event._def.extendedProps['ShipEndDate']),
+                                allDay: false,
+                                extendedProps: inf.event._def.extendedProps,
+                                className: 'bgc-info text-white text-75'
+                            });
+
+                            modal.modal("hide");
+                        });
+                        modal.find('button[data-action=delete]').on('click', function () {
+                            modal.modal("hide");
+                        });
+                        modal.modal('show').on('hidden.bs.modal', function () {
+                            modal.remove();
+                        });
+                    }
+                });
+
+
+            }
+        });
+    }
+    else {
+        window.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+            themeSystem: 'bootstrap',
+            height: 650,
+            // initialView: 'resourceTimeGridDay',
+            //resourceGroupField: 'groupdId',
+            resources: getResource(),
+            headerToolbar: {
+                start: 'prev,next today',
+                center: 'title',
+                end: 'dayGridMonth,timeGridWeek,resourceTimeGridDay'
+            },
+            events: getEvents(),
+            eventDidMount: function (info) {
+                info.el.querySelector('.fc-event-title').innerHTML = info.el.querySelector('.fc-event-title').innerText;
+            },
+            selectable: true,
+            selectLongPressDelay: 200,
+            editable: true,
+            droppable: true,
+            drop: function (info, event, a, b) {
+                if (info.draggedEl.parentNode) {
+                    updateOrderDate(info.draggedEl.children[0].innerHTML, info.date, null,
+                        function (data) {
+
+                            window.calendar.addEvent({
+                                id: data['OrderId'],
+                                resourceId: data['EmployeeId'],
+                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                start: new Date(data['ShipStartDate']),
+                                end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
+                                allDay: false,
+                                extendedProps: data,
+                                className: 'bgc-info text-white text-75'
+                            });
+                        });
+                    info.draggedEl.parentNode.removeChild(info.draggedEl);
+                    return false;
+                }
+
+                //if (info) {
+                //    if (info.event) {
+                //        info.event.remove();
+                //    }
+
+                //}
+
+            },
+            eventDrop: function (info) {
+                if (info.view.type == "resourceTimeGridDay") {
+                    updateOrderAssignee(info.event.id, info.event.start, info.event.end, info.event._def.resourceIds.toString(),
+                        function (data) {
+                            window.calendar.addEvent({
+                                id: data['OrderId'],
+                                resourceId: data['EmployeeId'],
+                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                start: new Date(data['ShipStartDate']),
+                                end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
+                                allDay: false,
+                                extendedProps: data,
+                                className: 'bgc-info text-white text-75'
+                            });
+
+                        });
+                    if (info.event) {
+                        info.event.remove();
+                    }
+
+                }
+                else {
+                    updateOrderDate(info.event.id, info.event.start, info.event.end, function () {
+
+                    });
+                }
+
+            },
+            slotDuration: '00:15:00',
+            eventResize: function (info) {
+                updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
+                });
+            },
+            eventDragStop: function (info) {
+                var event = info.event;
+                var jsEvent = info.jsEvent;
+                if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
+                    var el = $('<div style="cursor:pointer;margin-right:7px" onclick="showOrderDetail(' + info.event._def.extendedProps.OrderId + ')" ' +
+                        ' oid="' + info.event._def.extendedProps.OrderId + '" class= "fc-event badge bgc-blue-d1 text-white border-0 py-2 text-90 mb-1 radius-2px"' +
+                        'data-class="bgc-blue-d1 text-white text-95" >' +
+                        'Order #<span>' + info.event._def.extendedProps.OrderId + '</span> <br />' +
+                        '' + info.event._def.extendedProps.EmployeeName + '' +
+                        '</div >').appendTo('#external-events-listing');
+
+                    new FullCalendar.Draggable(document.getElementById('external-events'), {
+                        itemSelector: '.fc-event',
+                        longPressDelay: 50,
+                        eventData: function (eventEl) {
+                            return {
+                                title: eventEl.innerText,
+                                classNames: eventEl.getAttribute('data-class').split(' ')
+                            }
+                        },
+                        zIndex: 999,
+                        revert: true,
+                        revertDuration: 0
+                    });
+
+                    info.event.remove();
+                    updateOrderDate(info.event._def.extendedProps.OrderId, null, null, function () { });
+                }
+            },
+            eventClick: function (info) {
+                var inf = info;
+                var orderId = info.event._def.extendedProps.OrderId;
+                if (!orderId) {
+                    orderId = info.el.getAttribute('oid');
+                }
+
+                $.ajax({
+                    url: "/Home/GetOrderPopup/" + orderId,
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "html",
+                    success: function (response) {
+                        var modal = response;
+                        modal = $(modal).appendTo('body');
+                        modal.find('form').on('submit', function (ev) {
+                            ev.preventDefault();
+                            if (inf) {
+                                inf.event.remove();
+                            }
+                            window.calendar.addEvent({
+                                id: inf.event._def.extendedProps['OrderId'],
+                                resourceId: $("#EmployeeId").val(),
+                                title: inf.event._def.extendedProps.CustomerName + '<br/>' + $("#EmployeeId option:selected").text(),
+                                start: new Date(inf.event._def.extendedProps['ShipStartDate']),
+                                end: inf.event._def.extendedProps['ShipEndDate'] == null ? null : new Date(inf.event._def.extendedProps['ShipEndDate']),
+                                allDay: false,
+                                extendedProps: inf.event._def.extendedProps,
+                                className: 'bgc-info text-white text-75'
+                            });
+
+                            modal.modal("hide");
+                        });
+                        modal.find('button[data-action=delete]').on('click', function () {
+                            modal.modal("hide");
+                        });
+                        modal.modal('show').on('hidden.bs.modal', function () {
+                            modal.remove();
+                        });
+                    }
+                });
+
+            },
+            scrollTime: window.startTime,
+            viewDidMount: function (args) {
+                getDayTimeDetail(window.calendar.getDate().getDay() + 1, function () {
+                    debugger;
+                    setTimeSlotColor();
+                });
+            }
+            //slotMinTime: window.startTime,
+            //slotMaxTime: window.endTime
+
+        });
+
+    }
+
+   
+    window.calendar.render();
+
+   
+
+    $('.fc-prev-button').click(function () {
+        getDayTimeDetail(window.calendar.getDate().getDay()+1, function () {
+            setTimeSlotColor();
+        });
+    });
+
+    $('.fc-next-button').click(function () {
+        getDayTimeDetail(window.calendar.getDate().getDay()+1,function () {
+            setTimeSlotColor();
+        });
+    });
+
+    function getDayTimeDetail(day, callback) {
+        if (day==0) {
+            day = 7;
+        }
+        var data = {
+            'day': day
+        };
+        console.log(data);
+        $.ajax({
+            url: "/Home/GetDayTimeDetail",
+            type: "POST",
+            dataType: "json",
+            data: data,
+            success: function (data) {
                 
+                debugger;
+                window.startTime = data.StartTimeFormatted;
+                window.endTime = data.EndTimeFormatted;
+                callback();
+            },
+            error: function (data) {
+                
+
+            }
+        })
+    }
+
+    function setTimeSlotColor() {
+
+        removeTimeSlotColor();
+
+
+        if (!window.startTime) {
+            return;
+        }
+        var startHr = Number(window.startTime.split(":")[0]);
+        var startMin = Number(window.startTime.split(":")[1]);
+
+        var endHr = Number(window.endTime.split(":")[0]);
+        var endMin = Number(window.endTime.split(":")[1]);
+
+        for (var i = startHr; i < (endHr + 1); i++) {
+            if (i < 10) {
+                if (i < endHr) {
+                    if (i == startHr) {
+                        if (startMin == 30) {
+                            $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        }
+                        else {
+                            $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        }
+                    }
+                    else {
+                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                    }
+                }
+                else {
+                    if (endMin == 30) {
+                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+
+                    }
+                    else {
+                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+
+                    }
+                }
             }
             else {
-                updateOrderDate(info.event.id, info.event.start, info.event.end, function () {
-
-                });
-            }
-            
-        },
-        slotDuration: '00:15:00',
-        eventResize: function (info) {
-            updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
-            });
-        },
-        eventDragStop: function (info) {
-            var event = info.event;
-            var jsEvent = info.jsEvent;
-            if (isEventOverDiv(jsEvent.clientX, jsEvent.clientY)) {
-                var el = $('<div style="cursor:pointer;margin-right:7px" onclick="showOrderDetail(' + info.event._def.extendedProps.OrderId + ')" ' +
-                    ' oid="' + info.event._def.extendedProps.OrderId + '" class= "fc-event badge bgc-blue-d1 text-white border-0 py-2 text-90 mb-1 radius-2px"' +
-                    'data-class="bgc-blue-d1 text-white text-95" >' +
-                    'Order #<span>' + info.event._def.extendedProps.OrderId + '</span> <br />' +
-                    '' + info.event._def.extendedProps.EmployeeName + '' +
-                    '</div >').appendTo('#external-events-listing');
-
-                new FullCalendar.Draggable(document.getElementById('external-events'), {
-                    itemSelector: '.fc-event',
-                    longPressDelay: 50,
-                    eventData: function (eventEl) {
-                        return {
-                            title: eventEl.innerText,
-                            classNames: eventEl.getAttribute('data-class').split(' ')
+                if (i < endHr) {
+                    if (i == startHr) {
+                        if (startMin == 30) {
+                            $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
                         }
-                    },
-                    zIndex: 999,
-                    revert: true,     
-                    revertDuration: 0
-                });
-
-                info.event.remove();
-                updateOrderDate(info.event._def.extendedProps.OrderId, null, null, function () { });
-            }
-        },
-
-        eventClick: function (info) {
-            var inf = info;
-            var orderId = info.event._def.extendedProps.OrderId;
-            if (!orderId) {
-                orderId = info.el.getAttribute('oid');
-            }
-
-            $.ajax({
-                url: "/Home/GetOrderPopup/" + orderId,
-                type: "POST",
-                contentType: "application/json; charset=utf-8",
-                dataType: "html",
-                success: function (response) {
-                    var modal = response;
-                    modal = $(modal).appendTo('body');
-                    modal.find('form').on('submit', function (ev) {
-                        ev.preventDefault();
-                        if (inf) {
-                            inf.event.remove();
+                        else {
+                            $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
                         }
-                        window.calendar.addEvent({
-                            id: inf.event._def.extendedProps['OrderId'],
-                            resourceId: $("#EmployeeId").val(),
-                            title: inf.event._def.extendedProps.CustomerName + '<br/>' + $("#EmployeeId option:selected").text(),
-                            start: new Date(inf.event._def.extendedProps['ShipStartDate']),
-                            end: inf.event._def.extendedProps['ShipEndDate'] == null ? null : new Date(inf.event._def.extendedProps['ShipEndDate']),
-                            allDay: false,
-                            extendedProps: inf.event._def.extendedProps,
-                            className: 'bgc-info text-white text-75'
-                        });
-
-                        modal.modal("hide");
-                    });
-                    modal.find('button[data-action=delete]').on('click', function () {
-                        modal.modal("hide");
-                    });
-                    modal.modal('show').on('hidden.bs.modal', function () {
-                        modal.remove();
-                    });
+                    }
+                    else {
+                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                    }
                 }
-            });
+                else {
+                    if (endMin == 30) {
+                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
 
+                    }
+                    else {
+                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
 
+                    }
+                }
+            }
+           
         }
 
 
+    }
 
-    });
+    function removeTimeSlotColor() {
+        if (!window.startTime) {
+            return;
+        }
+        $(".fc-timegrid-slot").each(function (index, ele) {
+            $(this).css({ 'background-color': '' });
 
-
-
-    //
-    window.calendar.render();
+        });
+      
+       
+    }
+   
 
     var isEventOverDiv = function (x, y) {
 

@@ -172,7 +172,7 @@
             <tbody class="pos-rel">
                 @foreach (var item in Model.OrderList)
                 {
-                    <tr class="d-style bgc-h-default-l4">
+                    <tr class="d-style bgc-h-default-l4 @(item.ScheduledOnNonWorkingDay?"nonWkDayOrder":"")">
 
                         <td class="text-grey">
                             @item.OrderNo
@@ -186,7 +186,12 @@
                         </td>
 
                         <td class="text-grey">
-                            @item.ShipStartDate?.ToString("MM/dd/yyyy HH:mm")
+                            @if (item.ShipStartDate != null)
+                            {
+                                <span>@item.ShipStartDate?.DayOfWeek ,</span>
+                            }
+                            @item.ShipStartDate?.ToString("MM/dd/yyyy hh:mm tt")
+
                         </td>
 
                         <td class="text-grey">
@@ -238,6 +243,12 @@
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
     </environment>
+
+<style>
+    .nonWkDayOrder {
+    background-color: #ffbc002b;
+    }
+</style>
 
 }
 
@@ -347,6 +358,8 @@
                 var shipDateTo = $("#id-date-2").val();
                 var orderDateFrom = $("#id-date-3").val();
                 var orderDateTo = $("#id-date-4").val();
+
+
 
                 if (((shipFromDate) && (!shipDateTo)) || ((!shipFromDate) && (shipDateTo))) {
                 swal("Please select both ship dates", "", "error");

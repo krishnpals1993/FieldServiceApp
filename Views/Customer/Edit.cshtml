@@ -24,108 +24,123 @@
 
                 <div class="form-group row">
 
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            Company Code
+                            Code
                         </label>
                     </div>
 
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         @Html.TextBoxFor(m => m.Code,
                         new { @placeholder = "Code", @class = "form-control", maxlength = "44" })
                         <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
 
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            Company Name
+                            Name
                         </label>
                     </div>
 
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         @Html.TextBoxFor(m => m.CompanyName,
                         new { @placeholder = "Company Name", @class = "form-control", maxlength = "250" })
                         <span asp-validation-for="CompanyName" class="text-danger"></span>
                     </div>
 
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            Company Type
+                            Type
                         </label>
                     </div>
 
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         @Html.DropDownListFor(model => model.CompanyType, new SelectList(CompanyTypeList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select company type" })
                     </div>
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            State
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
-                        <span asp-validation-for="StateId" class="text-danger"></span>
-                    </div>
 
                 </div>
+
                 <div class="form-group row">
-
-
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            City
+                            First Name
                         </label>
                     </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.CityId, new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
-                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.FirstName,
+                        new { @placeholder = "First Name", @class = "form-control" })
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
                     </div>
-
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Last Name
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.LastName,
+                          new { @placeholder = "Last Name", @class = "form-control" })
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             Address
                         </label>
                     </div>
 
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         @Html.TextBoxFor(m => m.Address,
-                        new { @placeholder = "Address", @class = "form-control", maxlength = "300" })
+                        new { @placeholder = "Address", @class = "form-control", maxlength = "298" })
                         <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
 
                 </div>
+
                 <div class="form-group row">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            Zip 1
+                            State
                         </label>
                     </div>
 
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
+                        @Html.DropDownListFor(model => model.StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
+                        <span asp-validation-for="StateId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            City
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.DropDownListFor(model => model.CityId, new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Zip
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
                         @Html.TextBoxFor(m => m.Zip1,
                         new { @placeholder = "Zip 1", @class = "form-control" })
                         <span asp-validation-for="Zip1" class="text-danger"></span>
                     </div>
 
 
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Zip 2
-                        </label>
-                    </div>
 
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         @Html.TextBoxFor(m => m.Zip2,
                         new { @placeholder = "Zip 2", @class = "form-control" })
                         <span asp-validation-for="Zip2" class="text-danger"></span>
                     </div>
 
-
                 </div>
+
 
 
 
@@ -142,70 +157,63 @@
 
 
 
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
                                     First Name
                                 </label>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 @Html.TextBoxFor(m => m.Contacts[i].FirstName,
-                                new { @placeholder = "First Name", @class = "form-control", maxlength = "250" })
+                                new { @placeholder = "First Name", @class = "form-control" })
                                 <span asp-validation-for="Contacts[i].FirstName" class="text-danger"></span>
                             </div>
 
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
-                                    Middle Name
+                                    Middle
                                 </label>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 @Html.TextBoxFor(m => m.Contacts[i].MiddleName,
-                                   new { @placeholder = "Middle Name", @class = "form-control", maxlength = "250" })
+                                   new { @placeholder = "Middle Name", @class = "form-control" })
                                 <span asp-validation-for="Contacts[i].MiddleName" class="text-danger"></span>
                             </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
-                                    Last Name
+                                    Last
                                 </label>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 @Html.TextBoxFor(m => m.Contacts[i].LastName,
-                                  new { @placeholder = "Last Name", @class = "form-control", maxlength = "250" })
+                                  new { @placeholder = "Last Name", @class = "form-control" })
                                 <span asp-validation-for="Contacts[i].MiddleName" class="text-danger"></span>
-                            </div>
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Email
-                                </label>
-                            </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.Contacts[i].Email,
-                                  new { @placeholder = "Email", @class = "form-control", maxlength = "150" })
-                                <span asp-validation-for="Contacts[i].Email" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
                                     Phone
                                 </label>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 @Html.TextBoxFor(m => m.Contacts[i].Phone,
                                   new { @placeholder = "Phone", @class = "form-control" })
                                 <span asp-validation-for="Contacts[i].Phone" class="text-danger"></span>
                             </div>
-                            @*<div class="col-lg-2">
-                                    <button onclick="addContacts()" type="button"
-                                            class="btnAddContact btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                                        Add
-                                        <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                                    </button>
-                                </div>*@
+
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Email
+                                </label>
+                            </div>
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.Contacts[i].Email,
+                                  new { @placeholder = "Email", @class = "form-control" })
+                                <span asp-validation-for="Contacts[i].Email" class="text-danger"></span>
+                            </div>
+
                         </div>
 
                         <hr />
@@ -226,101 +234,88 @@
                         @Html.HiddenFor(h => h.Shippings[i].ShipId)
 
                         <div class="form-group row">
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    <span class="text-primary text-400">Shipping @(i + 1)- </span>   First Name
-                                </label>
-                            </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.Shippings[i].FirstName,
-                                new { @placeholder = "First Name", @class = "form-control", maxlength = "250" })
-                                <span asp-validation-for="Shippings[i].FirstName" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Middle Name
-                                </label>
-                            </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.Shippings[i].MiddleName,
-                                   new { @placeholder = "Middle Name", @class = "form-control", maxlength = "250" })
-                                <span asp-validation-for="Shippings[i].MiddleName" class="text-danger"></span>
+                            <div class="col-1">
+                                <span class="text-primary text-400">Shipping @(i + 1) </span>
                             </div>
                         </div>
-
                         <div class="form-group row">
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Last Name
-                                </label>
-                            </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.Shippings[i].LastName,
-                                  new { @placeholder = "Last Name", @class = "form-control", maxlength = "250" })
-                                <span asp-validation-for="Shippings[i].MiddleName" class="text-danger"></span>
-                            </div>
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Email
-                                </label>
-                            </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.Shippings[i].Email,
-                                  new { @placeholder = "Email", @class = "form-control", maxlength = "150" })
-                                <span asp-validation-for="Shippings[i].Email" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Phone
-                                </label>
-                            </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.Shippings[i].Phone,
-                                  new { @placeholder = "Phone", @class = "form-control" })
-                                <span asp-validation-for="Shippings[i].Phone" class="text-danger"></span>
-                            </div>
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
                                     State
                                 </label>
                             </div>
 
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 @Html.DropDownListFor(model => model.Shippings[i].StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
                                 <span asp-validation-for="Shippings[i].StateId" class="text-danger"></span>
                             </div>
-
-                        </div>
-
-                        <div class="form-group row">
-
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
                                     City
                                 </label>
                             </div>
 
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 @Html.DropDownListFor(model => model.Shippings[i].CityId, new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
                                 <span asp-validation-for="Shippings[i].CityId" class="text-danger"></span>
                             </div>
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Zip
+                                </label>
+                            </div>
 
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.Shippings[i].Zip1,
+                                  new { @placeholder = "Zip 1", @class = "zip form-control" })
+                                <span asp-validation-for="Shippings[i].Zip1" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.Shippings[i].Zip2,
+                                  new { @placeholder = "Zip 2", @class = "zip form-control" })
+                                <span asp-validation-for="Shippings[i].Zip2" class="text-danger"></span>
+                            </div>
+
+
+
+                        </div>
+
+
+                        <div class="form-group row">
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                 <label for="id-form-field-1" class="mb-0">
                                     Address
                                 </label>
                             </div>
 
-                            <div class="col-sm-3">
+                            <div class="col-sm-5">
                                 @Html.TextBoxFor(m => m.Shippings[i].Address,
-                                new { @placeholder = "Address", @class = "form-control", maxlength = "300" })
+                                new { @placeholder = "Address", @class = "form-control" })
                                 <span asp-validation-for="Shippings[i].Address" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Phone
+                                </label>
+                            </div>
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.Shippings[i].Phone,
+                                  new { @placeholder = "Phone", @class = "form-control" })
+                                <span asp-validation-for="Shippings[i].Phone" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Email
+                                </label>
+                            </div>
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.Shippings[i].Email,
+                                  new { @placeholder = "Email", @class = "form-control", maxlength = "150" })
+                                <span asp-validation-for="Shippings[i].Email" class="text-danger"></span>
                             </div>
 
                         </div>
@@ -333,23 +328,23 @@
                             <div id="apartmentPanel_@i">
                                 <div class="form-group row">
 
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                         <label for="id-form-field-1" class="mb-0">
                                             @(j + 1)-  Apartment No
                                         </label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         @Html.TextBoxFor(m => m.Shippings[i].ApartmentList[j].ApartmentNo,
                                         new { @placeholder = "Apartment No", @class = "form-control", maxlength = "150" })
                                         <span asp-validation-for="Shippings[i].ApartmentList[j].ApartmentNo" class="text-danger"></span>
                                     </div>
 
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
                                         <label for="id-form-field-1" class="mb-0">
                                             Apartment Name
                                         </label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         @Html.TextBoxFor(m => m.Shippings[i].ApartmentList[j].ApartmentName,
                                            new { @placeholder = "Apartment Name", @class = "form-control", maxlength = "150" })
                                         <span asp-validation-for="Shippings[i].ApartmentList[j].ApartmentName"
@@ -504,11 +499,11 @@
         }
 
            function addShippingApartment(i) {
-              debugger;
-              var index = $("#apartmentPanel_"+i+" .btnAddApartment").length;
-              var data = {parentIndex : i , index : index };
+
+               var index = $("#apartmentPanel_"+i+" .btnAddApartment").length;
+              var data = i+"_"+index;
             $.ajax({
-                url: "/Customer/GetCustomerShippingApartment",
+                url: "/Customer/GetCustomerShippingApartment/"+data,
                 data: data,
                 type: "POST",
                  contentType: "application/json; charset=utf-8",

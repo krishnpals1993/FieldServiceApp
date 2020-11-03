@@ -91,6 +91,7 @@ namespace FieldServiceApp.Utility
                                        join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.ShipId
                                        join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                        join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                       where order.IsActive ==1
                                        select new OrderMasterViewModel
                                        {
                                            OrderNo = order.OrderNo,
@@ -105,7 +106,6 @@ namespace FieldServiceApp.Utility
                                            CustomerShipAddress = city.CityName + " " + state.StateName + " " + shipping.Address,
                                            Status = (orderAssign1 == null ? "New" : (orderAssign1.CompletedDate == null ? "Assigned" : "Completed")),
 
-
                                        })
                                                .ToList();
                 }
@@ -119,7 +119,7 @@ namespace FieldServiceApp.Utility
                                        join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.ShipId
                                        join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                        join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                       where employee.EmployeeId == _employeeId
+                                       where employee.EmployeeId == _employeeId &&  order.IsActive == 1
                                        select new OrderMasterViewModel
                                        {
                                            OrderId = order.OrderId,
@@ -137,6 +137,27 @@ namespace FieldServiceApp.Utility
                                   .ToList();
                 }
 
+
+                var checkWeekOffs = _dbContext.tbl_CalenderWorkingDays.Where(w => w.DayName != null).Select(s => s.DayName).ToList();
+                var checkHolidays = _dbContext.tbl_CalenderWorkingDays.Where(w => w.HolidayDate != null).Select(s => s.HolidayDate).ToList();
+
+
+                foreach (var order in model.OrderList)
+                {
+                    if (checkWeekOffs.Contains(order.ShipStartDate?.DayOfWeek.ToString()))
+                    {
+                        order.ScheduledOnNonWorkingDay = true;
+                    }
+                    else
+                    {
+                        var checkHoliday = checkHolidays.Where(w => w.Value.Day == order.ShipStartDate?.Day && w.Value.Month == order.ShipStartDate?.Month).Count();
+                        if (checkHoliday > 0)
+                        {
+                            order.ScheduledOnNonWorkingDay = true;
+                        }
+
+                    }
+                }
 
                 return (model);
 

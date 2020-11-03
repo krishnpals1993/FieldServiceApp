@@ -1,0 +1,113 @@
+﻿@model IEnumerable<FieldServiceApp.Models.CalenderWorkingHourViewModel>
+@using Microsoft.Extensions.Options;
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = "Calender Working Hour";
+}
+<div role="main" class="page-content container container-plus">
+    <div class="page-header mb-2 pb-2 flex-column flex-sm-row align-items-start align-items-sm-center py-25 px-1">
+        <h1 class="page-title text-primary-d2 text-140">
+            @ViewData["Title"]
+        </h1>
+
+       
+
+    </div>
+
+    <div class="card bcard h-auto">
+        <form autocomplete="off" class="border-t-3 brc-blue-m2">
+
+            <table id="datatable" class="d-style w-100 table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed">
+                <!-- add `collapsed` by default ... it will be removed by default -->
+                <!-- thead with .sticky-nav -->
+                <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
+                    <tr>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Week Day
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Start Time
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            End Time
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="pos-rel">
+
+                    @foreach (var item in Model)
+                    {
+                        <tr class="d-style bgc-h-default-l4">
+                            <td>
+                                @item.DayName
+                            </td>
+                            <td>
+                                @if (item.StartTime != null)
+                                {
+                                    @item.StartTime.Value.ToString("hh:mm tt")
+                                }
+
+                            </td>
+                            <td>
+                                @if (item.EndTime != null)
+                                {
+                                    @item.EndTime.Value.ToString("hh:mm tt")
+                                }
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "CalenderHour", new { id = item.Id })
+                            </td>
+
+
+
+                        </tr>
+                    }
+
+
+
+
+                </tbody>
+            </table>
+
+        </form>
+    </div>
+</div>
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib//datatable/dataTables.bootstrap4.css" />
+        <link rel="stylesheet" href="~/lib//datatable/buttons.bootstrap4.css" />
+        <link rel="stylesheet" href="~/pages/datatable/@@page-style.css" />
+    </environment>
+
+}
+
+@section scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/lib//datatable/jquery.dataTables.js"></script>
+        <script src="~/lib//datatable/dataTables.bootstrap4.js"></script>
+        <script src="~/lib//datatable/dataTables.colReorder.js"></script>
+        <script src="~/lib//datatable/dataTables.select.js"></script>
+        <script src="~/lib//datatable/dataTables.buttons.js"></script>
+        <script src="~/lib//datatable/buttons.bootstrap4.js"></script>
+        <script src="~/lib//datatable/buttons.colVis.js"></script>
+        <script src="~/lib//datatable/buttons.html5.js"></script>
+        <script src="~/lib//datatable/buttons.print.js"></script>
+        <script src="~/pages/datatable/@@page-script.js"></script>
+    </environment>
+    <script type="text/javascript">
+            window.baseUrl = '@Settings.Value.WebBaseURL';
+
+            function add() {
+                window.location = window.baseUrl + "/CalenderHour/Add";
+            }
+
+    </script>
+}

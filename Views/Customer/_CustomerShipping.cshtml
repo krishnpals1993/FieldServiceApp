@@ -1,111 +1,105 @@
 ﻿@model FieldServiceApp.Models.CustmoerShippingViewModel
 <div class="form-group row">
-
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-        <label for="id-form-field-1" class="mb-0">
-            First Name
-        </label>
-    </div>
-    <div class="col-sm-3">
-        @Html.TextBoxFor(m => m.FirstName,
-        new { @placeholder = "First Name", @class = "form-control", id = "Shippings_" + ViewBag.index + "__FirstName", @name1 = "Shippings[" + ViewBag.index + "].FirstName" ,maxlength="250" })
-        <span asp-validation-for="FirstName" class="text-danger"></span>
+    <div class="col-lg-1">
+        <span class="text-primary text-400">Shipping @(Convert.ToInt16(ViewBag.index) + 1) </span>
     </div>
 
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-        <label for="id-form-field-1" class="mb-0">
-            Middle Name
-        </label>
-    </div>
-    <div class="col-sm-3">
-        @Html.TextBoxFor(m => m.MiddleName,
-           new { @placeholder = "Middle Name", @class = "form-control", id = "Shippings_" + ViewBag.index + "__MiddleName", @name1 = "Shippings[" + ViewBag.index + "].MiddleName",maxlength="250"  })
-        <span asp-validation-for="MiddleName" class="text-danger"></span>
-    </div>
 </div>
-
 <div class="form-group row">
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-        <label for="id-form-field-1" class="mb-0">
-            Last Name
-        </label>
-    </div>
-    <div class="col-sm-3">
-        @Html.TextBoxFor(m => m.LastName,
-          new { @placeholder = "Last Name", @class = "form-control", id = "Shippings_" + ViewBag.index + "__LastName", @name1 = "Shippings[" + ViewBag.index + "].LastName",maxlength="250"  })
-        <span asp-validation-for="MiddleName" class="text-danger"></span>
-    </div>
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-        <label for="id-form-field-1" class="mb-0">
-            Email
-        </label>
-    </div>
-    <div class="col-sm-3">
-        @Html.TextBoxFor(m => m.Email,
-          new { @placeholder = "Email", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Email", @name1 = "Shippings[" + ViewBag.index + "].Email",maxlength="150"  })
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-</div>
 
-<div class="form-group row">
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-        <label for="id-form-field-1" class="mb-0">
-            Phone
-        </label>
-    </div>
-    <div class="col-sm-3">
-        @Html.TextBoxFor(m => m.Phone,
-          new { @placeholder = "Phone", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Phone", @name1 = "Shippings[" + ViewBag.index + "].Phone" })
-        <span asp-validation-for="Phone" class="text-danger"></span>
-    </div>
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+    <div class="col-sm-1 col-form-label text-sm-right pr-0">
         <label for="id-form-field-1" class="mb-0">
             State
         </label>
     </div>
 
-    <div class="col-sm-3">
+    <div class="col-sm-2">
         @Html.DropDownListFor(model => model.StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state",
        new { @class = "form-control", @placeholder = "Select State", id = "Shippings_" + ViewBag.index + "__StateId", @name1 = "Shippings[" + ViewBag.index + "].StateId" })
         <span asp-validation-for="StateId" class="text-danger"></span>
     </div>
 
-</div>
-
-<div class="form-group row">
-
-
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+    <div class="col-sm-1 col-form-label text-sm-right pr-0">
         <label for="id-form-field-1" class="mb-0">
             City
         </label>
     </div>
 
-    <div class="col-sm-3">
+    <div class="col-sm-2">
         @Html.DropDownListFor(model => model.CityId, new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city",
        new { @class = "form-control", @placeholder = "Select city", id = "Shippings_" + ViewBag.index + "__CityId", @name1 = "Shippings[" + ViewBag.index + "].CityId" })
         <span asp-validation-for="CityId" class="text-danger"></span>
     </div>
 
-    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+        <label for="id-form-field-1" class="mb-0">
+            Zip
+        </label>
+    </div>
+    <div class="col-sm-2">
+        @Html.TextBoxFor(m => m.Zip1,
+          new { @placeholder = "Zip 1", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Zip1", @name1 = "Shippings[" + ViewBag.index + "].Zip1", maxlength = "5" })
+        <span asp-validation-for="Zip1" class="text-danger"></span>
+    </div>
+    <div class="col-sm-2">
+        @Html.TextBoxFor(m => m.Zip2,
+          new { @placeholder = "Zip 2", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Zip2", @name1 = "Shippings[" + ViewBag.index + "].Zip2", maxlength = "5" })
+        <span asp-validation-for="Zip2" class="text-danger"></span>
+    </div>
+
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-1 col-form-label text-sm-right pr-0">
         <label for="id-form-field-1" class="mb-0">
             Address
         </label>
     </div>
 
-    <div class="col-sm-3">
+    <div class="col-sm-5">
         @Html.TextBoxFor(m => m.Address,
-        new { @placeholder = "Address", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Address", @name1 = "Shippings[" + ViewBag.index + "].Address",maxlength="250"  })
+        new { @placeholder = "Address", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Address", @name1 = "Shippings[" + ViewBag.index + "].Address", maxlength = "250" })
         <span asp-validation-for="Address" class="text-danger"></span>
     </div>
-    <div class="col-lg-2">
+
+</div>
+
+
+<div class="form-group row">
+
+    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+        <label for="id-form-field-1" class="mb-0">
+            Phone
+        </label>
+    </div>
+    <div class="col-sm-2">
+        @Html.TextBoxFor(m => m.Phone,
+          new { @placeholder = "Phone", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Phone", @name1 = "Shippings[" + ViewBag.index + "].Phone" })
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+        <label for="id-form-field-1" class="mb-0">
+            Email
+        </label>
+    </div>
+    <div class="col-sm-2">
+        @Html.TextBoxFor(m => m.Email,
+          new { @placeholder = "Email", @class = "form-control", id = "Shippings_" + ViewBag.index + "__Email", @name1 = "Shippings[" + ViewBag.index + "].Email", maxlength = "150" })
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+
+    @*<div class="col-lg-2">
         <button onclick="addShipping()" type="button"
                 class="btnAddShipping btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-            Add
+            Add More Shipping Address
             <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
         </button>
-    </div>
+    </div>*@
+
 </div>
+
 <hr class="border-dashed" />
 
 @for (int j = 0; j < Model.ApartmentList.Count(); j++)
@@ -113,29 +107,38 @@
     <div id="apartmentPanel_@ViewBag.index">
         <div class="form-group row">
 
-            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                 <label for="id-form-field-1" class="mb-0">
-                    Apartment No
+                  1-  Apartment No
                 </label>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 @Html.TextBoxFor(m => m.ApartmentList[j].ApartmentNo,
-                new { @placeholder = "Apartment No", @class = "form-control",
-                id = "Shippings_" + ViewBag.index + "ApartmentList" + j + "__ApartmentNo", @name1 = "Shippings[" + ViewBag.index + "].ApartmentList[" + j + "].ApartmentNo"
+                new
+                     {
+                         @placeholder = "Apartment No",
+                         @class = "form-control",
+                id = "Shippings_" + ViewBag.index + "ApartmentList" + j + "__ApartmentNo",
+                         @name1 = "Shippings[" + ViewBag.index + "].ApartmentList[" + j + "].ApartmentNo"
                 })
                 <span asp-validation-for="ApartmentList[j].ApartmentNo" class="text-danger"></span>
             </div>
 
-            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+            <div class="col-sm-1 col-form-label text-sm-right pr-0">
                 <label for="id-form-field-1" class="mb-0">
                     Apartment Name
                 </label>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-2">
                 @Html.TextBoxFor(m => m.ApartmentList[j].ApartmentName,
-                 
-                   new { @placeholder = "Apartment Name", @class = "form-control",
-                   id = "Shippings_" + ViewBag.index + "ApartmentList" + ViewBag.index + "__ApartmentName", @name1 = "Shippings[" + ViewBag.index + "].ApartmentList[" + j + "].ApartmentName"})
+
+                   new
+                        {
+                            @placeholder = "Apartment Name",
+                            @class = "form-control",
+                   id = "Shippings_" + ViewBag.index + "ApartmentList" + ViewBag.index + "__ApartmentName",
+                            @name1 = "Shippings[" + ViewBag.index + "].ApartmentList[" + j + "].ApartmentName"
+                        })
                 <span asp-validation-for="ApartmentList[j].ApartmentName"
                       class="text-danger"></span>
             </div>
@@ -143,14 +146,22 @@
             <div class="col-lg-2">
                 <button onclick="addShippingApartment('@ViewBag.index')" type="button"
                         class="btnAddApartment btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                    Add
+                    Add More
                     <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
                 </button>
             </div>
         </div>
     </div>
 }
-
+<div class="form-group row">
+    <div class="col-lg-3 offset-9">
+        <button onclick="addShipping()" type="button"
+                class="btnAddShipping btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+            Add More Shipping Address
+            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+        </button>
+    </div>
+</div>
 
 <hr />
 

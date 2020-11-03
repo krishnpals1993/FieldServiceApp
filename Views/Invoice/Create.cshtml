@@ -1,0 +1,496 @@
+﻿
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@model FieldServiceApp.Models.BilHeaderViewModel
+@inject IOptions<Appsettings> Settings
+@inject IOptions<Appsettings> Settings
+@{
+    ViewData["Title"] = "New Invoice";
+    List<string> CompanyTypeList = new List<string>();
+    CompanyTypeList.Add("Business");
+    CompanyTypeList.Add("Residential");
+
+}
+
+<div role="main" class="page-content container container-plus">
+    <div class="card bcard mt-2 mt-lg-3">
+        <div class="card-header">
+            <h3 class="card-title text-125">
+                @ViewData["Title"]
+                <button type="button" onclick="backToSearch()"
+                        style="float:right"
+                        class=" btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                    Back to search
+
+                </button>
+            </h3>
+        </div>
+
+        <div class="card-body px-3 pb-1">
+            <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Invoice/Create" method="post">
+
+                @Html.HiddenFor(h => h.OrderId)
+                @Html.HiddenFor(h => h.OrderNo)
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Order No
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="input-group date">
+                            @Html.TextBoxFor(m => m.OrderNo,
+                            new { @placeholder = "Order No", min = "1", type = "number", @class = "form-control" })
+                            <span asp-validation-for="OrderNo" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Order Date
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="input-group date">
+                            @Html.TextBoxFor(m => m.OrderDate, new { @placeholder = "Order Date", @class = "form-control" })
+
+                        </div>
+
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Ship Date
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="input-group date" id="id-timepicker">
+                            @Html.TextBoxFor(m => m.ShipStartDate, new { @placeholder = "Ship Date", @class = "form-control" })
+                        </div>
+                    </div>
+
+                </div>
+
+                <h3 class="card-title text-125">
+                    Billing Information
+                </h3>
+                <hr />
+
+
+
+                <div class="form-group row">
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Code
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligCompanyCode,
+                        new { @placeholder = "Code", @class = "form-control", maxlength = "44", @readonly = "readonly" })
+
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Name
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligCompanyName,
+                        new { @placeholder = "Company Name", @class = "form-control", maxlength = "250", @readonly = "readonly" })
+
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            First Name
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligFirstName,
+                        new { @placeholder = "First Name", @class = "form-control", @readonly = "readonly" })
+
+                    </div>
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Last Name
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligLastName,
+                          new { @placeholder = "Last Name", @class = "form-control", @readonly = "readonly" })
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group row">
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            State
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligStateName,
+                             new { @placeholder = "State", @class = "form-control", maxlength = "298", @readonly = "readonly" })
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            City
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligCityName,
+                        new { @placeholder = "City", @class = "form-control", maxlength = "298", @readonly = "readonly" })
+
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Zip
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligZip1,
+                        new { @placeholder = "Zip 1", @class = "form-control", @readonly = "readonly" })
+                    </div>
+
+
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.BilligZip2,
+                        new { @placeholder = "Zip 2", @class = "form-control", @readonly = "readonly" })
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group row">
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Address
+                        </label>
+                    </div>
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.BilligAddress,
+                        new { @placeholder = "Address", @class = "form-control", maxlength = "298", @readonly = "readonly" })
+
+                    </div>
+                </div>
+
+
+                <h3 class="card-title text-125">
+                    Shipping Information
+                </h3>
+                <hr />
+                <div class="form-group row">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            State
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Shipping.StateName,
+                           new { @placeholder = "State Name", @class = "zip form-control", @readonly = "readonly" })
+                    </div>
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            City
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Shipping.CityName,
+                          new { @placeholder = "City Name", @class = "zip form-control", @readonly = "readonly" })
+                    </div>
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Zip
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Shipping.Zip1,
+                          new { @placeholder = "Zip 1", @class = "zip form-control", @readonly = "readonly" })
+
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Shipping.Zip2,
+                          new { @placeholder = "Zip 2", @class = "zip form-control", @readonly = "readonly" })
+
+                    </div>
+
+
+
+                </div>
+
+
+                <div class="form-group row">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Address
+                        </label>
+                    </div>
+
+                    <div class="col-sm-5">
+                        @Html.TextBoxFor(m => m.Shipping.Address,
+                        new { @placeholder = "Address", @class = "form-control", @readonly = "readonly" })
+
+                    </div>
+
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Phone
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Shipping.Phone,
+                          new { @placeholder = "Phone", @class = "form-control", @readonly = "readonly" })
+
+                    </div>
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Email
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Shipping.Email,
+                          new { @placeholder = "Email", @class = "form-control", maxlength = "150", @readonly = "readonly" })
+
+                    </div>
+
+                </div>
+
+                <h3 class="card-title text-125">
+                    Item detail
+                </h3>
+                <hr />
+
+                <div class="form-group row">
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Item
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DropDownListFor(model => model.ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control", @placeholder = "Select Item", @readonly = "readonly" })
+                        <span asp-validation-for="ItemId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Price
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.PerUnitPrice,
+                           new { @placeholder = "Price", @class = "form-control", @readonly = "@readonly" })
+                        <span asp-validation-for="PerUnitPrice" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Quantity
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.Quantity,
+                         new { @placeholder = "Quantity", @class = "form-control", @readonly = "readonly" })
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Total Price
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.TextBoxFor(m => m.TotalPrice,
+                       new { @placeholder = "Total Price", @class = "form-control", @readonly = "@readonly" })
+                        <span asp-validation-for="TotalPrice" class="text-danger"></span>
+                        @*<a href="#" class="btn btn-link text-primary-d1">Add More</a>*@
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Description
+                        </label>
+                    </div>
+                    <div class="col-sm-5">
+                        @Html.TextBoxFor(m => m.Description,
+                         new { @placeholder = "Description", @class = "form-control", @readonly = "@readonly" })
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Total Amount
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.TotalAmount,
+                       new { @placeholder = "Total Amount", @class = "form-control", @readonly = "@readonly" })
+                        <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                    </div>
+                </div>
+
+
+
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-3 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
+
+                        <a href="~/Invoice/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+        @*<link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />*@
+    </environment>
+    <style>
+        hr {
+            /*margin-bottom: 2rem !important;*/
+        }
+    </style>
+}
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+        <script src="~/pages/form-basic/@@page-script.js"></script>
+        @*<script src="~/lib/chosen-js/chosen.jquery.js"></script>*@
+    </environment>
+    <script type="text/javascript">
+        // Restricts input for each element in the set of matched elements to the given inputFilter.
+        (function ($) {
+            $.fn.inputFilter = function (inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            };
+        }(jQuery));
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+             $("#OrderNo").inputFilter(function(value) {
+                 return /^-?\d*[.,]?\d*$/.test(value);
+             });
+
+
+            window.itemList = '@Json.Serialize(Model.ItemList)';
+            window.itemList = JSON.parse(itemList);
+            console.log(window.itemList);
+        var SuccessMessage = '@ViewBag.SuccessMessage';
+        var ErrorMessage = '@ViewBag.ErrorMessage';
+        if (SuccessMessage) {
+            swal(SuccessMessage, "", "success");
+           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Invoice/Add"; }, 500);
+
+        }
+        if (ErrorMessage) {
+            swal(ErrorMessage, "", "error");
+            }
+
+      });
+
+        function getItemPrice(itemId) {
+            var price = 0;
+            for (var i = 0; i <  window.itemList.length; i++) {
+                if (window.itemList[i]["ItemId"].toString()== itemId) {
+                    price = window.itemList[i]["ItemPrice"];
+                    i = window.itemList.length;
+                    break;
+                }
+            }
+            return price;
+        }
+
+        function getItemDescription(itemId) {
+            var description = 0;
+            for (var i = 0; i <  window.itemList.length; i++) {
+                if (window.itemList[i]["ItemId"].toString()== itemId) {
+                    description = window.itemList[i]["ItemDescription"];
+                    i = window.itemList.length;
+                    break;
+                }
+            }
+            return description;
+        }
+
+        function searchOrder() {
+
+            if ($("#OrderNo").val()) {
+                window.location.href = "@Settings.Value.WebBaseURL/Invoice/Create/"+$("#OrderNo").val();
+            }
+            else {
+                swal("Please enter order no", "", "error");
+            }
+
+        }
+
+        function backToSearch() {
+             window.location.href = "@Settings.Value.WebBaseURL/Invoice/Add";
+        }
+
+    </script>
+
+}

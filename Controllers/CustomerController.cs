@@ -86,6 +86,7 @@ namespace FieldServiceApp.Controllers
         [HttpPost]
         public ActionResult Add(CustomerMasterViewModel model)
         {
+            var a = new Exception();
             try
             {
                 
@@ -121,7 +122,11 @@ namespace FieldServiceApp.Controllers
                         CompanyName = model.CompanyName,
                         CityId = model.CityId == null ? 0 : model.CityId.Value,
                         StateId = model.StateId == null ? 0 : model.StateId.Value,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
                         Address = model.Address,
+                        Address2 = model.Address2??"",
+                        Address3 = model.Address3??"",
                         CompanyType = model.CompanyType,
                         Zip1 = model.Zip1,
                         Zip2 = model.Zip2,
@@ -136,9 +141,8 @@ namespace FieldServiceApp.Controllers
 
                     foreach (var item in model.Shippings)
                     {
-                        if (Convert.ToString(item.FirstName ?? "") != "" ||
-                            Convert.ToString(item.MiddleName ?? "") != "" ||
-                            Convert.ToString(item.LastName ?? "") != "" ||
+                        if (Convert.ToString(item.Zip1 ?? "") != "" ||
+                            Convert.ToString(item.Zip2 ?? "") != "" ||
                             Convert.ToString(item.Email ?? "") != "" ||
                             Convert.ToString(item.Phone ?? "") != "" ||
                             Convert.ToString(item.StateId) != "0" ||
@@ -155,6 +159,8 @@ namespace FieldServiceApp.Controllers
                                 Phone = item.Phone,
                                 CityId = item.CityId == null ? 0 : item.CityId.Value,
                                 StateId = item.StateId == null ? 0 : item.StateId.Value,
+                                Zip1 = item.Zip1,
+                                Zip2 = item.Zip2,
                                 Address = item.Address,
                                 IsActive = 1,
                                 CreatedBy = 1,
@@ -192,7 +198,7 @@ namespace FieldServiceApp.Controllers
                                     catch (Exception wx)
                                     {
 
-                                        var a = "";
+                                         a =wx ;
                                     }
 
                                     
@@ -239,9 +245,10 @@ namespace FieldServiceApp.Controllers
 
                 }
             }
+          
             catch (Exception ex)
             {
-                var a = "";
+                 a = ex;
             }
 
             return View(model);
@@ -275,6 +282,8 @@ namespace FieldServiceApp.Controllers
                 {
                     model.CompanyName = checkCustomer.CompanyName;
                     model.Address = checkCustomer.Address;
+                    model.FirstName = checkCustomer.FirstName;
+                    model.LastName = checkCustomer.LastName;
                     model.CityId = checkCustomer.CityId;
                     model.StateId = checkCustomer.StateId;
                     model.CustmoerId = checkCustomer.CustmoerId;
@@ -318,7 +327,9 @@ namespace FieldServiceApp.Controllers
                             CityId = s.CityId,
                             StateId = s.StateId,
                             Address = s.Address,
-                            ShipId = s.ShipId
+                            ShipId = s.ShipId,
+                            Zip1= s.Zip1,
+                            Zip2 = s.Zip2
 
                         }).ToList();
                         foreach (var item in model.Shippings)
@@ -393,6 +404,8 @@ namespace FieldServiceApp.Controllers
                     checkCustomer.CityId = model.CityId == null ? 0 : model.CityId.Value;
                     checkCustomer.StateId = model.StateId == null ? 0 : model.StateId.Value;
                     checkCustomer.Address = model.Address;
+                    checkCustomer.FirstName = model.FirstName;
+                    checkCustomer.LastName = model.LastName;
                     checkCustomer.Zip1 = model.Zip1;
                     checkCustomer.Zip2 = model.Zip2;
                     checkCustomer.Code = model.Code;
@@ -415,6 +428,8 @@ namespace FieldServiceApp.Controllers
                             checkShipping.CityId = item.CityId == null ? 0 : item.CityId.Value;
                             checkShipping.StateId = item.StateId == null ? 0 : item.StateId.Value;
                             checkShipping.Address = item.Address;
+                            checkShipping.Zip1 = item.Zip1;
+                            checkShipping.Zip2 = item.Zip2;
                             checkShipping.ModifiedBy = 1;
                             checkShipping.ModifiedDate = DateTime.Now;
                             _dbContext.SaveChanges();
@@ -438,7 +453,7 @@ namespace FieldServiceApp.Controllers
                                         Convert.ToString(apartment.ApartmentName ?? "") != "")
                                     {
                                         var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == item.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
-                                        if (checkAprtment != null)
+                                        if (checkAprtment == null)
                                         {
                                             CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
                                             {
@@ -464,9 +479,8 @@ namespace FieldServiceApp.Controllers
                         }
                         else
                         {
-                            if (Convert.ToString(item.FirstName ?? "") != "" ||
-                            Convert.ToString(item.MiddleName ?? "") != "" ||
-                            Convert.ToString(item.LastName ?? "") != "" ||
+                            if (Convert.ToString(item.Zip1 ?? "") != "" ||
+                            Convert.ToString(item.Zip2 ?? "") != "" ||
                             Convert.ToString(item.Email ?? "") != "" ||
                             Convert.ToString(item.Phone ?? "") != "" ||
                             Convert.ToString(item.StateId) != "0" ||
@@ -481,6 +495,8 @@ namespace FieldServiceApp.Controllers
                                     LastName = item.LastName,
                                     Email = item.Email,
                                     Phone = item.Phone,
+                                    Zip1 = item.Zip1,
+                                    Zip2 = item.Zip2,
                                     CityId = item.CityId == null ? 0 : item.CityId.Value,
                                     StateId = item.StateId == null ? 0 : item.StateId.Value,
                                     Address = item.Address,
@@ -497,7 +513,7 @@ namespace FieldServiceApp.Controllers
                                             Convert.ToString(apartment.ApartmentName ?? "") != "")
                                     {
                                         var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == custmoerShipping.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
-                                        if (checkAprtment != null)
+                                        if (checkAprtment == null)
                                         {
                                             CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
                                             {
@@ -656,7 +672,10 @@ namespace FieldServiceApp.Controllers
             return Json(response);
         }
 
-
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
 
     }
 }

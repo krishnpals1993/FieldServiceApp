@@ -1,0 +1,209 @@
+﻿@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@model FieldServiceApp.Models.CalenderWorkingHourViewModel
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = "Calender Working Hour - " + Model.DayName;
+}
+<div role="main" class="page-content container container-plus">
+    <div class="card bcard mt-2 mt-lg-3">
+        <div class="card-header">
+            <h3 class="card-title text-125">
+                @ViewData["Title"]
+            </h3>
+        </div>
+
+        <div class="card-body px-3 pb-1">
+            <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/CalenderHour/Edit"
+                  method="post">
+                @Html.HiddenFor(h=>h.Id)
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Start Time
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+
+                        <div class="input-group date" id='datetimepicker3'>
+                            @Html.TextBoxFor(m => m.StartTime,
+                          new { @placeholder = "Start Time", @class = "form-control" })
+                            <div class="input-group-addon input-group-append">
+                                <div class="input-group-text">
+                                    <i class="far fa-clock"></i>
+                                </div>
+                            </div>
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            End Time
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+
+                        <div class="input-group date" id='datetimepicker2'>
+                            @Html.TextBoxFor(m => m.EndTime,
+                          new { @placeholder = "End Time", @class = "form-control" })
+                            <div class="input-group-addon input-group-append">
+                                <div class="input-group-text">
+                                    <i class="far fa-clock"></i>
+                                </div>
+                            </div>
+                            <span asp-validation-for="EndTime" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <p class="text-danger">
+                    @ViewBag.ErrorMessage
+                </p>
+
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-3 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit" onclick="return checkDate();">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
+
+                        <a href="~/CalenderHour/Index" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+    </environment>
+    <style>
+        hr {
+            /*margin-bottom: 2rem !important;*/
+        }
+    </style>
+}
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+        @*<script src="~/pages/form-basic/@@page-script.js"></script>*@
+    </environment>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            window.shipFromDate = $("#StartTime").val();
+            window.shipDateTo = $("#EndTime").val();
+            debugger;
+        var SuccessMessage = '@ViewBag.SuccessMessage';
+        var ErrorMessage = '@ViewBag.ErrorMessage';
+        if (SuccessMessage) {
+            swal(SuccessMessage, "", "success");
+           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/CalenderHour/Index"; }, 500);
+
+        }
+        if (ErrorMessage) {
+            swal(ErrorMessage, "", "error");
+            }
+
+        $('#datetimepicker3').datetimepicker({
+            format: 'LT',
+             icons: {
+      time: 'far fa-clock text-green-d1 text-120',
+      date: 'far fa-calendar text-blue-d1 text-120',
+
+      up: 'fa fa-chevron-up text-secondary',
+      down: 'fa fa-chevron-down text-secondary',
+      previous: 'fa fa-chevron-left text-secondary',
+      next: 'fa fa-chevron-right text-secondary',
+
+      today: 'far fa-calendar-check text-purple-d1 text-120',
+      clear: 'fa fa-trash-alt text-orange-d2 text-120',
+      close: 'fa fa-times text-danger text-120'
+    },
+        });
+
+         $('#datetimepicker2').datetimepicker({
+            format: 'LT',
+             icons: {
+      time: 'far fa-clock text-green-d1 text-120',
+      date: 'far fa-calendar text-blue-d1 text-120',
+
+      up: 'fa fa-chevron-up text-secondary',
+      down: 'fa fa-chevron-down text-secondary',
+      previous: 'fa fa-chevron-left text-secondary',
+      next: 'fa fa-chevron-right text-secondary',
+
+      today: 'far fa-calendar-check text-purple-d1 text-120',
+      clear: 'fa fa-trash-alt text-orange-d2 text-120',
+      close: 'fa fa-times text-danger text-120'
+    },
+         });
+
+            if (window.shipFromDate) {
+                $("#StartTime").val(new moment(window.shipFromDate).format("hh:mm a").toUpperCase());
+                $("#EndTime").val(new moment(window.shipDateTo).format("hh:mm a").toUpperCase());
+            }
+
+
+
+        })
+
+
+        function checkDate() {
+
+            var shipFromDate = $("#StartTime").val();
+            var shipDateTo = $("#EndTime").val();
+
+             if (!shipFromDate) {
+                    swal("Please select start time", "", "error");
+                return false;
+                }
+
+                if (!shipDateTo) {
+                    swal("Please select end time", "", "error");
+                return false;
+                }
+
+            if (((shipFromDate) && (!shipDateTo)) || ((!shipFromDate) && (shipDateTo))) {
+                swal("Please select both times", "", "error");
+                return false;
+            }
+
+            if ((shipFromDate) && (shipDateTo)) {
+                if (shipFromDate >= shipDateTo) {
+                    swal("Start Time should be less than to End Time", "", "error");
+                    return false;
+                }
+
+
+
+            }
+
+            return true;
+        }
+
+    </script>
+}

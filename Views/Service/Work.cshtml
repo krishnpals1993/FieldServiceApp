@@ -8,6 +8,9 @@
     serviceTypeList.Add("Yes");
     serviceTypeList.Add("No");
     ViewData["Title"] = "Service Form";
+    List<string> CheckboxSelectionList = new List<string>();
+    CheckboxSelectionList.Add("Yes");
+    CheckboxSelectionList.Add("No");
 }
 <div role="main" class="page-content container container-plus">
     <div class="card bcard mt-2 mt-lg-3">
@@ -32,7 +35,7 @@
                         @Html.DropDownListFor(model => model.OrderId, new SelectList(Model.OrderList.Select(x => new { Value = x.OrderId, Text = x.CustomerName }), "Value", "Text"), "Select Customer", new { @class = "form-control", @placeholder = "Select Company" })
 
                         <span class="btn btn-link" id="btnOrder" onclick="getOrderDetail()"> View Order Detail </span>
-                        
+
                         <span asp-validation-for="OrderId" class="text-danger"></span>
                     </div>
 
@@ -62,7 +65,7 @@
                     </div>
 
                     <div class="col-sm-3 apartmentPanel">
-                        @Html.DropDownListFor(model => model.ApartmentId, 
+                        @Html.DropDownListFor(model => model.ApartmentId,
                        new SelectList(Model.ApartmentList.Select(x => new { Value = x.ApartmentId, Text = x.ApartmentNo }), "Value", "Text"), "Select Apartment", new { @class = "form-control", @placeholder = "Select Company" })
 
                         <span asp-validation-for="OrderId" class="text-danger"></span>
@@ -94,19 +97,35 @@
 
                 </div>
 
+                <div class="form-group row">
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Follow Up
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.IsFollowUp, new SelectList(CheckboxSelectionList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select" })
+                        <span asp-validation-for="IsFollowUp" class="text-danger"></span>
+                    </div>
+                    
+                </div>
+
 
                 @*<div class="form-group row">
-                        <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Signature
-                            </label>
-                        </div>
+            <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                <label for="id-form-field-1" class="mb-0">
+                    Signature
+                </label>
+            </div>
 
-                        <div class="col-sm-3">
-                            <input type="file" name="file" class="form-control" placeholder="Signature" />
+            <div class="col-sm-3">
+                <input type="file" name="file" class="form-control" placeholder="Signature" />
 
-                        </div>
-                    </div>*@
+            </div>
+        </div>*@
 
                 <div id="itemPanel" style="display:none">
 

@@ -139,6 +139,21 @@ namespace FieldServiceApp.Controllers
                     _dbContext.tbl_ServiceFormLogs.Add(ServiceFormLog);
                     _dbContext.SaveChanges();
 
+                    var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
+                    if (checkOrder!= null)
+                    {
+                        if (model.IsFollowUp== "Yes")
+                        {
+                            checkOrder.IsFollowUp = 1;
+                        }
+                        else
+                        {
+                            checkOrder.IsFollowUp = 0;
+                        }
+
+                        _dbContext.SaveChanges();
+                    }
+
                     ViewBag.SuccessMessage = "Detail added successfully";
 
 
@@ -201,7 +216,18 @@ namespace FieldServiceApp.Controllers
 
                 var orderItemId = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == model.OrderId).Select(s => s.ItemId).FirstOrDefault();
 
-                var shipId = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).Select(s => s.ShipId).FirstOrDefault();
+                var orderDetail = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
+
+                var shipId = orderDetail.ShipId;
+
+                if ((orderDetail.IsFollowUp??0)==0)
+                {
+                    model.IsFollowUp = "No";
+                }
+                else
+                {
+                    model.IsFollowUp = "Yes";
+                }
 
                 model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == shipId).
                   Select(s => new CustomerShippingApartmentViewModel()
@@ -283,6 +309,22 @@ namespace FieldServiceApp.Controllers
                         checkServiceFormLog.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();
                         ViewBag.SuccessMessage = "Detail added successfully";
+
+                        var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
+                        if (checkOrder != null)
+                        {
+                            if (model.IsFollowUp == "Yes")
+                            {
+                                checkOrder.IsFollowUp = 1;
+                            }
+                            else
+                            {
+                                checkOrder.IsFollowUp = 0;
+                            }
+
+                            _dbContext.SaveChanges();
+                        }
+
                     }
                     else
                     {

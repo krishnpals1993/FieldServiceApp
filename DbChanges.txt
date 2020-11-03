@@ -368,7 +368,133 @@ Alter table "CustomerMaster" Alter column "Code" type varchar(45);
 
 ALter table "OrderMaster" Add "ApartmentIds" varchar(250);
 	
-	
+-----------------------------------------------------------------
+
+
+CREATE TABLE "CalenderWorkingHour"
+(
+    "Id" serial PRIMARY KEY, 
+	"StartTime" timestamp ,
+    "EndTime" timestamp ,
+    "IsActive" smallint ,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+-----------------------------------------------------------------
+
+Alter table "OrderMaster" Add "IsFollowUp" smallint;
+Alter table "OrderMaster" Add "ParentOrderId" int;
+
+
+
+Alter table "CalenderWorkingHour" Add "DayName" varchar(100);
+
+insert into "CalenderWorkingHour" ("Day","DayName","IsActive","CreatedDate","CreatedBy")  values 
+(7,'Saturday',1,now(),1);
+
+
+
+Alter table "OrderMaster" Add "ReOccurence" smallint;
+Alter table "OrderMaster" Add "ReOccurenceFrequency" int;
+Alter table "OrderMaster" Add "ReOccurenceCycle" varchar(50);
+Alter table "OrderMaster" Add "ReOccurenceWeekday" varchar(50);
+
+----------------------------------------------------------------------------------------------
+
+
+Alter table "CustomerMaster" Add "Address2" varchar(40);
+Alter table "CustomerMaster" Add "Address3" varchar(40);
+
+Alter table "CustmoerShipping" Add "Zip1" varchar(5);
+Alter table "CustmoerShipping" Add "Zip2" varchar(5);
+
+Alter table "OrderMaster" Add "ReOccurenceStartDate" timestamp;
+Alter table "OrderMaster" Add "ReOccurenceEndDate" timestamp;
+
+-----------------------------------------------------------------------------------------------
+
+CREATE TABLE "CalenderWorkingDay"
+(
+    "Id" serial PRIMARY KEY, 
+	"Type" varchar(15),
+	"DayName" varchar(15),
+    "HolidayDate" timestamp ,
+    "IsActive" smallint ,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+-------------------------------------------------------------------------------------------------
+
+Alter table "OrderMaster" Add "ReOccurenceParentOrderId" int;
+Alter table "CustomerMaster" Alter column "Address2" type varchar(100);
+
+------------------------------------------------------------------------------------------------
+
+Alter table "CustomerMaster" Add column "LastName" varchar(300);
+
+------------------------------------------------------------------------------------------------
+
+Create TABLE "BilHeader"
+(   "BillId" serial PRIMARY KEY,
+	"BillNo" int,
+    "OrderId" int,
+    "BillInvoiceDate" timestamp,
+	"TotalAmount" decimal(10,2),
+	"CustomerId" int,
+	"ShipId" int,
+	"IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+Create TABLE "BilDetail"
+(
+    "BilDetailId" serial PRIMARY KEY,
+    "Bill2No" int,
+	"Bill2Seq" int,
+	"Bill2ItemId" int,
+	"Bill2Description" character varying(500),
+	"Bill2Price" decimal(10,2),
+	"IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

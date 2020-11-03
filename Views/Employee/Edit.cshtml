@@ -81,7 +81,7 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.Phone,
-                           new { @placeholder = "Phone", @class = "form-control", maxlength = "10" })
+                           new { @placeholder = "Phone", @class = "form-control", maxlength = "15" })
                         <span asp-validation-for="Phone" class="text-danger"></span>
                     </div>
 
@@ -133,17 +133,14 @@
 
 @section scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <environment names="Development,Staging,Production">
-        <script src="~/lib/moment/moment.js"></script>
-        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
-        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
-        <script src="~/pages/form-basic/@@page-script.js"></script>
-    </environment>
+<environment names="Development,Staging,Production">
+    <script src="~/lib/inputmask/jquery.inputmask.js"></script>
+</environment>
     <script type="text/javascript">
 
         $(document).ready(function () {
 
-
+        $("#Phone").inputmask("(999) 999-9999");
         var SuccessMessage = '@ViewBag.SuccessMessage';
         var ErrorMessage = '@ViewBag.ErrorMessage';
         if (SuccessMessage) {

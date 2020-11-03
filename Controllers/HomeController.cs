@@ -38,6 +38,25 @@ namespace FieldServiceApp.Controllers
             DashboardViewModel model = new DashboardViewModel();
             DashboardUtility _dashboardUtility = new DashboardUtility(_dbContext);
             model = _dashboardUtility.getDashBoardDetail(_rolename,_userId);
+            var todayDayName = DateTime.Now.DayOfWeek.ToString();
+            var checkCalenderHour = _dbContext.tbl_CalenderWorkingHours.Where(w=>w.DayName == todayDayName).FirstOrDefault();
+            if (checkCalenderHour != null)
+            {
+                model.CalenderWorkingHour.StartTime = checkCalenderHour.StartTime;
+                model.CalenderWorkingHour.EndTime = checkCalenderHour.EndTime;
+                model.CalenderWorkingHour.Id = checkCalenderHour.Id;
+                CommanUtility _commanUtility = new CommanUtility(_appSettings);
+                if (model.CalenderWorkingHour.StartTime != null)
+                {
+                    model.CalenderWorkingHour.StartTime = _commanUtility.RoundUp(model.CalenderWorkingHour.StartTime.Value, TimeSpan.FromMinutes(30));
+                    model.CalenderWorkingHour.EndTime = _commanUtility.RoundUp(model.CalenderWorkingHour.EndTime.Value, TimeSpan.FromMinutes(30));
+
+                }
+            }
+            else
+            {
+                model.CalenderWorkingHour.Id = 0;
+            }
             return View(model);
         }
 
@@ -49,7 +68,22 @@ namespace FieldServiceApp.Controllers
 
         }
 
-        
+
+        [HttpPost]
+        public JsonResult GetDayTimeDetail(int day )
+        {
+            CalenderWorkingHourViewModel model = new CalenderWorkingHourViewModel();
+            var checkCalenderHour = _dbContext.tbl_CalenderWorkingHours.Where(w => w.Day == day).FirstOrDefault();
+            if (checkCalenderHour != null)
+            {
+                model.StartTimeFormatted = checkCalenderHour.StartTime != null  ?checkCalenderHour.StartTime.Value.ToString("HH:mm:ss"):"00:00:00";
+                model.EndTimeFormatted = checkCalenderHour.EndTime != null ? checkCalenderHour.EndTime.Value.ToString("HH:mm:ss") : "00:00:00";
+                model.Id = checkCalenderHour.Id;
+                model.DayName = checkCalenderHour.DayName;
+
+            }
+            return Json(model);
+        }
 
         protected override void Dispose(bool disposing)
         {

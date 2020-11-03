@@ -258,9 +258,10 @@
                                                     </a>
                                                 </li>
 
-                                                <li class="nav-item">
-                                                    <a href="#" class="nav-link">
+                                                <li class="nav-item @((routeControl=="Invoice" &&
+                                        (routeAction=="Add" || routeAction=="Edit" || routeAction=="List" ))  ?"active":"" )">
 
+                                                    <a href="~/Invoice/List" class="nav-link">
                                                         <span class="nav-text">
                                                             <span>Invoice</span>
                                                         </span>
@@ -370,6 +371,54 @@
                                         <b class="sub-arrow"></b>
 
                                     </li>
+                                    <li class="nav-item @((routeControl=="CalenderHour")  ?"active open":"" )">
+
+                                        <a href="#" class="nav-link dropdown-toggle @(routeControl!="CalenderHour" ?"collapsed":"" )">
+                                            <i class="nav-icon fa fa-cogs"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Calender Days</span>
+                                            </span>
+
+                                            <b class="caret fa fa-angle-left rt-n90"></b>
+                                        </a>
+
+                                        <div class="hideable submenu @(routeControl!="CalenderHour" ?"collapse":"" )">
+                                            <ul class="submenu-inner">
+
+                                                <li class="nav-item @((routeControl=="CalenderHour" &&
+                                        (routeAction=="Index" || routeAction=="Add" || routeAction=="Edit"))  ?"active":"" )">
+
+                                                    <a href="~/CalenderHour/Index" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Calender Hour</span>
+                                                        </span>
+                                                    </a>
+
+
+                                                </li>
+                                                <li class="nav-item @((routeControl=="CalenderHour" &&
+                                        (routeAction=="AddWorkingDay"))  ?"active":"" )">
+
+                                                    <a href="~/CalenderHour/NonWorkingDayList" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Working Day</span>
+                                                        </span>
+                                                    </a>
+
+
+                                                </li>
+
+                                            </ul>
+                                        </div>
+
+                                        <b class="sub-arrow"></b>
+
+                                    </li>
+
+
+
 
                                 }
 

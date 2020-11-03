@@ -29,6 +29,10 @@ namespace FieldServiceApp.Models
         public DbSet<ItemCategory> tbl_ItemCategory { get; set; }
         public DbSet<ServiceFormLog> tbl_ServiceFormLogs { get; set; }
         public DbSet<CustomerShippingApartment> tbl_CustomerShippingApartments { get; set; }
+        public DbSet<CalenderWorkingHour> tbl_CalenderWorkingHours { get; set; }
+        public DbSet<CalenderWorkingDay> tbl_CalenderWorkingDays { get; set; }
+        public DbSet<BilHeader> tbl_BilHeaders { get; set; }
+        public DbSet<BilDetail> tbl_BilDetail { get; set; }
 
     }
 
@@ -42,7 +46,7 @@ namespace FieldServiceApp.Models
         public string UserName { get; set; }
         public string Password { get; set; }
         public int RoleId { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -58,7 +62,7 @@ namespace FieldServiceApp.Models
 
         public string RoleName { get; set; }
 
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -85,7 +89,7 @@ namespace FieldServiceApp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ClaimId { get; set; }
         public int MenuId { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -109,11 +113,14 @@ namespace FieldServiceApp.Models
         public string Zip2 { get; set; }
         public string Code { get; set; }
         public string CompanyType { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string LastName { get; set; }
     }
 
     [Table("CustmoerContact")]
@@ -130,7 +137,7 @@ namespace FieldServiceApp.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -152,11 +159,13 @@ namespace FieldServiceApp.Models
         public string Address { get; set; }
         public int CityId { get; set; }
         public int StateId { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
     }
 
     [Table("ItemMaster")]
@@ -165,14 +174,14 @@ namespace FieldServiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ItemId { get; set; }
-        public int ? CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public string ItemCd { get; set; }
         public string ItemDescription { get; set; }
         public int ItemUnitId { get; set; }
         public int ItemQOH { get; set; }
         public decimal ItemCost { get; set; }
         public decimal ItemPrice { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -206,17 +215,26 @@ namespace FieldServiceApp.Models
         public decimal TotalAmount { get; set; }
         public int CustomerId { get; set; }
         public int ShipId { get; set; }
-        public DateTime ? ShipStartDate { get; set; }
-        public DateTime ? ShipEndDate { get; set; }
+        public DateTime? ShipStartDate { get; set; }
+        public DateTime? ShipEndDate { get; set; }
         public DateTime? ShipDate { get; set; }
         public DateTime? CancelDate { get; set; }
         public string CancelReason { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string ApartmentIds { get; set; }
+        public Int16? IsFollowUp { get; set; }
+        public int? ParentOrderId { get; set; }
+        public Int16? ReOccurence { get; set; }
+        public int? ReOccurenceFrequency { get; set; }
+        public string ReOccurenceCycle { get; set; }
+        public string ReOccurenceWeekday { get; set; }
+        public DateTime? ReOccurenceStartDate { get; set; }
+        public DateTime? ReOccurenceEndDate { get; set; }
+        public int? ReOccurenceParentOrderId { get; set; }
     }
 
     [Table("OrderDetail")]
@@ -233,7 +251,7 @@ namespace FieldServiceApp.Models
         public int Quantity { get; set; }
         public decimal PerUnitPrice { get; set; }
         public decimal TotalPrice { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -264,7 +282,7 @@ namespace FieldServiceApp.Models
 
         public string CityName { get; set; }
 
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -280,8 +298,7 @@ namespace FieldServiceApp.Models
         public int StateId { get; set; }
 
         public string StateName { get; set; }
-
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -297,7 +314,7 @@ namespace FieldServiceApp.Models
 
         public string UnitName { get; set; }
 
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -310,12 +327,12 @@ namespace FieldServiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmployeeId { get; set; }
-       public string FirstName { get; set; }
+        public string FirstName { get; set; }
         public string MiddleName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public Int16  IsActive { get; set; }
+        public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
@@ -370,6 +387,75 @@ namespace FieldServiceApp.Models
         public int ShipId { get; set; }
         public string ApartmentNo { get; set; }
         public string ApartmentName { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("CalenderWorkingHour")]
+    public class CalenderWorkingHour
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public Int16 Day { get; set; }
+        public string DayName { get; set; }
+    }
+
+    [Table("CalenderWorkingDay")]
+    public class CalenderWorkingDay
+    {
+
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public string DayName { get; set; }
+        public DateTime? HolidayDate { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("BilHeader")]
+    public class BilHeader
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int BillId { get; set; }
+        public int BillNo { get; set; }
+        public int OrderId { get; set; }
+        public DateTime BillInvoiceDate { get; set; }
+        public decimal TotalAmount { get; set; }
+        public int CustomerId { get; set; }
+        public int ShipId { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("BilDetail")]
+    public class BilDetail
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int BilDetailId { get; set; }
+        public int Bill2No { get; set; }
+        public int Bill2Seq { get; set; }
+        public int Bill2ItemId { get; set; }
+        public string Bill2Description { get; set; }
+        public decimal Bill2Price { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
