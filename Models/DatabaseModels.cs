@@ -14,8 +14,10 @@ namespace FieldServiceApp.Models
         public DbSet<Role> tbl_Roles { get; set; }
         public DbSet<Menu> tbl_Menus { get; set; }
         public DbSet<CustomerMaster> tbl_CustomerMaster { get; set; }
-        public DbSet<CustmoerContact> tbl_CustmoerContact { get; set; }
-        public DbSet<CustmoerShipping> tbl_CustmoerShipping { get; set; }
+        public DbSet<CustomerContact> tbl_CustmoerContact { get; set; }
+        public DbSet<CustomerShipping> tbl_CustmoerShipping { get; set; }
+        public DbSet<CustomerBilling> tbl_CustomerBillings { get; set; }
+        public DbSet<CustomerShippingApartment> tbl_CustomerShippingApartments { get; set; }
         public DbSet<Userclaim> tbl_Userclaim { get; set; }
         public DbSet<ItemMaster> tbl_ItemMaster { get; set; }
         public DbSet<ItemPrice> tbl_ItemPrice { get; set; }
@@ -28,7 +30,6 @@ namespace FieldServiceApp.Models
         public DbSet<EmployeeMaster> tbl_EmployeeMaster { get; set; }
         public DbSet<ItemCategory> tbl_ItemCategory { get; set; }
         public DbSet<ServiceFormLog> tbl_ServiceFormLogs { get; set; }
-        public DbSet<CustomerShippingApartment> tbl_CustomerShippingApartments { get; set; }
         public DbSet<CalenderWorkingHour> tbl_CalenderWorkingHours { get; set; }
         public DbSet<CalenderWorkingDay> tbl_CalenderWorkingDays { get; set; }
         public DbSet<BilHeader> tbl_BilHeaders { get; set; }
@@ -96,76 +97,6 @@ namespace FieldServiceApp.Models
         public DateTime? ModifiedDate { get; set; }
         public int RoleId { get; set; }
 
-    }
-
-    [Table("CustomerMaster")]
-    public class CustomerMaster
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CustmoerId { get; set; }
-        public string CompanyName { get; set; }
-        public string Address { get; set; }
-        public int CityId { get; set; }
-        public int StateId { get; set; }
-        public string FirstName { get; set; }
-        public string Zip1 { get; set; }
-        public string Zip2 { get; set; }
-        public string Code { get; set; }
-        public string CompanyType { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string Address2 { get; set; }
-        public string Address3 { get; set; }
-        public string LastName { get; set; }
-    }
-
-    [Table("CustmoerContact")]
-    public class CustmoerContact
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CustmoerContactId { get; set; }
-
-        public int ShipId { get; set; }
-        public int CustmoerId { get; set; }
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-    }
-
-    [Table("CustmoerShipping")]
-    public class CustmoerShipping
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ShipId { get; set; }
-        public int CustmoerId { get; set; }
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public string Address { get; set; }
-        public int CityId { get; set; }
-        public int StateId { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string Zip1 { get; set; }
-        public string Zip2 { get; set; }
     }
 
     [Table("ItemMaster")]
@@ -378,22 +309,6 @@ namespace FieldServiceApp.Models
         public int? ApartmentId { get; set; }
     }
 
-    [Table("CustomerShippingApartment")]
-    public class CustomerShippingApartment
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ApartmentId { get; set; }
-        public int ShipId { get; set; }
-        public string ApartmentNo { get; set; }
-        public string ApartmentName { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-    }
-
     [Table("CalenderWorkingHour")]
     public class CalenderWorkingHour
     {
@@ -461,6 +376,113 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+    }
+    [Table("CustomerMaster")]
+    public class CustomerMaster
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int CustomerId { get; set; }
+        public string CompanyName { get; set; }
+        public string CompanyType { get; set; }
+        public string CompanyCode { get; set; }
+        public string Notes { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("CustomerBilling")]
+    public class CustomerBilling
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int CustomerBillingId { get; set; }
+        public int CustomerId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int CityId { get; set; }
+        public int StateId { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string Notes { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+
+    }
+
+    [Table("CustomerContact")]
+    public class CustomerContact
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int CustomerContactId { get; set; }
+        public int CustomerShipId { get; set; }
+        public int CustomerId { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("CustomerShipping")]
+    public class CustomerShipping
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int CustomerShipId { get; set; }
+        public int CustomerId { get; set; }
+        public int CustomerBillingId { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public int CityId { get; set; }
+        public int StateId { get; set; }
+        public string Address { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string Notes { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+
+    }
+
+    [Table("CustomerShippingApartment")]
+    public class CustomerShippingApartment
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ApartmentId { get; set; }
+        public int CustomerShipId { get; set; }
+        public string ApartmentNo { get; set; }
+        public string ApartmentName { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string Notes { get; set; }
     }
 
 }

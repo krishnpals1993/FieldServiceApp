@@ -1,5 +1,10 @@
 ﻿@model FieldServiceApp.Models.DashboardOrderViewModel
-
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    String RoleName = Convert.ToString(@HttpContextAccessor.HttpContext.Session.GetString("RoleName"));
+    Model.EmployeeName = Model.EmployeeList.Where(w => w.EmployeeId == Model.EmployeeId).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
+}
 <div class="modal fade">
 
     <div class="modal-dialog">
@@ -19,19 +24,40 @@
                     <div class="input-group">
                         <div class="input-groupp-repend align-self-center mr-2">
                         </div>
-                        @Html.DropDownListFor(model => model.EmployeeId,
-                     new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"),
-                     "Select Employee", new
-                          {
+                        @if (RoleName == "Admin")
+                        {
+                            @Html.DropDownListFor(model => model.EmployeeId,
+                            new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"),
+                            "Select Employee", new
+                            {
                               @class = "form-control",
                               @placeholder = "Select Employee",
                               style = "margin-right:10px;max-width:300px"
-                     })
-                        <div class="input-group-append">
-                            <button type="button" onclick="updateOrder('@Model.OrderId')" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
-                            <button type="submit" style="display:none" id="btnSumbit" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
-                            <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px"  data-dismiss="modal">Close</button>
-                        </div>
+                            })
+                            <div class="input-group-append">
+                                <button type="button" onclick="updateOrder('@Model.OrderId')" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
+                                <button type="submit" style="display:none" id="btnSumbit" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" data-dismiss="modal">Close</button>
+                            </div>
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(m => m.EmployeeName,
+                             new
+                             {
+                                 @class = "form-control",
+                                 @placeholder = "Select Employee",
+                                 style = "margin-right:10px;max-width:300px",
+                                 @readonly = "readonly",
+
+                             })
+                            <div class="input-group-append">
+                                @Html.ActionLink("Submit Form/ Complete Job","Work","Service",new { id = Model.OrderId }, new {@class="btn btn-sm btn-orange btn-bold ml-2px" } )
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" data-dismiss="modal">Close</button>
+                            </div>
+                        }
+
+
                     </div>
                 </form>
             </div>

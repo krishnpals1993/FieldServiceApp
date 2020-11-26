@@ -82,7 +82,7 @@
                 </div>
                 <div class="col-sm-2">
                     <div class="input-group date">
-                        
+
                         @Html.TextBoxFor(m => m.OrderDateTo,
                            new { id = "id-date-4", @placeholder = "Order Date To", @class = "form-control" })
                         <div class="input-group-addon input-group-append">
@@ -130,7 +130,7 @@
 
             </div>
 
-</form>
+        </form>
 
         <table id="datatable" class="d-style w-100 table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed">
             <!-- add `collapsed` by default ... it will be removed by default -->
@@ -158,7 +158,10 @@
                     <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                         Assigned To
                     </th>
+                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
 
+                        Ship Address
+                    </th>
 
                     <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                         Status
@@ -201,6 +204,11 @@
                         <td class="text-grey">
                             @item.EmployeeName
                         </td>
+
+                        <td class="text-grey">
+                            @item.CustomerShipAddress
+                        </td>
+
                         <td>
                             @if (item.IsActive == 1)
                             {
@@ -244,11 +252,11 @@
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
     </environment>
 
-<style>
-    .nonWkDayOrder {
-    background-color: #ffbc002b;
-    }
-</style>
+    <style>
+        .nonWkDayOrder {
+            background-color: #ffbc002b;
+        }
+    </style>
 
 }
 
@@ -371,7 +379,7 @@
                 return false;
             }
                 }
-               
+
                 if (((orderDateFrom) && (!orderDateTo)) || ((!orderDateFrom) && (orderDateTo))) {
                 swal("Please select both order dates", "", "error");
                 return false;
@@ -382,7 +390,7 @@
                 return false;
             }
                 }
-               
+
 
                 return true;
 

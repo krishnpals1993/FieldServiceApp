@@ -8,9 +8,11 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
+using FieldServiceApp.Filters;
 
 namespace FieldServiceApp.Controllers
 {
+    [Authentication]
     public class ServiceController : Controller
     {
 
@@ -38,7 +40,7 @@ namespace FieldServiceApp.Controllers
         {
             var items = (from servicelog in _dbContext.tbl_ServiceFormLogs
                          join order in _dbContext.tbl_OrderMaster on servicelog.OrderId equals order.OrderId
-                         join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                         join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                          join item in _dbContext.tbl_ItemMaster on servicelog.ItemId equals item.ItemId
                          join category in _dbContext.tbl_ItemCategory on item.CategoryId equals category.CategoryId
                          join apartment in _dbContext.tbl_CustomerShippingApartments on servicelog.ApartmentId equals apartment.ApartmentId
@@ -64,20 +66,43 @@ namespace FieldServiceApp.Controllers
             return View(items);
         }
 
-        public IActionResult Work()
+        public IActionResult Work(int id)
         {
             ServiceFormViewModel model = new ServiceFormViewModel();
             try
             {
-                //model.ItemList = _dbContext.tbl_ItemMaster
-                //    .Where(w => w.IsActive == 1)
-                //            .Select(s => new ItemMasterViewModel
-                //            {
-                //                ItemId = s.ItemId,
-                //                ItemCd = s.ItemCd,
-                //                ItemPrice = s.ItemPrice
-                //            })
-                //            .ToList();
+                
+                if (id>0)
+                {
+                    var orderDetail = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == id).FirstOrDefault();
+                    if (orderDetail!=null)
+                    {
+                        
+                        model.OrderId = orderDetail.OrderId;
+                        model.ShipId = orderDetail.ShipId;
+                    }
+                }
+                else
+                {
+                    model.ItemCategoryList = _dbContext.tbl_ItemCategory.Where(w => w.IsActive == 1).Select(s => new ItemCategoryViewModel
+                    {
+                        CategoryId = s.CategoryId,
+                        CategoryName = s.CategoryName
+
+                    }).ToList();
+
+                    model.OrderList = (from order in _dbContext.tbl_OrderMaster
+                                       join customer in _dbContext.tbl_CustomerMaster
+                                       on order.CustomerId equals customer.CustomerId
+                                       join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
+                                       where orderAssign.EmployeeId == _employeeId
+                                       select new ServiceFormOrderViewModel
+                                       {
+                                           OrderId = order.OrderId,
+                                           CustomerName = customer.CompanyName + " (Order #" + order.OrderId + ")"
+
+                                       }).ToList();
+                }
 
                 model.ItemCategoryList = _dbContext.tbl_ItemCategory.Where(w => w.IsActive == 1).Select(s => new ItemCategoryViewModel
                 {
@@ -88,7 +113,7 @@ namespace FieldServiceApp.Controllers
 
                 model.OrderList = (from order in _dbContext.tbl_OrderMaster
                                    join customer in _dbContext.tbl_CustomerMaster
-                                   on order.CustomerId equals customer.CustmoerId
+                                   on order.CustomerId equals customer.CustomerId
                                    join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                    where orderAssign.EmployeeId == _employeeId
                                    select new ServiceFormOrderViewModel
@@ -116,7 +141,7 @@ namespace FieldServiceApp.Controllers
             try
             {
 
-                if (ModelState.IsValid)
+                if (true)
                 {
                     int itemCategoryId = 0;
                     int.TryParse(model.ServiceType, out itemCategoryId);
@@ -158,7 +183,7 @@ namespace FieldServiceApp.Controllers
 
 
                 }
-
+                
 
 
             }
@@ -177,7 +202,7 @@ namespace FieldServiceApp.Controllers
 
             model.OrderList = (from order in _dbContext.tbl_OrderMaster
                                join customer in _dbContext.tbl_CustomerMaster
-                               on order.CustomerId equals customer.CustmoerId
+                               on order.CustomerId equals customer.CustomerId
                                join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                where orderAssign.EmployeeId == _employeeId
                                select new ServiceFormOrderViewModel
@@ -229,7 +254,7 @@ namespace FieldServiceApp.Controllers
                     model.IsFollowUp = "Yes";
                 }
 
-                model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == shipId).
+                model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == shipId).
                   Select(s => new CustomerShippingApartmentViewModel()
                   {
                       ApartmentId = s.ApartmentId,
@@ -240,7 +265,7 @@ namespace FieldServiceApp.Controllers
                 model.ShipAddress = (from shipping in _dbContext.tbl_CustmoerShipping
                                      join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                      join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                     where shipping.ShipId == shipId
+                                     where shipping.CustomerShipId == shipId
                                      select city.CityName + " " + state.StateName + " " + shipping.Address ?? ""
                                      ).FirstOrDefault();
 
@@ -264,7 +289,7 @@ namespace FieldServiceApp.Controllers
 
                 model.OrderList = (from order in _dbContext.tbl_OrderMaster
                                    join customer in _dbContext.tbl_CustomerMaster
-                                   on order.CustomerId equals customer.CustmoerId
+                                   on order.CustomerId equals customer.CustomerId
                                    join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                    where orderAssign.EmployeeId == _employeeId
                                    select new ServiceFormOrderViewModel
@@ -353,7 +378,7 @@ namespace FieldServiceApp.Controllers
 
             model.OrderList = (from order in _dbContext.tbl_OrderMaster
                                join customer in _dbContext.tbl_CustomerMaster
-                               on order.CustomerId equals customer.CustmoerId
+                               on order.CustomerId equals customer.CustomerId
                                join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                where orderAssign.EmployeeId == _employeeId
                                select new ServiceFormOrderViewModel
@@ -383,13 +408,13 @@ namespace FieldServiceApp.Controllers
                 CustomerShipingAddress = (from shipping in _dbContext.tbl_CustmoerShipping
                                           join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                           join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                          where shipping.ShipId == orderDetail.ShipId
+                                          where shipping.CustomerShipId == orderDetail.ShipId
                                           select city.CityName + " " + state.StateName + " " + shipping.Address ?? ""
                                            )
                                               .FirstOrDefault();
                
                 model.Address = CustomerShipingAddress;
-                model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == orderDetail.ShipId).
+                model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == orderDetail.ShipId).
                     Select(s => new CustomerShippingApartmentViewModel()
                     {
                         ApartmentId = s.ApartmentId,
@@ -448,14 +473,14 @@ namespace FieldServiceApp.Controllers
         {
             DashboardOrderViewModel model = new DashboardOrderViewModel();
             model = (from order in _dbContext.tbl_OrderMaster
-                     join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                     join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                      join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                      into orderAssign
                      from orderAssign1 in orderAssign.DefaultIfEmpty()
                      join employee in _dbContext.tbl_EmployeeMaster on orderAssign1.EmployeeId equals employee.EmployeeId
                       into employee
                      from employee1 in employee.DefaultIfEmpty()
-                     join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.ShipId
+                     join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.CustomerShipId
                      join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                      join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                      where order.OrderId == id
@@ -511,7 +536,7 @@ namespace FieldServiceApp.Controllers
         {
             var items = (from servicelog in _dbContext.tbl_ServiceFormLogs
                          join order in _dbContext.tbl_OrderMaster on servicelog.OrderId equals order.OrderId
-                         join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                         join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                          join item in _dbContext.tbl_ItemMaster on servicelog.ItemId equals item.ItemId
                          join category in _dbContext.tbl_ItemCategory on item.CategoryId equals category.CategoryId
                          where servicelog.CreatedBy == _userId && order.OrderId == id

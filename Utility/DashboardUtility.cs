@@ -24,7 +24,7 @@ namespace FieldServiceApp.Utility
         {
             DashboardOrderViewModel model = new DashboardOrderViewModel();
             model = (from order in _dbContext.tbl_OrderMaster
-                     join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                     join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                      join orderDetail in _dbContext.tbl_OrderDetail on order.OrderId equals orderDetail.OrderId
                      join item in _dbContext.tbl_ItemMaster on orderDetail.ItemId equals item.ItemId
                      join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
@@ -33,7 +33,7 @@ namespace FieldServiceApp.Utility
                      join employee in _dbContext.tbl_EmployeeMaster on orderAssign1.EmployeeId equals employee.EmployeeId
                       into employee
                      from employee1 in employee.DefaultIfEmpty()
-                     join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.ShipId
+                     join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.CustomerShipId
                      join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                      join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                      where order.OrderId == id
@@ -81,14 +81,14 @@ namespace FieldServiceApp.Utility
                 if (_rolename == "Admin")
                 {
                     model.OrderList = (from order in _dbContext.tbl_OrderMaster
-                                       join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                                       join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                                        join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                        into orderAssign
                                        from orderAssign1 in orderAssign.DefaultIfEmpty()
                                        join employee in _dbContext.tbl_EmployeeMaster on orderAssign1.EmployeeId equals employee.EmployeeId
                                         into employee
                                        from employee1 in employee.DefaultIfEmpty()
-                                       join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.ShipId
+                                       join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.CustomerShipId
                                        join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                        join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                                        where order.IsActive ==1
@@ -113,10 +113,10 @@ namespace FieldServiceApp.Utility
                 {
                     var _employeeId = _dbContext.tbl_EmployeeMaster.Where(w => w.UserId == _userId).Select(s => s.EmployeeId).FirstOrDefault();
                     model.OrderList = (from order in _dbContext.tbl_OrderMaster
-                                       join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                                       join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                                        join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                        join employee in _dbContext.tbl_EmployeeMaster on orderAssign.EmployeeId equals employee.EmployeeId
-                                       join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.ShipId
+                                       join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.CustomerShipId
                                        join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                        join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                                        where employee.EmployeeId == _employeeId &&  order.IsActive == 1

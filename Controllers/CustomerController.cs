@@ -8,42 +8,121 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
+using JqueryDataTables.ServerSide.AspNetCoreWeb.Infrastructure;
+using JqueryDataTables.ServerSide.AspNetCoreWeb.Models;
+using System.Text.Json;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using System.Threading.Tasks;
+using FieldServiceApp.Filters;
 
 namespace FieldServiceApp.Controllers
 {
+    [Authentication]
     public class CustomerController : Controller
     {
         private readonly IOptions<Appsettings> _appSettings;
         private readonly IOptions<EmailSettings> _emailSettings;
         private readonly DBContext _dbContext;
+        private readonly IConfigurationProvider _mappingConfiguration;
 
-        public CustomerController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext)
+        public CustomerController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext, IConfigurationProvider mappingConfiguration)
         {
             _appSettings = appSettings;
             _emailSettings = emailSettings;
             _dbContext = dbContext;
+            _mappingConfiguration = mappingConfiguration;
         }
 
         public IActionResult List()
         {
-            List<CustomerMasterViewModel> CustomerList = (from customer in _dbContext.tbl_CustomerMaster
-                                                          join city in _dbContext.tbl_Cities on customer.CityId equals city.CityId
-                                                          into city
-                                                          from city1 in city.DefaultIfEmpty()
-                                                          join state in _dbContext.tbl_States on customer.StateId equals state.StateId
-                                                          into state
-                                                          from state1 in state.DefaultIfEmpty()
-                                                          select new CustomerMasterViewModel
-                                                          {
-                                                              CustmoerId = customer.CustmoerId,
-                                                              CompanyName = customer.CompanyName,
-                                                              CityName = city1.CityName,
-                                                              StateName = state1.StateName,
-                                                              Address = customer.Address,
-                                                              IsActive = customer.IsActive
-                                                          })
-                                                   .ToList();
-            return View(CustomerList);
+            
+
+            return View(new CustomerMasterViewModel_datatable());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LoadTable([FromBody]JqueryDataTablesParameters param)
+        {
+            try
+            {
+                HttpContext.Session.SetString(nameof(JqueryDataTablesParameters), System.Text.Json.JsonSerializer.Serialize(param));
+                IQueryable<CustomerMasterViewModel_datatable> customerList;
+                customerList = (from customer in _dbContext.tbl_CustomerMaster
+                                select new CustomerMasterViewModel_datatable
+                                {
+                                    CustmoerId = customer.CustomerId,
+                                    CompanyName = customer.CompanyName,
+                                    CompanyType = customer.CompanyType,
+                                   IsActive = customer.IsActive
+                                });
+                                                 
+
+                var size = customerList.Count();
+
+
+                if (Convert.ToString(param.Search?.Value) != "")
+                {
+                    var serchValue = param.Search?.Value.ToLower();
+                    customerList = customerList.Where(w =>
+                                  (w.CompanyName.ToLower().Contains(serchValue) ? true :
+                                  (w.CompanyType.ToLower().Contains(serchValue) ? true :false)));
+
+                }
+
+
+                if (param.Length == -1)
+                {
+                    var items = customerList
+                                      .ProjectTo<CustomerMasterViewModel_datatable>(_mappingConfiguration)
+                                      .ToArray();
+
+
+                    var result = new JqueryDataTablesPagedResults<CustomerMasterViewModel_datatable>
+                    {
+                        Items = items,
+                        TotalSize = size
+                    };
+
+                    return new JsonResult(new JqueryDataTablesResult<CustomerMasterViewModel_datatable>
+                    {
+                        Draw = param.Draw,
+                        Data = result.Items,
+                        RecordsFiltered = result.TotalSize,
+                        RecordsTotal = result.TotalSize
+                    });
+                }
+                else
+                {
+                    var items = customerList
+                  .Skip((param.Start / param.Length) * param.Length)
+                  .Take(param.Length)
+                  .ProjectTo<CustomerMasterViewModel_datatable>(_mappingConfiguration)
+                  .ToArray();
+
+
+                    var result = new JqueryDataTablesPagedResults<CustomerMasterViewModel_datatable>
+                    {
+                        Items = items,
+                        TotalSize = size
+                    };
+
+                    return new JsonResult(new JqueryDataTablesResult<CustomerMasterViewModel_datatable>
+                    {
+                        Draw = param.Draw,
+                        Data = result.Items,
+                        RecordsFiltered = result.TotalSize,
+                        RecordsTotal = result.TotalSize
+                    });
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                Console.Write(e.Message);
+                return new JsonResult(new { error = "Internal Server Error" });
+            }
         }
 
         public IActionResult Add()
@@ -120,17 +199,17 @@ namespace FieldServiceApp.Controllers
                     CustomerMaster customerMaster = new CustomerMaster()
                     {
                         CompanyName = model.CompanyName,
-                        CityId = model.CityId == null ? 0 : model.CityId.Value,
-                        StateId = model.StateId == null ? 0 : model.StateId.Value,
-                        FirstName = model.FirstName,
-                        LastName = model.LastName,
-                        Address = model.Address,
-                        Address2 = model.Address2??"",
-                        Address3 = model.Address3??"",
+                        //CityId = model.CityId == null ? 0 : model.CityId.Value,
+                        //StateId = model.StateId == null ? 0 : model.StateId.Value,
+                        //FirstName = model.FirstName,
+                        //LastName = model.LastName,
+                        //Address = model.Address,
+                        //Address2 = model.Address2??"",
+                        //Address3 = model.Address3??"",
                         CompanyType = model.CompanyType,
-                        Zip1 = model.Zip1,
-                        Zip2 = model.Zip2,
-                        Code = model.Code,
+                        //Zip1 = model.Zip1,
+                        //Zip2 = model.Zip2,
+                        CompanyCode = model.Code,
                         IsActive = 1,
                         CreatedBy = 1,
                         CreatedDate = DateTime.Now
@@ -149,9 +228,9 @@ namespace FieldServiceApp.Controllers
                             Convert.ToString(item.CityId) != "0" ||
                             Convert.ToString(item.Address ?? "") != "")
                         {
-                            CustmoerShipping custmoerShipping = new CustmoerShipping()
+                           CustomerShipping custmoerShipping = new CustomerShipping()
                             {
-                                CustmoerId = customerMaster.CustmoerId,
+                               CustomerId = customerMaster.CustomerId,
                                 FirstName = item.FirstName,
                                 MiddleName = item.MiddleName,
                                 LastName = item.LastName,
@@ -178,12 +257,12 @@ namespace FieldServiceApp.Controllers
 
                                     try
                                     {
-                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == custmoerShipping.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
+                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == custmoerShipping.CustomerShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
                                         if (checkAprtment ==null)
                                         {
                                             CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
                                             {
-                                                ShipId = custmoerShipping.ShipId,
+                                                CustomerShipId = custmoerShipping.CustomerShipId,
                                                 ApartmentNo = apartment.ApartmentNo,
                                                 ApartmentName = apartment.ApartmentName,
                                                 IsActive = 1,
@@ -219,14 +298,14 @@ namespace FieldServiceApp.Controllers
                             Convert.ToString(item.Email ?? "") != "" ||
                             Convert.ToString(item.Phone ?? "") != "")
                         {
-                            CustmoerContact customerContactDetail = new CustmoerContact()
+                            CustomerContact customerContactDetail = new CustomerContact()
                             {
                                 FirstName = item.FirstName,
                                 MiddleName = item.MiddleName,
                                 LastName = item.LastName,
                                 Email = item.Email,
                                 Phone = item.Phone,
-                                CustmoerId = customerMaster.CustmoerId,
+                                CustomerId = customerMaster.CustomerId,
                                 IsActive = 1,
                                 CreatedBy = 1,
                                 CreatedDate = DateTime.Now
@@ -277,34 +356,28 @@ namespace FieldServiceApp.Controllers
                 int _customerId = 0;
                 int.TryParse(id, out _customerId);
 
-                var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustmoerId == _customerId).FirstOrDefault();
+                var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustomerId == _customerId).FirstOrDefault();
                 if (checkCustomer != null)
                 {
                     model.CompanyName = checkCustomer.CompanyName;
-                    model.Address = checkCustomer.Address;
-                    model.FirstName = checkCustomer.FirstName;
-                    model.LastName = checkCustomer.LastName;
-                    model.CityId = checkCustomer.CityId;
-                    model.StateId = checkCustomer.StateId;
-                    model.CustmoerId = checkCustomer.CustmoerId;
-                    model.Zip1 = checkCustomer.Zip1;
-                    model.Zip2 = checkCustomer.Zip2;
+                    model.CustmoerId = checkCustomer.CustomerId;
                     model.CompanyType = checkCustomer.CompanyType;
-                    model.Code = checkCustomer.Code;
+                    model.Notes = checkCustomer.Notes;
+                    model.Code = checkCustomer.CompanyCode;
 
-                    var checkCustomerContacts = _dbContext.tbl_CustmoerContact.Where(w => w.CustmoerId == _customerId).ToList();
+                    var checkCustomerContacts = _dbContext.tbl_CustmoerContact.Where(w => w.CustomerId == _customerId).ToList();
 
                     if (checkCustomerContacts.Count() > 0)
                     {
                         model.Contacts = checkCustomerContacts.Select(s => new CustmoerContactViewModel
                         {
-                            CustmoerId = s.CustmoerId,
+                            CustmoerId = s.CustomerId,
                             FirstName = s.FirstName,
                             MiddleName = s.MiddleName,
                             LastName = s.LastName,
                             Email = s.Email,
                             Phone = s.Phone,
-                            CustmoerContactId = s.CustmoerContactId
+                            CustmoerContactId = s.CustomerContactId
                         }).ToList();
                     }
                     else
@@ -312,50 +385,85 @@ namespace FieldServiceApp.Controllers
                         model.Contacts.Add(new CustmoerContactViewModel());
                     }
 
-                    var checkCustomerShipping = _dbContext.tbl_CustmoerShipping.Where(w => w.CustmoerId == _customerId).ToList();
+                    var checkCustomerBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerId == _customerId).ToList();
 
-                    if (checkCustomerShipping.Count() > 0)
+                    if (checkCustomerBilling.Count() > 0)
                     {
-                        model.Shippings = checkCustomerShipping.Select(s => new CustmoerShippingViewModel
+                        model.Billings = checkCustomerBilling.Select(s => new CustomerBillingViewModel
                         {
+                            CustomerBillingId = s.CustomerBillingId,
                             FirstName = s.FirstName,
-                            MiddleName = s.MiddleName,
                             LastName = s.LastName,
-                            Email = s.Email,
-                            Phone = s.Phone,
-                            CustmoerId = s.CustmoerId,
+                            CustomerId = s.CustomerId,
                             CityId = s.CityId,
                             StateId = s.StateId,
-                            Address = s.Address,
-                            ShipId = s.ShipId,
-                            Zip1= s.Zip1,
-                            Zip2 = s.Zip2
+                            Address1 = s.Address1,
+                            Address2 = s.Address2,
+                            Address3 = s.Address3,
+                            Zip1 = s.Zip1,
+                            Zip2 = s.Zip2,
+                            Notes = s.Notes
 
                         }).ToList();
-                        foreach (var item in model.Shippings)
+                        foreach (var item in model.Billings)
                         {
-                            var checkApartment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == item.ShipId).ToList();
-                            if (checkApartment.Count() > 0)
+                            var checkCustomerShipping = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerBillingId == item.CustomerBillingId).ToList();
+
+                            if (checkCustomerShipping.Count() > 0)
                             {
-                                item.ApartmentList = checkApartment.Select(s => new CustomerShippingApartmentViewModel
+                                item.Shippings = checkCustomerShipping.Select(s => new CustmoerShippingViewModel
                                 {
-                                    ApartmentNo = s.ApartmentNo,
-                                    ApartmentName = s.ApartmentName,
-                                    ApartmentId = s.ApartmentId
+                                    FirstName = s.FirstName,
+                                    MiddleName = s.MiddleName,
+                                    LastName = s.LastName,
+                                    Email = s.Email,
+                                    Phone = s.Phone,
+                                    CustmoerId = s.CustomerId,
+                                    CityId = s.CityId,
+                                    StateId = s.StateId,
+                                    Address = s.Address,
+                                    Address2 = s.Address2,
+                                    Address3 = s.Address3,
+                                    ShipId = s.CustomerShipId,
+                                    Zip1 = s.Zip1,
+                                    Zip2 = s.Zip2,
+                                    Notes= s.Notes
 
                                 }).ToList();
+                                foreach (var itemShip in item.Shippings)
+                                {
+                                    var checkApartment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == itemShip.ShipId).ToList();
+                                    if (checkApartment.Count() > 0)
+                                    {
+                                        itemShip.ApartmentList = checkApartment.Select(s => new CustomerShippingApartmentViewModel
+                                        {
+                                            ApartmentNo = s.ApartmentNo,
+                                            ApartmentName = s.ApartmentName,
+                                            ApartmentId = s.ApartmentId,
+                                            Notes = s.Notes
+
+                                        }).ToList();
+                                    }
+                                    else
+                                    {
+                                        itemShip.ApartmentList.Add(new CustomerShippingApartmentViewModel());
+                                    }
+                                }
                             }
                             else
                             {
-                                item.ApartmentList.Add(new CustomerShippingApartmentViewModel());
+                                item.Shippings.Add(new CustmoerShippingViewModel());
+                                item.Shippings.FirstOrDefault().ApartmentList.Add(new CustomerShippingApartmentViewModel());
                             }
                         }
                     }
                     else
                     {
-                        model.Shippings.Add(new CustmoerShippingViewModel());
-                        model.Shippings.FirstOrDefault().ApartmentList.Add(new CustomerShippingApartmentViewModel());
+                        model.Billings.Add(new CustomerBillingViewModel());
+                        model.Billings.FirstOrDefault().Shippings.Add(new CustmoerShippingViewModel());
+                        model.Billings.FirstOrDefault().Shippings.FirstOrDefault().ApartmentList.Add(new CustomerShippingApartmentViewModel());
                     }
+
                 }
             }
             catch (Exception ex)
@@ -375,7 +483,7 @@ namespace FieldServiceApp.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName && w.CustmoerId != model.CustmoerId).FirstOrDefault();
+                    var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName && w.CustomerId != model.CustmoerId).FirstOrDefault();
                     if (checkCustomer != null)
                     {
                         ViewBag.ErrorMessage = "Customer name is already exists";
@@ -398,143 +506,274 @@ namespace FieldServiceApp.Controllers
 
                     }
 
-                    checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustmoerId == model.CustmoerId).FirstOrDefault();
+                    checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustomerId == model.CustmoerId).FirstOrDefault();
 
                     checkCustomer.CompanyName = model.CompanyName;
-                    checkCustomer.CityId = model.CityId == null ? 0 : model.CityId.Value;
-                    checkCustomer.StateId = model.StateId == null ? 0 : model.StateId.Value;
-                    checkCustomer.Address = model.Address;
-                    checkCustomer.FirstName = model.FirstName;
-                    checkCustomer.LastName = model.LastName;
-                    checkCustomer.Zip1 = model.Zip1;
-                    checkCustomer.Zip2 = model.Zip2;
-                    checkCustomer.Code = model.Code;
+                    checkCustomer.CompanyCode = model.Code;
                     checkCustomer.ModifiedBy = 1;
+                    checkCustomer.Notes = model.Notes ;
                     checkCustomer.ModifiedDate = DateTime.Now;
 
                     _dbContext.SaveChanges();
 
-                    foreach (var item in model.Shippings)
+                    foreach (var item in model.Billings)
                     {
-                        if (item.ShipId != 0)
+                        if (item.CustomerBillingId != 0)
                         {
-                            var checkShipping = _dbContext.tbl_CustmoerShipping.Where(w => w.ShipId == item.ShipId).FirstOrDefault();
+                            var checkBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == item.CustomerBillingId).FirstOrDefault();
 
-                            checkShipping.FirstName = item.FirstName;
-                            checkShipping.MiddleName = item.MiddleName;
-                            checkShipping.LastName = item.LastName;
-                            checkShipping.Email = item.Email;
-                            checkShipping.Phone = item.Phone;
-                            checkShipping.CityId = item.CityId == null ? 0 : item.CityId.Value;
-                            checkShipping.StateId = item.StateId == null ? 0 : item.StateId.Value;
-                            checkShipping.Address = item.Address;
-                            checkShipping.Zip1 = item.Zip1;
-                            checkShipping.Zip2 = item.Zip2;
-                            checkShipping.ModifiedBy = 1;
-                            checkShipping.ModifiedDate = DateTime.Now;
+                            checkBilling.FirstName = item.FirstName;
+                            checkBilling.LastName = item.LastName;
+                            checkBilling.CityId = item.CityId??0;
+                            checkBilling.StateId = item.StateId??0;
+                            checkBilling.Address1 = item.Address1;
+                            checkBilling.Address2 = item.Address2;
+                            checkBilling.Address3 = item.Address3;
+                            checkBilling.Zip1 = item.Zip1;
+                            checkBilling.Zip2 = item.Zip2;
+                            checkBilling.Notes = item.Notes;
+                            checkBilling.ModifiedBy = 1;
+                            checkBilling.ModifiedDate = DateTime.Now;
                             _dbContext.SaveChanges();
 
-                            foreach (var apartment in item.ApartmentList)
+                            foreach (var ship in item.Shippings)
                             {
-                                if (apartment.ApartmentId != 0)
+                                if (ship.ShipId != 0)
                                 {
-                                    var checkApartment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ApartmentId == apartment.ApartmentId).FirstOrDefault();
+                                    var checkShipping = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == ship.ShipId).FirstOrDefault();
 
-                                    checkApartment.ApartmentName = apartment.ApartmentName;
-                                    checkApartment.ApartmentNo = apartment.ApartmentNo;
-                                    checkShipping.Address = item.Address;
+                                    checkShipping.FirstName = ship.FirstName;
+                                    checkShipping.LastName = ship.LastName;
+                                    checkShipping.Email = ship.Email;
+                                    checkShipping.Phone = ship.Phone;
+                                    checkShipping.CityId = ship.CityId??0 ;
+                                    checkShipping.StateId = ship.StateId??0;
+                                    checkShipping.Address = ship.Address;
+                                    checkShipping.Address2= ship.Address2;
+                                    checkShipping.Address3 = ship.Address3;
+                                    checkShipping.Zip1 = ship.Zip1;
+                                    checkShipping.Zip2 = ship.Zip2;
+                                    checkShipping.Notes = ship.Notes;
                                     checkShipping.ModifiedBy = 1;
                                     checkShipping.ModifiedDate = DateTime.Now;
                                     _dbContext.SaveChanges();
+
+                                    foreach (var apartment in ship.ApartmentList)
+                                    {
+                                        if (apartment.ApartmentId != 0)
+                                        {
+                                            var checkApartment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ApartmentId == apartment.ApartmentId).FirstOrDefault();
+
+                                            checkApartment.ApartmentName = apartment.ApartmentName;
+                                            checkApartment.ApartmentNo = apartment.ApartmentNo;
+                                            checkApartment.ApartmentNo = apartment.Notes;
+                                            checkShipping.ModifiedBy = 1;
+                                            checkShipping.ModifiedDate = DateTime.Now;
+                                            _dbContext.SaveChanges();
+                                        }
+                                        else
+                                        {
+                                            if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
+                                                Convert.ToString(apartment.ApartmentName ?? "") != "")
+                                            {
+                                                var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == ship.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
+                                                if (checkAprtment == null)
+                                                {
+                                                    CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                                    {
+                                                        CustomerShipId = ship.ShipId,
+                                                        ApartmentNo = apartment.ApartmentNo,
+                                                        ApartmentName = apartment.ApartmentName,
+                                                        Notes = apartment.Notes,
+                                                        IsActive = 1,
+                                                        CreatedBy = 1,
+                                                        CreatedDate = DateTime.Now
+                                                    };
+                                                    _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
+                                                    _dbContext.SaveChanges();
+                                                }
+
+                                            }
+                                        }
+
+
+
+
+                                    }
+
                                 }
                                 else
                                 {
-                                    if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
-                                        Convert.ToString(apartment.ApartmentName ?? "") != "")
+                                    if (Convert.ToString(ship.Zip1 ?? "") != "" ||
+                                    Convert.ToString(ship.Zip2 ?? "") != "" ||
+                                    Convert.ToString(ship.Email ?? "") != "" ||
+                                    Convert.ToString(ship.Phone ?? "") != "" ||
+                                    Convert.ToString(ship.StateId) != "0" ||
+                                    Convert.ToString(ship.CityId) != "0" ||
+                                    Convert.ToString(ship.Address ?? "") != "")
                                     {
-                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == item.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
-                                        if (checkAprtment == null)
+                                        CustomerShipping custmoerShipping = new CustomerShipping()
                                         {
-                                            CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                            CustomerId = checkCustomer.CustomerId,
+                                            CustomerBillingId = item.CustomerBillingId,
+                                            FirstName = ship.FirstName,
+                                            MiddleName = ship.MiddleName,
+                                            LastName = ship.LastName,
+                                            Email = ship.Email,
+                                            Phone = ship.Phone,
+                                            Zip1 = ship.Zip1,
+                                            Zip2 = ship.Zip2,
+                                            CityId = ship.CityId == null ? 0 : ship.CityId.Value,
+                                            StateId = ship.StateId == null ? 0 : ship.StateId.Value,
+                                            Address = ship.Address,
+                                            Address2 = ship.Address2,
+                                            Address3 = ship.Address3,
+                                            Notes = ship.Notes,
+                                            IsActive = 1,
+                                            CreatedBy = 1,
+                                            CreatedDate = DateTime.Now
+                                        };
+                                        _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
+                                        _dbContext.SaveChanges();
+
+                                        foreach (var apartment in ship.ApartmentList)
+                                        {
+                                            if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
+                                                    Convert.ToString(apartment.ApartmentName ?? "") != "")
                                             {
-                                                ShipId = item.ShipId,
-                                                ApartmentNo = apartment.ApartmentNo,
-                                                ApartmentName = apartment.ApartmentName,
-                                                IsActive = 1,
-                                                CreatedBy = 1,
-                                                CreatedDate = DateTime.Now
-                                            };
-                                            _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
-                                            _dbContext.SaveChanges();
+                                                var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == custmoerShipping.CustomerShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
+                                                if (checkAprtment == null)
+                                                {
+                                                    CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                                    {
+                                                        CustomerShipId = custmoerShipping.CustomerShipId,
+                                                        ApartmentNo = apartment.ApartmentNo,
+                                                        Notes = apartment.Notes,
+
+                                                        ApartmentName = apartment.ApartmentName,
+                                                        IsActive = 1,
+                                                        CreatedBy = 1,
+                                                        CreatedDate = DateTime.Now
+                                                    };
+                                                    _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
+                                                    _dbContext.SaveChanges();
+                                                }
+
+
+                                            }
+
                                         }
-                                        
+
                                     }
                                 }
-
-
-
-
                             }
 
                         }
                         else
                         {
                             if (Convert.ToString(item.Zip1 ?? "") != "" ||
-                            Convert.ToString(item.Zip2 ?? "") != "" ||
-                            Convert.ToString(item.Email ?? "") != "" ||
-                            Convert.ToString(item.Phone ?? "") != "" ||
-                            Convert.ToString(item.StateId) != "0" ||
-                            Convert.ToString(item.CityId) != "0" ||
-                            Convert.ToString(item.Address ?? "") != "")
+                                    Convert.ToString(item.Zip2 ?? "") != "" ||
+                                    Convert.ToString(item.FirstName ?? "") != "" ||
+                                    Convert.ToString(item.LastName ?? "") != "" ||
+                                    Convert.ToString(item.StateId) != "0" ||
+                                    Convert.ToString(item.CityId) != "0" ||
+                                    Convert.ToString(item.Address1 ?? "") != "")
                             {
-                                CustmoerShipping custmoerShipping = new CustmoerShipping()
+                                CustomerBilling custmoerBilling = new CustomerBilling()
                                 {
-                                    CustmoerId = checkCustomer.CustmoerId,
+                                    CustomerId = checkCustomer.CustomerId,
                                     FirstName = item.FirstName,
-                                    MiddleName = item.MiddleName,
                                     LastName = item.LastName,
-                                    Email = item.Email,
-                                    Phone = item.Phone,
+                                    Notes = item.Notes,
                                     Zip1 = item.Zip1,
                                     Zip2 = item.Zip2,
-                                    CityId = item.CityId == null ? 0 : item.CityId.Value,
-                                    StateId = item.StateId == null ? 0 : item.StateId.Value,
-                                    Address = item.Address,
+                                    CityId = item.CityId??0,
+                                    StateId = item.StateId??0,
+                                    Address1 = item.Address1,
+                                    Address2 = item.Address2,
+                                    Address3 = item.Address3,
                                     IsActive = 1,
                                     CreatedBy = 1,
                                     CreatedDate = DateTime.Now
                                 };
-                                _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
+                                _dbContext.tbl_CustomerBillings.Add(custmoerBilling);
                                 _dbContext.SaveChanges();
+                                item.CustomerBillingId = custmoerBilling.CustomerBillingId;
 
-                                foreach (var apartment in item.ApartmentList)
+                                foreach (var ship in item.Shippings)
                                 {
-                                    if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
-                                            Convert.ToString(apartment.ApartmentName ?? "") != "")
                                     {
-                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.ShipId == custmoerShipping.ShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
-                                        if (checkAprtment == null)
+                                        if (Convert.ToString(ship.Zip1 ?? "") != "" ||
+                                        Convert.ToString(ship.Zip2 ?? "") != "" ||
+                                        Convert.ToString(ship.Email ?? "") != "" ||
+                                        Convert.ToString(ship.Phone ?? "") != "" ||
+                                        Convert.ToString(ship.StateId) != "0" ||
+                                        Convert.ToString(ship.CityId) != "0" ||
+                                        Convert.ToString(ship.Address ?? "") != "")
                                         {
-                                            CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                            CustomerShipping custmoerShipping = new CustomerShipping()
                                             {
-                                                ShipId = custmoerShipping.ShipId,
-                                                ApartmentNo = apartment.ApartmentNo,
-                                                ApartmentName = apartment.ApartmentName,
+                                                CustomerId = checkCustomer.CustomerId,
+                                                CustomerBillingId = item.CustomerBillingId,
+                                                FirstName = ship.FirstName,
+                                                MiddleName = ship.MiddleName,
+                                                LastName = ship.LastName,
+                                                Notes = ship.Notes,
+                                                Email = ship.Email,
+                                                Phone = ship.Phone,
+                                                Zip1 = ship.Zip1,
+                                                Zip2 = ship.Zip2,
+                                                CityId = ship.CityId == null ? 0 : ship.CityId.Value,
+                                                StateId = ship.StateId == null ? 0 : ship.StateId.Value,
+                                                Address = ship.Address,
+                                                Address2 = ship.Address2,
+                                                Address3 = ship.Address3,
                                                 IsActive = 1,
                                                 CreatedBy = 1,
                                                 CreatedDate = DateTime.Now
                                             };
-                                            _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
+                                            _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                                             _dbContext.SaveChanges();
+
+                                            foreach (var apartment in ship.ApartmentList)
+                                            {
+                                                if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
+                                                        Convert.ToString(apartment.ApartmentName ?? "") != "")
+                                                {
+                                                    var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == custmoerShipping.CustomerShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
+                                                    if (checkAprtment == null)
+                                                    {
+                                                        CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
+                                                        {
+                                                            CustomerShipId = custmoerShipping.CustomerShipId,
+                                                            ApartmentNo = apartment.ApartmentNo,
+                                                            ApartmentName = apartment.ApartmentName,
+                                                            Notes = apartment.Notes,
+                                                            IsActive = 1,
+                                                            CreatedBy = 1,
+                                                            CreatedDate = DateTime.Now
+                                                        };
+                                                        _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
+                                                        _dbContext.SaveChanges();
+                                                    }
+
+
+                                                }
+
+                                            }
+
                                         }
-
-                                      
                                     }
-
                                 }
 
+
+
                             }
+
                         }
+                      
+
+                        
 
 
                     }
@@ -543,13 +782,13 @@ namespace FieldServiceApp.Controllers
                     {
                         if (item.CustmoerContactId != 0)
                         {
-                            var checkCustomerContact = _dbContext.tbl_CustmoerContact.Where(w => w.CustmoerContactId == item.CustmoerContactId).FirstOrDefault();
+                            var checkCustomerContact = _dbContext.tbl_CustmoerContact.Where(w => w.CustomerContactId == item.CustmoerContactId).FirstOrDefault();
                             checkCustomerContact.FirstName = item.FirstName;
                             checkCustomerContact.MiddleName = item.MiddleName;
                             checkCustomerContact.LastName = item.LastName;
                             checkCustomerContact.Email = item.Email;
                             checkCustomerContact.Phone = item.Phone;
-                            checkCustomerContact.CustmoerId = checkCustomer.CustmoerId;
+                            checkCustomerContact.CustomerId = checkCustomer.CustomerId;
                             checkCustomerContact.ModifiedBy = 1;
                             checkCustomerContact.ModifiedDate = DateTime.Now;
                             _dbContext.SaveChanges();
@@ -562,14 +801,14 @@ namespace FieldServiceApp.Controllers
                            Convert.ToString(item.Email ?? "") != "" ||
                            Convert.ToString(item.Phone ?? "") != "")
                             {
-                                CustmoerContact customerContactDetail = new CustmoerContact()
+                                CustomerContact customerContactDetail = new CustomerContact()
                                 {
                                     FirstName = item.FirstName,
                                     MiddleName = item.MiddleName,
                                     LastName = item.LastName,
                                     Email = item.Email,
                                     Phone = item.Phone,
-                                    CustmoerId = checkCustomer.CustmoerId,
+                                    CustomerId = checkCustomer.CustomerId,
                                     IsActive = 1,
                                     CreatedBy = 1,
                                     CreatedDate = DateTime.Now
@@ -649,7 +888,7 @@ namespace FieldServiceApp.Controllers
             try
             {
 
-                var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustmoerId == id).FirstOrDefault();
+                var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustomerId == id).FirstOrDefault();
                 if (checkCustomer != null)
                 {
                     checkCustomer.IsActive = 0;

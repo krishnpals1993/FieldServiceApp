@@ -8,9 +8,11 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
+using FieldServiceApp.Filters;
 
 namespace FieldServiceApp.Controllers
 {
+    [Authentication]
     public class InvoiceController : Controller
     {
 
@@ -35,7 +37,7 @@ namespace FieldServiceApp.Controllers
             {
                 billHeaderList = (from billHeader in _dbContext.tbl_BilHeaders
                                   join order in _dbContext.tbl_OrderMaster on billHeader.OrderId equals order.OrderId
-                                  join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                                  join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                                   select new BilHeaderViewModel
                                   {
                                       BillId = billHeader.BillId,
@@ -128,26 +130,26 @@ namespace FieldServiceApp.Controllers
                 if (checkOrder != null)
                 {
                     model = (from customer in _dbContext.tbl_CustomerMaster
-                             join state in _dbContext.tbl_States on customer.StateId equals state.StateId
-                             into state
-                             from state1 in state.DefaultIfEmpty()
-                             join city in _dbContext.tbl_Cities on customer.CityId equals city.CityId
-                             into city
-                             from city1 in city.DefaultIfEmpty()
-                             where customer.CustmoerId == checkOrder.CustomerId
+                             //join state in _dbContext.tbl_States on customer.StateId equals state.StateId
+                             //into state
+                             //from state1 in state.DefaultIfEmpty()
+                             //join city in _dbContext.tbl_Cities on customer.CityId equals city.CityId
+                             //into city
+                             //from city1 in city.DefaultIfEmpty()
+                             where customer.CustomerId == checkOrder.CustomerId
                              select new BilHeaderViewModel
                              {
-                                 BilligFirstName = customer.FirstName,
-                                 BilligLastName = customer.LastName,
+                                 //BilligFirstName = customer.FirstName,
+                                 //BilligLastName = customer.LastName,
                                  BilligCompanyName = customer.CompanyName,
-                                 BilligCompanyCode = customer.Code,
-                                 BilligAddress = customer.Address,
-                                 BilligAddress2 = customer.Address2,
-                                 BilligAddress3 = customer.Address3,
-                                 BilligCityName = city1.CityName,
-                                 BilligStateName = state1.StateName,
-                                 BilligZip1 = customer.Zip1,
-                                 BilligZip2 = customer.Zip2
+                                 BilligCompanyCode = customer.CompanyCode,
+                                 //BilligAddress = customer.Address,
+                                 //BilligAddress2 = customer.Address2,
+                                 //BilligAddress3 = customer.Address3,
+                                 //BilligCityName = city1.CityName,
+                                 //BilligStateName = state1.StateName,
+                                 //BilligZip1 = customer.Zip1,
+                                 //BilligZip2 = customer.Zip2
 
                              }).FirstOrDefault();
 
@@ -178,7 +180,7 @@ namespace FieldServiceApp.Controllers
                                           join city in _dbContext.tbl_Cities on ship.CityId equals city.CityId
                                           into city
                                           from city1 in city.DefaultIfEmpty()
-                                          where ship.ShipId == checkOrder.ShipId
+                                          where ship.CustomerShipId == checkOrder.ShipId
                                           select new CustmoerShippingViewModel
                                           {
                                               FirstName = ship.FirstName,
@@ -286,7 +288,16 @@ namespace FieldServiceApp.Controllers
             {
                 var a = "";
             }
-
+            model.ItemList = _dbContext.tbl_ItemMaster
+                 .Where(w => w.IsActive == 1)
+                         .Select(s => new ItemMasterViewModel
+                         {
+                             ItemId = s.ItemId,
+                             ItemCd = s.ItemCd,
+                             ItemPrice = s.ItemPrice,
+                             ItemDescription = s.ItemDescription
+                         })
+                         .ToList();
             return View(model);
         }
 

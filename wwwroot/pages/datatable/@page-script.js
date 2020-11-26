@@ -9,13 +9,13 @@ jQuery(function($) {
 
 
 
-  $.extend( true, $.fn.dataTable.defaults, {
-    dom:
-      "<'row'<'col-12 col-sm-6'l><'col-12 col-sm-6 text-right table-tools-col'f>>" +
-      "<'row'<'col-12'tr>>" +
-      "<'row'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
-    renderer: 'bootstrap'
-  })
+    $.extend(true, $.fn.dataTable.defaults, {
+        dom:
+            "<'row'<'col-12 col-sm-6'l><'col-12 col-sm-6 text-right table-tools-col'f>>" +
+            "<'row'<'col-12'tr>>" +
+            "<'row'<'col-12 col-md-5'i><'col-12 col-md-7'p>>",
+        renderer: 'bootstrap'
+    });
   
   var $_table = $(tableId).DataTable({
     responsive: true,

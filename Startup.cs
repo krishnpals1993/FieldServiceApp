@@ -3,7 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using FieldServiceApp.Contracts;
+using FieldServiceApp.Services;
 using FieldServiceApp.Models;
+using AutoMapper;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using System;
@@ -11,7 +14,6 @@ using Microsoft.AspNetCore.Http;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using FieldServiceApp.Utility;
 
 namespace FieldServiceApp
 {
@@ -46,6 +48,7 @@ namespace FieldServiceApp
             services.AddControllersWithViews();
             services.AddDbContext<DBContext>(options =>
               options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddAutoMapper(typeof(Startup));
             services.Configure<Appsettings>(Configuration.GetSection("AppSettings"));
             services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
  

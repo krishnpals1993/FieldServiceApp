@@ -42,9 +42,9 @@
                     <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                         Status
                     </th>
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                    @*<th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                         Action
-                    </th>
+                    </th>*@
                 </tr>
             </thead>
 
@@ -84,10 +84,10 @@
                         </td>
 
 
-                        <td class="text-grey">
+                        @*<td class="text-grey">
                             @Html.ActionLink("Edit", "Edit", "Invoice", new { id = item.BillId }) |
                             <a href="#" onclick="deleteFun('@item.BillId')">Delete</a>
-                        </td>
+                        </td>*@
 
                     </tr>
                 }

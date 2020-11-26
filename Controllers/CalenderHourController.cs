@@ -8,10 +8,11 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
-
+using FieldServiceApp.Filters;
 
 namespace FieldServiceApp.Controllers
 {
+    [Authentication]
     public class CalenderHourController : Controller
     {
         private readonly IOptions<Appsettings> _appSettings;

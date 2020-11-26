@@ -8,16 +8,18 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
+using FieldServiceApp.Filters;
 
 namespace FieldServiceApp.Controllers
 {
+    [Authentication]
     public class OrderController : Controller
     {
         private readonly IOptions<Appsettings> _appSettings;
         private readonly IOptions<EmailSettings> _emailSettings;
         private readonly DBContext _dbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        OrderUtility _orderUtility ;
+        OrderUtility _orderUtility;
 
 
         private ISession _session => _httpContextAccessor.HttpContext.Session;
@@ -38,7 +40,7 @@ namespace FieldServiceApp.Controllers
         public IActionResult Add()
         {
             OrderMasterViewModel model = new OrderMasterViewModel();
-           
+
             try
             {
                 var checkTemData = TempData["NewCustomer"];
@@ -57,6 +59,9 @@ namespace FieldServiceApp.Controllers
                                 ItemDescription = s.ItemDescription
                             })
                             .ToList();
+
+                model.OrderItemList.Add(new OrderDetailViewModel());
+
                 model.CustomerList = _orderUtility.GetCustomerListWithShipAddress();
 
 
@@ -92,13 +97,16 @@ namespace FieldServiceApp.Controllers
                 model.CustomerDetail.Contacts.Add(new CustmoerContactViewModel());
                 model.CustomerDetail.Shippings.Add(new CustmoerShippingViewModel());
 
+             
+
+
 
 
                 model.OrderNo = _dbContext.tbl_OrderMaster.Max(m => m.OrderId) + 1;
 
                 model.OrderList = (from order in _dbContext.tbl_OrderMaster
                                    join customer in _dbContext.tbl_CustomerMaster
-                                   on order.CustomerId equals customer.CustmoerId
+                                   on order.CustomerId equals customer.CustomerId
                                    where ((order.IsFollowUp ?? 0) == 1)
                                    select new ServiceFormOrderViewModel
                                    {
@@ -127,7 +135,6 @@ namespace FieldServiceApp.Controllers
             {
                 model.CustomerDetail.Code = "1";
 
-
                 {
                     var checkOrderNo = _dbContext.tbl_OrderMaster.Where(w => w.OrderNo == model.OrderNo).FirstOrDefault();
                     if (checkOrderNo != null)
@@ -147,7 +154,7 @@ namespace FieldServiceApp.Controllers
                             .Where(w => w.IsActive == 1)
                                         .Select(s => new CustomerMasterViewModel
                                         {
-                                            CustmoerId = s.CustmoerId,
+                                            CustmoerId = s.CustomerId,
                                             CompanyName = s.CompanyName
                                         })
                                         .ToList();
@@ -240,7 +247,7 @@ namespace FieldServiceApp.Controllers
 
                     };
 
-                    OrderDetail orderDetailReoccurence = new OrderDetail();
+                    List<OrderDetailViewModel> orderDetailReoccurence = new List<OrderDetailViewModel>();
                     OrderAssignment orderAssignmentReoccurence = new OrderAssignment();
 
 
@@ -256,22 +263,27 @@ namespace FieldServiceApp.Controllers
                     _dbContext.tbl_OrderMaster.Add(orderMaster);
                     _dbContext.SaveChanges();
 
-                    OrderDetail orderDetail = new OrderDetail()
+                    foreach (var item in model.OrderItemList)
                     {
-                        ItemId = model.ItemId,
-                        Description = model.Description,
-                        OrderId = orderMaster.OrderId,
-                        PerUnitPrice = model.PerUnitPrice,
-                        Quantity = model.Quantity,
-                        TotalPrice = model.TotalPrice,
-                        UnitId = model.UnitId,
-                        IsActive = 1,
-                        CreatedBy = 1,
-                        CreatedDate = DateTime.Now
-                    };
-                    _dbContext.tbl_OrderDetail.Add(orderDetail);
-                    _dbContext.SaveChanges();
-                    orderDetailReoccurence = orderDetail;
+                        OrderDetail orderDetail = new OrderDetail()
+                        {
+                            ItemId = item.ItemId,
+                            Description = item.Description,
+                            OrderId = orderMaster.OrderId,
+                            PerUnitPrice = item.PerUnitPrice,
+                            Quantity = item.Quantity,
+                            TotalPrice = item.TotalPrice,
+                            UnitId = item.UnitId,
+                            IsActive = 1,
+                            CreatedBy = 1,
+                            CreatedDate = DateTime.Now
+                        };
+                        _dbContext.tbl_OrderDetail.Add(orderDetail);
+                        _dbContext.SaveChanges();
+
+                    }
+
+                    orderDetailReoccurence = model.OrderItemList;
 
                     if (Convert.ToString(model.AssigneeId) != "")
                     {
@@ -332,6 +344,7 @@ namespace FieldServiceApp.Controllers
                                 count++;
                                 if (count == ((model.ReOccurenceFrequency * 30)))
                                 {
+
                                     count = 0;
                                     _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
                                 }
@@ -340,17 +353,45 @@ namespace FieldServiceApp.Controllers
 
                         if (model.ReOccurenceCycle == "WeekDay")
                         {
+
                             for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
                             {
-                                if (date.DayOfWeek.ToString() == model.ReOccurenceWeekday)
+
+                                if (model.ReOccurenceFrequency == 1)
                                 {
-                                    _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                    if (date.Day >= 1 && date.Day <= 7)
+                                    {
+                                        if (date.DayOfWeek.ToString() == model.ReOccurenceWeekday)
+                                        {
+                                            _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                        }
+                                    }
                                 }
+                                else if (model.ReOccurenceFrequency == 0)
+                                {
+                                    if (date.DayOfWeek.ToString() == model.ReOccurenceWeekday)
+                                    {
+                                        _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                    }
+                                }
+                                else if (model.ReOccurenceFrequency > 1)
+                                {
+                                    if (date.Day >= ((model.ReOccurenceFrequency - 1) * 7) && date.Day <= ((model.ReOccurenceFrequency) * 7))
+                                    {
+                                        if (date.DayOfWeek.ToString() == model.ReOccurenceWeekday)
+                                        {
+                                            _orderUtility.SaveReOccurenceOrder(orderId, orderMaster, orderDetailReoccurence, orderAssignmentReoccurence, date);
+                                        }
+                                    }
+                                }
+
+
                             }
                         }
 
                         if (model.ReOccurenceCycle == "Month's Day")
                         {
+
                             for (DateTime date = model.ReOccurenceStartDate.Value; date.Date <= model.ReOccurenceEndDate.Value; date = date.AddDays(1))
                             {
                                 if (date.Day == model.ReOccurenceFrequency)
@@ -420,7 +461,7 @@ namespace FieldServiceApp.Controllers
 
             model.OrderList = (from order in _dbContext.tbl_OrderMaster
                                join customer in _dbContext.tbl_CustomerMaster
-                               on order.CustomerId equals customer.CustmoerId
+                               on order.CustomerId equals customer.CustomerId
                                where ((order.IsFollowUp ?? 0) == 1)
                                select new ServiceFormOrderViewModel
                                {
@@ -428,6 +469,8 @@ namespace FieldServiceApp.Controllers
                                    CustomerName = customer.CompanyName + " (Order #" + order.OrderId + ")"
 
                                }).ToList();
+
+            
 
             return View(model);
         }
@@ -457,7 +500,7 @@ namespace FieldServiceApp.Controllers
                             .Where(w => w.IsActive == 1)
                                         .Select(s => new CustomerMasterViewModel
                                         {
-                                            CustmoerId = s.CustmoerId,
+                                            CustmoerId = s.CustomerId,
                                             CompanyName = s.CompanyName
                                         })
                                         .ToList();
@@ -505,13 +548,13 @@ namespace FieldServiceApp.Controllers
                     CustomerMaster customerMaster = new CustomerMaster()
                     {
                         CompanyName = model.CustomerDetail.CompanyName,
-                        CityId = model.CustomerDetail.CityId == null ? 0 : model.CustomerDetail.CityId.Value,
-                        StateId = model.CustomerDetail.StateId == null ? 0 : model.CustomerDetail.StateId.Value,
-                        Address = model.CustomerDetail.Address,
+                        //CityId = model.CustomerDetail.CityId == null ? 0 : model.CustomerDetail.CityId.Value,
+                        //StateId = model.CustomerDetail.StateId == null ? 0 : model.CustomerDetail.StateId.Value,
+                        //Address = model.CustomerDetail.Address,
                         CompanyType = model.CustomerDetail.CompanyType,
-                        Zip1 = model.CustomerDetail.Zip1,
-                        Zip2 = model.CustomerDetail.Zip2,
-                        Code = model.CustomerDetail.Code,
+                        //Zip1 = model.CustomerDetail.Zip1,
+                        //Zip2 = model.CustomerDetail.Zip2,
+                        CompanyCode = model.CustomerDetail.Code,
                         IsActive = 1,
                         CreatedBy = 1,
                         CreatedDate = DateTime.Now
@@ -520,7 +563,7 @@ namespace FieldServiceApp.Controllers
                     _dbContext.tbl_CustomerMaster.Add(customerMaster);
                     _dbContext.SaveChanges();
 
-                    model.CustomerId = customerMaster.CustmoerId;
+                    model.CustomerId = customerMaster.CustomerId;
 
                     foreach (var item in model.CustomerDetail.Shippings)
                     {
@@ -533,9 +576,9 @@ namespace FieldServiceApp.Controllers
                             Convert.ToString(item.CityId) != "0" ||
                             Convert.ToString(item.Address ?? "") != "")
                         {
-                            CustmoerShipping custmoerShipping = new CustmoerShipping()
+                            CustomerShipping custmoerShipping = new CustomerShipping()
                             {
-                                CustmoerId = customerMaster.CustmoerId,
+                                CustomerId = customerMaster.CustomerId,
                                 FirstName = item.FirstName,
                                 MiddleName = item.MiddleName,
                                 LastName = item.LastName,
@@ -562,14 +605,14 @@ namespace FieldServiceApp.Controllers
                             Convert.ToString(item.Email ?? "") != "" ||
                             Convert.ToString(item.Phone ?? "") != "")
                         {
-                            CustmoerContact customerContactDetail = new CustmoerContact()
+                            CustomerContact customerContactDetail = new CustomerContact()
                             {
                                 FirstName = item.FirstName,
                                 MiddleName = item.MiddleName,
                                 LastName = item.LastName,
                                 Email = item.Email,
                                 Phone = item.Phone,
-                                CustmoerId = customerMaster.CustmoerId,
+                                CustomerId = customerMaster.CustomerId,
                                 IsActive = 1,
                                 CreatedBy = 1,
                                 CreatedDate = DateTime.Now
@@ -593,7 +636,7 @@ namespace FieldServiceApp.Controllers
                         .Where(w => w.IsActive == 1)
                                     .Select(s => new CustomerMasterViewModel
                                     {
-                                        CustmoerId = s.CustmoerId,
+                                        CustmoerId = s.CustomerId,
                                         CompanyName = s.CompanyName
                                     })
                                     .ToList();
@@ -657,7 +700,14 @@ namespace FieldServiceApp.Controllers
             try
             {
                 model.OrderList = (from order in _dbContext.tbl_OrderMaster
-                                   join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                                   join ship in _dbContext.tbl_CustmoerShipping on order.ShipId equals ship.CustomerShipId
+                                   join city in _dbContext.tbl_Cities on ship.CityId equals city.CityId
+                                   into city
+                                   from city1 in city.DefaultIfEmpty()
+                                   join state in _dbContext.tbl_States on ship.StateId equals state.StateId
+                                   into state
+                                   from state1 in state.DefaultIfEmpty()
+                                   join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                                    join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                    into orderAssign
                                    from orderAssign1 in orderAssign.DefaultIfEmpty()
@@ -674,7 +724,8 @@ namespace FieldServiceApp.Controllers
                                        EmployeeName = employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName,
                                        TotalAmount = order.TotalAmount,
                                        IsActive = order.IsActive,
-                                       ScheduledOnNonWorkingDay = false
+                                       ScheduledOnNonWorkingDay = false,
+                                       CustomerShipAddress = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (ship.Address ?? "") + (ship.Address2 ?? "")
 
                                    })
                                                .ToList();
@@ -725,7 +776,14 @@ namespace FieldServiceApp.Controllers
             try
             {
                 model.OrderList = (from order in _dbContext.tbl_OrderMaster
-                                   join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustmoerId
+                                   join ship in _dbContext.tbl_CustmoerShipping on order.ShipId equals ship.CustomerShipId
+                                   join city in _dbContext.tbl_Cities on ship.CityId equals city.CityId
+                                   into city
+                                   from city1 in city.DefaultIfEmpty()
+                                   join state in _dbContext.tbl_States on ship.StateId equals state.StateId
+                                   into state
+                                   from state1 in state.DefaultIfEmpty()
+                                   join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
                                    join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
                                    into orderAssign
                                    from orderAssign1 in orderAssign.DefaultIfEmpty()
@@ -741,7 +799,8 @@ namespace FieldServiceApp.Controllers
                                        CustomerName = customer.CompanyName,
                                        EmployeeName = employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName,
                                        TotalAmount = order.TotalAmount,
-                                       IsActive = order.IsActive
+                                       IsActive = order.IsActive,
+                                       CustomerShipAddress = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (ship.Address ?? "") + (ship.Address2 ?? "")
 
                                    })
                                                .ToList();
@@ -902,12 +961,17 @@ namespace FieldServiceApp.Controllers
             {
                 CustomerShipingAddressList = (from shipping in _dbContext.tbl_CustmoerShipping
                                               join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                              into city
+                                              from city1 in city.DefaultIfEmpty()
                                               join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                              where shipping.CustmoerId == CustomerId
+                                              into state
+                                              from state1 in state.DefaultIfEmpty()
+                                              where (CustomerId==0 ? true : shipping.CustomerId == CustomerId) && ((Convert.ToString(shipping.Address) != "") || (Convert.ToString(shipping.Address2) != ""))
                                               select new CustmoerShippingViewModel
                                               {
-                                                  ShipId = shipping.ShipId,
-                                                  Address = city.CityName + " " + state.StateName + " " + shipping.Address ?? ""
+                                                  ShipId = shipping.CustomerShipId,
+                                                  Address = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + (shipping.Address2 ?? ""),
+                                                  CustmoerId = shipping.CustomerId
                                               })
                                                    .ToList();
             }
@@ -926,7 +990,7 @@ namespace FieldServiceApp.Controllers
             try
             {
                 CustomerShipingApartmentList = (from apartment in _dbContext.tbl_CustomerShippingApartments
-                                                where apartment.ShipId == ShipId
+                                                where apartment.CustomerShipId == ShipId
                                                 select new CustomerShippingApartmentViewModel
                                                 {
                                                     ApartmentId = apartment.ApartmentId,
@@ -998,10 +1062,10 @@ namespace FieldServiceApp.Controllers
                     model.CustomerShipingAddressList = (from shipping in _dbContext.tbl_CustmoerShipping
                                                         join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                                         join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                                        where shipping.CustmoerId == model.CustomerId
+                                                        where shipping.CustomerId == model.CustomerId
                                                         select new CustmoerShippingViewModel
                                                         {
-                                                            ShipId = shipping.ShipId,
+                                                            ShipId = shipping.CustomerShipId,
                                                             Address = city.CityName + " " + state.StateName + " " + shipping.Address ?? ""
                                                         })
                                                  .ToList();
@@ -1049,7 +1113,7 @@ namespace FieldServiceApp.Controllers
 
                 model.OrderList = (from order in _dbContext.tbl_OrderMaster
                                    join customer in _dbContext.tbl_CustomerMaster
-                                   on order.CustomerId equals customer.CustmoerId
+                                   on order.CustomerId equals customer.CustomerId
                                    where ((order.IsFollowUp ?? 0) == 1)
                                    select new ServiceFormOrderViewModel
                                    {
@@ -1100,16 +1164,23 @@ namespace FieldServiceApp.Controllers
 
                     model.ApartmentIds = (checkOrder.ApartmentIds ?? "").Replace('/', ' ');
 
-                    var orderDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == orderId).FirstOrDefault();
+                    var orderDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == orderId).ToList();
 
                     if (orderDetail != null)
                     {
-                        model.ItemId = orderDetail.ItemId;
-                        model.Description = orderDetail.Description;
-                        model.PerUnitPrice = orderDetail.PerUnitPrice;
-                        model.Quantity = orderDetail.Quantity;
-                        model.TotalPrice = orderDetail.TotalPrice;
-                        model.UnitId = orderDetail.UnitId;
+                        model.OrderItemList = orderDetail.Select(s => new OrderDetailViewModel
+                        {
+                            OrderDetailId = s.OrderDetailId,
+                            ItemId = s.ItemId,
+                            Description = s.Description,
+                            PerUnitPrice = s.PerUnitPrice,
+                            Quantity = s.Quantity,
+                            TotalPrice = s.TotalPrice,
+                            UnitId = s.UnitId,
+
+                        }).ToList();
+
+
 
                     }
 
@@ -1141,7 +1212,7 @@ namespace FieldServiceApp.Controllers
                 // if (ModelState.IsValid)
                 {
                     OrderAssignment orderAssignmentReoccurence = new OrderAssignment();
-                    OrderDetail orderDetailReoccurence = new OrderDetail();
+                    List<OrderDetailViewModel> orderDetailReoccurence = new List<OrderDetailViewModel>();
                     var checkOrderNo = _dbContext.tbl_OrderMaster.Where(w => w.OrderNo == model.OrderNo && w.OrderId != model.OrderId).FirstOrDefault();
                     if (checkOrderNo != null)
                     {
@@ -1241,61 +1312,83 @@ namespace FieldServiceApp.Controllers
                         checkOrder.ReOccurenceEndDate = model.ReOccurenceEndDate;
                         _dbContext.SaveChanges();
 
-                        var checkOrderDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
-                        if (checkOrderDetail != null)
+                        foreach (var item in model.OrderItemList)
                         {
-                            checkOrderDetail.ItemId = model.ItemId;
-                            checkOrderDetail.Description = model.Description;
-                            checkOrderDetail.OrderId = checkOrder.OrderId;
-                            checkOrderDetail.PerUnitPrice = model.PerUnitPrice;
-                            checkOrderDetail.Quantity = model.Quantity;
-                            checkOrderDetail.TotalPrice = model.TotalPrice;
-                            checkOrderDetail.UnitId = model.UnitId;
-
-                            _dbContext.SaveChanges();
-                            orderDetailReoccurence = checkOrderDetail;
-
+                            if (item.OrderDetailId > 0)
                             {
-                                var checkOrderAssignment = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
-                                if (checkOrderAssignment != null)
+                                var checkOrderDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderDetailId == item.OrderDetailId).FirstOrDefault();
+                                if (checkOrderDetail != null)
                                 {
-                                    if (Convert.ToString(model.AssigneeId) != "")
-                                    {
-                                        model.EmployeeId = Convert.ToInt32(model.AssigneeId);
-                                        checkOrderAssignment.EmployeeId = model.EmployeeId;
-                                        _dbContext.SaveChanges();
-                                        orderAssignmentReoccurence = checkOrderAssignment;
-                                    }
-                                    else
-                                    {
-                                        checkOrderAssignment.EmployeeId = 0;
-                                        _dbContext.SaveChanges();
-                                        orderAssignmentReoccurence = checkOrderAssignment;
-                                    }
+                                    checkOrderDetail.ItemId = item.ItemId;
+                                    checkOrderDetail.Description = item.Description;
+                                    checkOrderDetail.OrderId = checkOrder.OrderId;
+                                    checkOrderDetail.PerUnitPrice = item.PerUnitPrice;
+                                    checkOrderDetail.Quantity = item.Quantity;
+                                    checkOrderDetail.TotalPrice = item.TotalPrice;
+                                    checkOrderDetail.UnitId = item.UnitId;
+
+                                    _dbContext.SaveChanges();
+
+
+
                                 }
-                                else
+                            }
+                            else
+                            {
+                                OrderDetail orderDetail = new OrderDetail()
                                 {
-                                    if (Convert.ToString(model.AssigneeId) != "")
-                                    {
-                                        OrderAssignment orderAssignment = new OrderAssignment()
-                                        {
-                                            OrderId = checkOrder.OrderId,
-                                            EmployeeId = model.EmployeeId,
-                                            AssignmentDate = DateTime.Now,
-                                            Status = "Assigned"
-                                        };
-                                        _dbContext.tbl_OrderAssignment.Add(orderAssignment);
-                                        _dbContext.SaveChanges();
-                                        orderAssignmentReoccurence = orderAssignment;
-
-                                    }
-                                }
-
-
-
+                                    ItemId = item.ItemId,
+                                    Description = item.Description,
+                                    OrderId = checkOrder.OrderId,
+                                    PerUnitPrice = item.PerUnitPrice,
+                                    Quantity = item.Quantity,
+                                    TotalPrice = item.TotalPrice,
+                                    UnitId = item.UnitId,
+                                    IsActive = 1,
+                                    CreatedBy = 1,
+                                    CreatedDate = DateTime.Now
+                                };
+                                _dbContext.tbl_OrderDetail.Add(orderDetail);
+                                _dbContext.SaveChanges();
                             }
 
+                        }
+                        orderDetailReoccurence = model.OrderItemList;
 
+
+                        var checkOrderAssignment = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
+                        if (checkOrderAssignment != null)
+                        {
+                            if (Convert.ToString(model.AssigneeId) != "")
+                            {
+                                model.EmployeeId = Convert.ToInt32(model.AssigneeId);
+                                checkOrderAssignment.EmployeeId = model.EmployeeId;
+                                _dbContext.SaveChanges();
+                                orderAssignmentReoccurence = checkOrderAssignment;
+                            }
+                            else
+                            {
+                                checkOrderAssignment.EmployeeId = 0;
+                                _dbContext.SaveChanges();
+                                orderAssignmentReoccurence = checkOrderAssignment;
+                            }
+                        }
+                        else
+                        {
+                            if (Convert.ToString(model.AssigneeId) != "")
+                            {
+                                OrderAssignment orderAssignment = new OrderAssignment()
+                                {
+                                    OrderId = checkOrder.OrderId,
+                                    EmployeeId = model.EmployeeId,
+                                    AssignmentDate = DateTime.Now,
+                                    Status = "Assigned"
+                                };
+                                _dbContext.tbl_OrderAssignment.Add(orderAssignment);
+                                _dbContext.SaveChanges();
+                                orderAssignmentReoccurence = orderAssignment;
+
+                            }
                         }
 
                         if (prevReOccurence == 0 && checkOrder.ReOccurence == 1)
@@ -1499,62 +1592,87 @@ namespace FieldServiceApp.Controllers
                                 item.ReOccurenceEndDate = checkOrder.ReOccurenceEndDate;
                                 _dbContext.SaveChanges();
 
-                                if (checkOrderDetail != null)
+                                if (model.OrderItemList.Count() > 0)
                                 {
                                     var orderitemDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == item.OrderId).FirstOrDefault();
-                                    if (checkOrderDetail != null)
+
+                                    foreach (var orderItem in model.OrderItemList)
                                     {
-                                        orderitemDetail.ItemId = checkOrderDetail.ItemId;
-                                        orderitemDetail.Description = model.Description;
-                                        orderitemDetail.OrderId = checkOrder.OrderId;
-                                        orderitemDetail.PerUnitPrice = model.PerUnitPrice;
-                                        orderitemDetail.Quantity = model.Quantity;
-                                        orderitemDetail.TotalPrice = model.TotalPrice;
-                                        orderitemDetail.UnitId = model.UnitId;
-
-                                        _dbContext.SaveChanges();
-
-                                        if (orderAssignmentReoccurence != null)
+                                        if (orderItem.OrderDetailId > 0)
                                         {
-                                            var checkOrderAssignmentDetail = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == item.OrderId).FirstOrDefault();
-                                            if (checkOrderAssignmentDetail != null)
+                                            var checkOrderDetail = _dbContext.tbl_OrderDetail.Where(w => w.OrderDetailId == orderItem.OrderDetailId).FirstOrDefault();
+                                            if (checkOrderDetail != null)
                                             {
-                                                if (Convert.ToString(model.AssigneeId) != "")
-                                                {
-                                                    model.EmployeeId = Convert.ToInt32(model.AssigneeId);
-                                                    checkOrderAssignmentDetail.EmployeeId = model.EmployeeId;
-                                                    _dbContext.SaveChanges();
+                                                checkOrderDetail.ItemId = orderItem.ItemId;
+                                                checkOrderDetail.Description = orderItem.Description;
+                                                checkOrderDetail.OrderId = item.OrderId;
+                                                checkOrderDetail.PerUnitPrice = orderItem.PerUnitPrice;
+                                                checkOrderDetail.Quantity = orderItem.Quantity;
+                                                checkOrderDetail.TotalPrice = orderItem.TotalPrice;
+                                                checkOrderDetail.UnitId = orderItem.UnitId;
 
-                                                }
-                                                else
-                                                {
-                                                    checkOrderAssignmentDetail.EmployeeId = 0;
-                                                    _dbContext.SaveChanges();
+                                                _dbContext.SaveChanges();
 
-                                                }
+
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            OrderDetail orderDetail = new OrderDetail()
+                                            {
+                                                ItemId = orderItem.ItemId,
+                                                Description = orderItem.Description,
+                                                OrderId = item.OrderId,
+                                                PerUnitPrice = orderItem.PerUnitPrice,
+                                                Quantity = orderItem.Quantity,
+                                                TotalPrice = orderItem.TotalPrice,
+                                                UnitId = orderItem.UnitId,
+                                                IsActive = 1,
+                                                CreatedBy = 1,
+                                                CreatedDate = DateTime.Now
+                                            };
+                                            _dbContext.tbl_OrderDetail.Add(orderDetail);
+                                            _dbContext.SaveChanges();
+                                        }
+
+                                    }
+                                    if (orderAssignmentReoccurence != null)
+                                    {
+                                        var checkOrderAssignmentDetail = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == item.OrderId).FirstOrDefault();
+                                        if (checkOrderAssignmentDetail != null)
+                                        {
+                                            if (Convert.ToString(model.AssigneeId) != "")
+                                            {
+                                                model.EmployeeId = Convert.ToInt32(model.AssigneeId);
+                                                checkOrderAssignmentDetail.EmployeeId = model.EmployeeId;
+                                                _dbContext.SaveChanges();
+
                                             }
                                             else
                                             {
-                                                if (Convert.ToString(model.AssigneeId) != "")
-                                                {
-                                                    OrderAssignment orderAssignment = new OrderAssignment()
-                                                    {
-                                                        OrderId = item.OrderId,
-                                                        EmployeeId = model.EmployeeId,
-                                                        AssignmentDate = DateTime.Now,
-                                                        Status = "Assigned"
-                                                    };
-                                                    _dbContext.tbl_OrderAssignment.Add(orderAssignment);
-                                                    _dbContext.SaveChanges();
+                                                checkOrderAssignmentDetail.EmployeeId = 0;
+                                                _dbContext.SaveChanges();
 
-
-                                                }
                                             }
-
-
                                         }
+                                        else
+                                        {
+                                            if (Convert.ToString(model.AssigneeId) != "")
+                                            {
+                                                OrderAssignment orderAssignment = new OrderAssignment()
+                                                {
+                                                    OrderId = item.OrderId,
+                                                    EmployeeId = model.EmployeeId,
+                                                    AssignmentDate = DateTime.Now,
+                                                    Status = "Assigned"
+                                                };
+                                                _dbContext.tbl_OrderAssignment.Add(orderAssignment);
+                                                _dbContext.SaveChanges();
 
 
+                                            }
+                                        }
 
 
                                     }
@@ -1663,9 +1781,9 @@ namespace FieldServiceApp.Controllers
                             Convert.ToString(CityId) != "0" ||
                             Convert.ToString(Address ?? "") != "")
                 {
-                    CustmoerShipping custmoerShipping = new CustmoerShipping()
+                    CustomerShipping custmoerShipping = new CustomerShipping()
                     {
-                        CustmoerId = CustomerId,
+                        CustomerId = CustomerId,
                         FirstName = FirstName,
                         MiddleName = MiddleName,
                         LastName = LastName,
@@ -1681,7 +1799,7 @@ namespace FieldServiceApp.Controllers
                     _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                     _dbContext.SaveChanges();
 
-                    response.Status = custmoerShipping.ShipId.ToString();
+                    response.Status = custmoerShipping.CustomerShipId.ToString();
                 }
 
 
@@ -1692,6 +1810,25 @@ namespace FieldServiceApp.Controllers
             }
 
             return Json(response);
+        }
+
+        public IActionResult GetOrderDetail(int id)
+        {
+            var model = new OrderDetailViewModel();
+            ViewBag.index = id;
+
+            model.ItemList = _dbContext.tbl_ItemMaster
+                    .Where(w => w.IsActive == 1)
+                            .Select(s => new ItemMasterViewModel
+                            {
+                                ItemId = s.ItemId,
+                                ItemCd = s.ItemCd,
+                                ItemPrice = s.ItemPrice,
+                                ItemDescription = s.ItemDescription
+                            })
+                            .ToList();
+
+            return PartialView("_ItemDetail", model);
         }
 
         protected override void Dispose(bool disposing)

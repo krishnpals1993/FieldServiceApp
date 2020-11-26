@@ -1,4 +1,4 @@
-﻿
+﻿using JqueryDataTables.ServerSide.AspNetCoreWeb.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -193,12 +193,14 @@ namespace FieldServiceApp.Models
             CityList = new List<CityViewModel>();
             Contacts = new List<CustmoerContactViewModel>();
             Shippings = new List<CustmoerShippingViewModel>();
+            Billings = new List<CustomerBillingViewModel>();
         }
 
+        public string Notes { get; set; }
         public int CustmoerId { get; set; }
         public string CompanyName { get; set; }
 
-        [Required(ErrorMessage = "Please enter code")]
+        //[Required(ErrorMessage = "Please enter code")]
         public string Code { get; set; }
         public string Address { get; set; }
         public string Zip1 { get; set; }
@@ -222,8 +224,31 @@ namespace FieldServiceApp.Models
         public List<CustmoerContactViewModel> Contacts { get; set; }
         public CustmoerShippingViewModel Shipping { get; set; }
         public List<CustmoerShippingViewModel> Shippings { get; set; }
+        public List<CustomerBillingViewModel> Billings { get; set; }
         public List<StateViewModel> StateList { get; set; }
         public List<CityViewModel> CityList { get; set; }
+    }
+    public class CustomerMasterViewModel_datatable
+    {
+      
+        public int CustmoerId { get; set; }
+
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Customer")]
+        public string CompanyName { get; set; }
+
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "CompanyType")]
+        public string CompanyType { get; set; }
+
+        [Sortable]
+        [Display(Name = "Status")]
+        public Int16 IsActive { get; set; }
+
+        public string Action { get; set; }
+
     }
     public class CustmoerContactViewModel
     {
@@ -238,7 +263,7 @@ namespace FieldServiceApp.Models
 
         public string LastName { get; set; }
 
-        [EmailAddress(ErrorMessage ="Please enter valid email")]
+        [EmailAddress(ErrorMessage = "Please enter valid email")]
         public string Email { get; set; }
 
         public string Phone { get; set; }
@@ -268,6 +293,8 @@ namespace FieldServiceApp.Models
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
         public int? CityId { get; set; }
         public int? StateId { get; set; }
         public Int16 IsActive { get; set; }
@@ -282,6 +309,7 @@ namespace FieldServiceApp.Models
         public string Zip2 { get; set; }
         public string CityName { get; internal set; }
         public string StateName { get; internal set; }
+        public string Notes { get; set; }
     }
     public class ItemMasterViewModel
     {
@@ -353,6 +381,7 @@ namespace FieldServiceApp.Models
             CustomerShippingDetail = new CustmoerShippingViewModel();
             ApartmentList = new List<CustomerShippingApartmentViewModel>();
             OrderList = new List<ServiceFormOrderViewModel>();
+            OrderItemList = new List<OrderDetailViewModel>();
         }
         public int OrderId { get; set; }
 
@@ -388,23 +417,12 @@ namespace FieldServiceApp.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
-        [Display(Name = "Item")]
-        [Required(ErrorMessage = "Please select item")]
         public int ItemId { get; set; }
         public string Description { get; set; }
         public int UnitId { get; set; }
-
-        [Display(Name = "Quantity")]
-        [Required(ErrorMessage = "Please enter quantity")]
         public int Quantity { get; set; }
-
-        [Display(Name = "Per Unit Price")]
-        [Required(ErrorMessage = "Please enter per unit price")]
-        public decimal PerUnitPrice { get; set; }
-
-        [Display(Name = "Total Price")]
-        [Required(ErrorMessage = "Please enter total price")]
-        public decimal TotalPrice { get; set; }
+       public decimal PerUnitPrice { get; set; }
+       public decimal TotalPrice { get; set; }
         public int EmployeeId { get; set; }
 
         public string AssigneeId { get; set; }
@@ -432,12 +450,23 @@ namespace FieldServiceApp.Models
         public List<CustomerMasterViewModel> CustomerList { get; set; }
         public List<CustmoerShippingViewModel> CustomerShipingAddressList { get; set; }
         public List<CustomerShippingApartmentViewModel> ApartmentList { get; set; }
+        public List<OrderDetailViewModel> OrderItemList { get; set; }
         public List<ServiceFormOrderViewModel> OrderList { get; set; }
         public int ReOccurenceOrders { get; set; }
-        public bool  ScheduledOnNonWorkingDay { get; set; }
+        public bool ScheduledOnNonWorkingDay { get; set; }
     }
+
+    
+
     public class OrderDetailViewModel
     {
+        
+        public OrderDetailViewModel()
+        {
+            ItemList = new List<ItemMasterViewModel>();
+        }
+
+        public List<ItemMasterViewModel> ItemList { get; set; }
         public int OrderDetailId { get; set; }
 
         public int OrderId { get; set; }
@@ -672,6 +701,7 @@ namespace FieldServiceApp.Models
     }
     public class CustomerShippingApartmentViewModel
     {
+        public string Notes { get; set; }
         public int ApartmentId { get; set; }
         public int ShipId { get; set; }
         public string ApartmentNo { get; set; }
@@ -697,12 +727,12 @@ namespace FieldServiceApp.Models
         public DateTime? OrderDateTo { get; set; }
         public string CustomerName { get; set; }
         public string OrderNo { get; set; }
-        
+
 
     }
     public class CalenderWorkingHourViewModel
     {
-         
+
         public int Id { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
@@ -722,7 +752,7 @@ namespace FieldServiceApp.Models
         public int Id { get; set; }
         public string Type { get; set; }
         public string DayName { get; set; }
-        public DateTime ? HolidayDate { get; set; }
+        public DateTime? HolidayDate { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
@@ -734,8 +764,8 @@ namespace FieldServiceApp.Models
     {
         public BilHeaderViewModel()
         {
-            Shipping  = new CustmoerShippingViewModel();
-            ItemList  = new List<ItemMasterViewModel>();
+            Shipping = new CustmoerShippingViewModel();
+            ItemList = new List<ItemMasterViewModel>();
         }
         public int BilligCustomerId { get; set; }
         public string BilligCompanyName { get; set; }
@@ -776,7 +806,35 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+
+
+    }
+
+    public class CustomerBillingViewModel
+    {
+        public CustomerBillingViewModel()
+        {
+            Shippings = new List<CustmoerShippingViewModel>();
+        }
         
+        public int CustomerBillingId { get; set; }
+        public int CustomerId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int? CityId { get; set; }
+        public int? StateId { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string Notes { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public List<CustmoerShippingViewModel> Shippings { get; set; }
 
     }
 

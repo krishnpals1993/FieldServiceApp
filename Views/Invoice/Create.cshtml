@@ -13,21 +13,41 @@
 }
 
 <div role="main" class="page-content container container-plus">
-    <div class="card bcard mt-2 mt-lg-3">
-        <div class="card-header">
-            <h3 class="card-title text-125">
-                @ViewData["Title"]
-                <button type="button" onclick="backToSearch()"
-                        style="float:right"
-                        class=" btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                    Back to search
+    <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Invoice/Create" method="post">
+        <div class="card bcard mt-2 mt-lg-3">
+            <div class="card-header">
+                <div class="card-title ">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h3 class="text-125">
+                                <h3 class="card-title text-125">
+                                    @ViewData["Title"]
+                                </h3>
+                            </h3>
+                        </div>
+                        <div class="col-md-9 text-nowrap text-right">
+                            <button class="btn btn-info btn-bold px-4" type="submit">
+                                <i class="fa fa-check mr-1"></i>
+                                Submit
+                            </button>
 
-                </button>
-            </h3>
-        </div>
+                            <a href="~/Service/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                                <i class="fa fa-undo mr-1"></i>
+                                Cancel
+                            </a>
+                            <button type="button" onclick="backToSearch()"
+                                    class="btn btn-outline-orange btn-bold ml-2 px-4">
+                                Back to search
+                            </button>
+                        </div>
+                    </div>
 
-        <div class="card-body px-3 pb-1">
-            <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Invoice/Create" method="post">
+                </div>
+            </div>
+
+
+            <div class="card-body px-3 pb-1">
+
 
                 @Html.HiddenFor(h => h.OrderId)
                 @Html.HiddenFor(h => h.OrderNo)
@@ -378,9 +398,10 @@
                         </a>
                     </div>
                 </div>
-            </form>
+
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 
 

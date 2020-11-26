@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace FieldServiceApp.Controllers
 {
-    //[Authentication]
+    [Authentication]
     public class HomeController : Controller
     {
         private readonly IOptions<Appsettings> _appSettings;
