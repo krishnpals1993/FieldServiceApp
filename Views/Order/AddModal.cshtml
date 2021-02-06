@@ -33,11 +33,10 @@
 }
 
 <div role="main" class="page-content container container-plus">
-    <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Order/Add" method="post">
+    <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Order/AddModal" method="post">
         <div class="card bcard mt-2 mt-lg-3">
             @Html.HiddenFor(h => h.MaxReOccurenceEndDate)
             @Html.HiddenFor(h => h.ReOccurenceStartDateSetBy)
-            @Html.HiddenFor(h => h.Tax)
 
             <div class="card-header">
                 <div class="card-title ">
@@ -54,11 +53,6 @@
                                 <i class="fa fa-check mr-1"></i>
                                 Submit
                             </button>
-
-                            <a href="~/Order/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
-                                <i class="fa fa-undo mr-1"></i>
-                                Cancel
-                            </a>
                         </div>
                     </div>
 
@@ -153,28 +147,6 @@
                     </div>
                 </div>
 
-                <div class="form-group row" id="ApartmentIdPenal" style="display:none">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Apartment
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.ApartmentId, new SelectList(Model.ApartmentList.Select(x => new { Value = x.ApartmentId, Text = x.ApartmentNo }), "Value", "Text"),
-                       "Select Apartment", new { @class = "form-control chosen-select", @multiple = "", @placeholder = "Select Apartment" })
-                        <span asp-validation-for="ApartmentId" class="text-danger"></span>
-                    </div>
-                    <div class="col-lg-1">
-                        <button data-toggle="modal" data-target="#newApartmentModel" type="button"
-                                class="btn btn-outline-light btn-h-light-orange
-                                btn-a-light-orange border-b-2 text-600 px-2 mb-1">
-
-                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                        </button>
-                    </div>
-                </div>
-
                 <div class="form-group row">
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
@@ -239,7 +211,19 @@
                     </div>
 
                 </div>
+                <div class="form-group row" id="ApartmentIdPenal" style="display:none">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Apartment
+                        </label>
+                    </div>
 
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.ApartmentId, new SelectList(Model.ApartmentList.Select(x => new { Value = x.ApartmentId, Text = x.ApartmentNo }), "Value", "Text"),
+                       "Select Apartment", new { @class = "form-control chosen-select", @multiple = "", @placeholder = "Select Apartment" })
+                        <span asp-validation-for="ApartmentId" class="text-danger"></span>
+                    </div>
+                </div>
 
                 <div class="form-group row">
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
@@ -331,26 +315,6 @@
 
 
 
-
-
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Assigned To
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.AssigneeId,
-                       new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"),
-                       "Select Employee", new { @class = "form-control", @placeholder = "Select Employee" })
-                        <span asp-validation-for="AssigneeId" class="text-danger"></span>
-                    </div>
-
-
-
                 </div>
 
                 <h3 class="card-title text-125">
@@ -360,51 +324,42 @@
                 <div id="itemPanel">
                     @for (int i = 0; i < Model.OrderItemList.Count(); i++)
                     {
-                        @if (i == 0)
-                        {
-
-                            <div class="form-group row" style="margin-bottom:0px">
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        @*<span>@(i + 1).</span>*@ Item
-                                    </label>
-                                </div>
-                                <div class="col-sm-3  col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Description
-                                    </label>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Price
-                                    </label>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Quantity
-                                    </label>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Total Price
-                                    </label>
-                                </div>
-
-
-
+                        <div class="form-group row" style="margin-bottom:0px">
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    <span>@(i + 1).</span> Item
+                                </label>
                             </div>
-                        }
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Price
+                                </label>
+                            </div>
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Quantity
+                                </label>
+                            </div>
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Total Price
+                                </label>
+                            </div>
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Description
+                                </label>
+                            </div>
+
+
+                        </div>
                         <div class="form-group row">
 
                             <div class="col-sm-2">
                                 @Html.DropDownListFor(model => model.OrderItemList[i].ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control chosen-select ItemId", @placeholder = "Select Item" })
                                 <span asp-validation-for="OrderItemList[i].ItemId" class="text-danger"></span>
                             </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.OrderItemList[i].Description,
-                                 new { @placeholder = "Description", @class = "form-control Description", @readonly = "@readonly" })
-                                <span asp-validation-for="OrderItemList[i].Description" class="text-danger"></span>
-                            </div>
+
 
                             <div class="col-sm-2">
                                 @Html.TextBoxFor(m => m.OrderItemList[i].PerUnitPrice,
@@ -425,7 +380,11 @@
                                 <span asp-validation-for="OrderItemList[i].TotalPrice" class="text-danger"></span>
                                 @*<a href="#" class="btn btn-link text-primary-d1">Add More</a>*@
                             </div>
-
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(m => m.OrderItemList[i].Description,
+                                 new { @placeholder = "Description", @class = "form-control Description", @readonly = "@readonly" })
+                                <span asp-validation-for="OrderItemList[i].Description" class="text-danger"></span>
+                            </div>
                             <div class="col-lg-1" style="width:30px">
                                 <button onclick="addItems('@i')" type="button"
                                         class="btnAdd btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
@@ -438,44 +397,36 @@
 
 
 
-
+                <hr />
                 <div class="form-group row">
-                    <div class="col-sm-9 col-form-label text-sm-right pr-0">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            Amount
+                            Assigned To
                         </label>
                     </div>
 
-                    <div class="col-sm-2">
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.AssigneeId,
+                       new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"),
+                       "Select Employee", new { @class = "form-control", @placeholder = "Select Employee" })
+                        <span asp-validation-for="AssigneeId" class="text-danger"></span>
+                    </div>
+
+
+
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Total Amount
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.TotalAmount,
                        new { @placeholder = "Total Amount", @class = "form-control", @readonly = "@readonly" })
                         <span asp-validation-for="TotalAmount" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-9 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Tax Amount
-                        </label>
-                    </div>
-
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.TaxAmount,
-                       new { @placeholder = "Tax Amount Amount", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="TaxAmount" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-9 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Gross Amount
-                        </label>
-                    </div>
-
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.GrossAmount,
-                       new { @placeholder = "Gross Amount", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="GrossAmount" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -983,101 +934,13 @@
                                     Submit
                                 </button>
 
-                                <a data-dismiss="modal" id="btnCloseShipping" aria-label="Close" class="btn btn-outline-lightgrey btn-bold ml-2 px-4">
-                                    <i class="fa fa-undo mr-1"></i>
-                                    Cancel
-                                </a>
+                              
                             </div>
                         </div>
                     </form>
 
                 </div>
 
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade modal-lg" id="newApartmentModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-primary-d3" id="exampleModalLabelA">
-                        New Apartment
-                    </h5>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-
-                    <form class="mt-lg-3" autocomplete="off" method="post">
-                        <div id="apartmentPanel">
-
-                            <div class="form-group row">
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Apartment No
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <input type="text"
-                                           placeholder="Apartment No"
-                                           class="form-control" id="mApartmentNo" />
-                                </div>
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Apartment Name
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <input type="text" class="form-control"
-                                           id="mApartmentName" placeholder="Apartment Name" />
-                                </div>
-
-
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Notes
-                                    </label>
-                                </div>
-                                <div class="col-sm-5">
-                                    <input type="text" class="form-control"
-                                           id="mNotes" placeholder="Notes" />
-                                </div>
-                            </div>
-
-                            <hr />
-
-
-                        </div>
-
-
-
-
-                        <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
-                            <div class="offset-md-3 col-md-9 text-nowrap">
-                                <button class="btn btn-info btn-bold px-4" onclick="addNewApartment()" type="button">
-                                    <i class="fa fa-check mr-1"></i>
-                                    Submit
-                                </button>
-
-                                <a data-dismiss="modal" id="btnCloseApartment" aria-label="Close" class="btn btn-outline-lightgrey btn-bold ml-2 px-4">
-                                    <i class="fa fa-undo mr-1"></i>
-                                    Cancel
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
 
             </div>
         </div>
@@ -1095,6 +958,14 @@
     <style>
         hr {
             /*margin-bottom: 2rem !important;*/
+        }
+
+        #sidebar {
+            display: none !important;
+        }
+
+        .navbar {
+            display: none !important;
         }
     </style>
 }
@@ -1129,11 +1000,18 @@
     </script>
     <script type="text/javascript">
         $(document).ready(function () {
-
+            debugger;
+            var modelDt = '@ViewBag.dt';
+            if (modelDt) {
+                modelDt = new moment(modelDt);
+            }
+            else {
+                     modelDt = new moment();
+            }
               var TinyDatePicker1 = DateRangePicker.TinyDatePicker;
                           TinyDatePicker1('#ShipStartDate', {
                              mode: 'dp-below',
-                              date: new Date(),
+                              date: modelDt,
 
                          })
                           .on('statechange', function (ev) {
@@ -1151,7 +1029,7 @@
              var TinyDatePicker2 = DateRangePicker.TinyDatePicker;
                           TinyDatePicker2('#ShipEndDate', {
                              mode: 'dp-below',
-                              date: new Date(),
+                              date: modelDt,
 
                          })
                           .on('statechange', function (ev) {
@@ -1186,7 +1064,7 @@
             var TinyDatePicker5 = DateRangePicker.TinyDatePicker;
                           TinyDatePicker5('#OrderDate', {
                              mode: 'dp-below',
-                              date: new Date(),
+                              date: modelDt,
 
                          })
                           .on('statechange', function (ev) {
@@ -1269,7 +1147,12 @@
 
 
                 });
-                $("#OrderDate").val(new moment().format("MM/DD/YYYY"));
+                $("#OrderDate").val(new moment(modelDt).format("MM/DD/YYYY"));
+                $("#ShipStartDate").val(new moment(modelDt).format("MM/DD/YYYY"));
+                $("#ShipEndDate").val(new moment(modelDt).format("MM/DD/YYYY"));
+                $("#ReOccurenceStartDate").val(new moment(modelDt).format("MM/DD/YYYY"));
+                $("#MaxReOccurenceEndDate").val(new moment(modelDt).format("MM/DD/YYYY"));
+                //ReOccurenceStartDate
 
             //    try {
             //        debugger;
@@ -1287,7 +1170,7 @@
         var ErrorMessage = '@ViewBag.ErrorMessage';
         if (SuccessMessage) {
             swal(SuccessMessage, "", "success");
-           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Order/Add"; }, 500);
+          // setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Order/Add"; }, 500);
 
         }
         if (ErrorMessage) {
@@ -1417,18 +1300,7 @@
                 }
 
             });
-            $("#TotalAmount").val(total);
-
-            if ($("#Tax").val()=='') {
-                $("#Tax").val('0');
-            }
-
-            var taxAmount = Number(((total) * Number($("#Tax").val())) / 100).toFixed(2);
-            var grossAmount = total + taxAmount;
-            $("#TaxAmount").val(taxAmount);
-            $("#GrossAmount").val(grossAmount);
-
-
+            $("#TotalAmount").val(total)
         }
 
         function getItemPrice(itemId) {
@@ -1480,28 +1352,24 @@
                 data: data,
                 success: function (response) {
 
-                    if (response.length > 0) {
-                        debugger;
+                   if (response.length > 0) {
                 $('#ShipId').html('');
                        var options = '';
 
                 options += '<option value="">Select Ship Address</option>';
                        for (var i = 0; i < response.length; i++) {
-                        options += '<option cust="' + response[i]['CustmoerId'] + '" value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
-                        }
 
-                        $("#Tax").val(response[0]['Tax']);
+                    options += '<option cust="' + response[i]['CustmoerId'] + '" value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
+                       }
 
                        $('#ShipId').append(options);
-                        $('#ShipId').trigger("chosen:updated");
+                       $('#ShipId').trigger("chosen:updated");
 
-                       if (response.length==1) {
+                        if (response.length==1) {
                            $('#ShipId').val(response[0]['ShipId']);
                            $('#ShipId').trigger("chosen:updated");
                             $('#ShipId').trigger("change");
                        }
-
-
             }
                 }
             })
@@ -1529,12 +1397,7 @@
 
                  {
                 $('#ApartmentId').html('');
-                        var options = '';
-                        debugger;
-                        var tax = response.tax;
-                        response = response.aList;
-                        $("#Tax").val(tax);
-
+                var options = '';
                 //options += '<option value="">Select Apartment Address</option>';
                 for (var i = 0; i < response.length; i++) {
                     options += '<option value="' + response[i]['ApartmentId'] + '">' + response[i]['ApartmentNo'] + '</option>';
@@ -1802,67 +1665,6 @@
                 $("#CompanyType").removeAttr("readonly");
             }
         });
-
-
-
-        function addNewApartment() {
-
-            if (!$("#ShipId").val()) {
-                swal("Please select ship address ", "", "error")
-                return;
-            }
-
-            if ((!$("#mApartmentNo").val()) && (!$("#mApartmentName").val())) {
-                swal("Please select apartment no or name", "", "error")
-                return;
-            }
-
-            var data = {
-                'ShipId': $("#ShipId").val(),
-                ApartmentNo: $("#mApartmentNo").val(),
-                ApartmentName: $("#mApartmentName").val(),
-                Notes: $("#mNotes").val(),
-                ApartmentId: ($("#ApartmentId").val() ? $("#ApartmentId").val().toString() : ""),
-
-
-            };
-
-            $.ajax({
-                url: "/Order/AddApartment",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (response) {
-                    debugger;
-                    console.log(response);
-                    $("#mApartmentNo").val('');
-                    $("#mApartmentName").val('');
-                    $("#mNotes").val('');
-                    if (true) {
-                        $("#btnCloseApartment").trigger('click');
-                        $('#ApartmentId').html('');
-                        var options = '';
-                        var selectedApartments = "";
-                        //options += '<option value="">Select Apartment Address</option>';
-                        for (var i = 0; i < response.length; i++) {
-                            options += '<option value="' + response[i]['ApartmentId'] + '">' + response[i]['ApartmentNo'] + '</option>';
-                            selectedApartments = response[i]['ApartmentName'];
-                        }
-
-                        selectedApartments = selectedApartments == "" ? [] : selectedApartments.split(',');
-
-                        $('#ApartmentId').empty(); //remove all child nodes
-                        $('#ApartmentId').append(options);
-                        $('#ApartmentId').val(selectedApartments);
-                        $('#ApartmentId').trigger("chosen:updated");
-
-
-                    }
-
-                }
-            });
-
-        }
 
         function addNewShipping() {
 

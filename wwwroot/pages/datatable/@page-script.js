@@ -19,7 +19,9 @@ jQuery(function($) {
   
   var $_table = $(tableId).DataTable({
     responsive: true,
-
+      //stateSave: true,
+      "pageLength": 50,
+      lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
     /** optional scrolling **/
     // scrollY: "300px",
     // scrollCollapse: true,
@@ -107,7 +109,8 @@ jQuery(function($) {
     language: {
       search: '<i class="fa fa-search pos-abs mt-2 pt-3px ml-25 text-blue-m2"></i>',
       searchPlaceholder: " Search ..."
-    }
+      },
+      stateSave: true,
   })
 
   

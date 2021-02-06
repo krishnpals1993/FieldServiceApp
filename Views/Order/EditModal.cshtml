@@ -26,15 +26,34 @@
     WeekDayList.Add("Saturday");
 }
 <div role="main" class="page-content container container-plus">
-    <div class="card bcard mt-2 mt-lg-3">
-        <div class="card-header">
-            <h3 class="card-title text-125">
-                @ViewData["Title"]
-            </h3>
-        </div>
+    <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Order/Edit" method="post">
+        <div class="card bcard mt-2 mt-lg-3">
+            @Html.HiddenFor(h => h.MaxReOccurenceEndDate)
+            @Html.HiddenFor(h => h.ReOccurenceStartDateSetBy)
+            <div class="card-header">
+                <div class="card-title ">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h3 class="text-125">
+                                <h3 class="card-title text-125">
+                                    @ViewData["Title"]
+                                </h3>
+                            </h3>
+                        </div>
+                        <div class="col-md-9 text-nowrap text-right">
+                            <button class="btn btn-info btn-bold px-4" onclick="return checkNonWorkingDay();" type="button">
+                                <i class="fa fa-check mr-1"></i>
+                                Submit
+                            </button>
 
-        <div class="card-body px-3 pb-1">
-            <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Order/Edit" method="post">
+                            
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-body px-3 pb-1">
                 @Html.HiddenFor(h => h.OrderId)
                 @Html.HiddenFor(h => h.ApartmentIds)
                 @Html.HiddenFor(h => h.ReOccurenceOrderCount)
@@ -54,19 +73,16 @@
 
                     </div>
 
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Follow-up Order
-                        </label>
-                    </div>
+                    @*<div class="col-sm-2 col-form-label text-sm-right pr-0">
+                <label for="id-form-field-1" class="mb-0">
+                    Follow-up Order
+                </label>
+            </div>
 
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.ParentOrderId, new SelectList(Model.OrderList.Select(x => new { Value = x.OrderId, Text = x.CustomerName }), "Value", "Text"), "Select Follow-up Order", new { @class = "form-control", @placeholder = "Select Company" })
-                        <span asp-validation-for="ParentOrderId" class="text-danger"></span>
-                    </div>
-
-                </div>
-                <div class="form-group row">
+            <div class="col-sm-3">
+                @Html.DropDownListFor(model => model.ParentOrderId, new SelectList(Model.OrderList.Select(x => new { Value = x.OrderId, Text = x.CustomerName }), "Value", "Text"), "Select Follow-up Order", new { @class = "form-control", @placeholder = "Select Company" })
+                <span asp-validation-for="ParentOrderId" class="text-danger"></span>
+            </div>*@
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             Order Date
@@ -75,7 +91,7 @@
                     <div class="col-sm-3">
                         <div class="input-group date">
                             @Html.TextBoxFor(m => m.OrderDate,
-                            new { id = "id-date-1", @placeholder = "Order Date", @class = "form-control" })
+                            new { id = "OrderDate", @placeholder = "Order Date", @class = "form-control" })
                             <div class="input-group-addon input-group-append">
                                 <div class="input-group-text">
                                     <i class="far fa-calendar"></i>
@@ -85,41 +101,70 @@
                         </div>
 
                     </div>
+                </div>
+                <div class="form-group row">
+
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             Customer
                         </label>
                     </div>
 
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.CustomerId, new SelectList(Model.CustomerList.Select(x => new { Value = x.CustmoerId, Text = x.CompanyName }), "Value", "Text"), "Select Customer", new { @class = "form-control", @placeholder = "Select Company" })
+                    <div class="col-sm-2" style="min-width: 25%">
+                        @Html.DropDownListFor(model => model.CustomerId, new SelectList(Model.CustomerList.Select(x => new { Value = x.CustmoerId, Text = x.CompanyName }), "Value", "Text"), "Select Customer", new { @class = "form-control chosen-select", @placeholder = "Select Company" })
                         <span asp-validation-for="CustomerId" class="text-danger"></span>
                     </div>
-                </div>
+                    <div class="col-lg-1" style="max-width: 1%">
+                        <button data-toggle="modal" data-target="#newCustomerModel" type="button"
+                                class="btn btn-outline-light btn-h-light-orange
+                                btn-a-light-orange border-b-2 text-600 px-2 mb-1">
 
-                <div class="form-group row">
-
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0" style="max-width: 14.1%">
                         <label for="id-form-field-1" class="mb-0">
                             Ship Address
                         </label>
                     </div>
 
                     <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.ShipId, new SelectList(Model.CustomerShipingAddressList.Select(x => new { Value = x.ShipId, Text = x.Address }), "Value", "Text"), "Select Ship Address", new { @class = "form-control", @placeholder = "Select Ship Address" })
+                        @Html.DropDownListFor(model => model.ShipId, new SelectList(Model.CustomerShipingAddressList.Select(x => new { Value = x.ShipId, Text = x.Address }), "Value", "Text"), "Select Ship Address", new { @class = "form-control chosen-select", @placeholder = "Select Ship Address" })
                         <span asp-validation-for="ShipId" class="text-danger"></span>
                     </div>
+                    <div class="col-sm-2" style="max-width: 13%">
+                        <button data-toggle="modal" data-target="#newCustomerShippingModel"
+                                type="button"
+                                class="btnAddShipping btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                            Address
+                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                    </div>
+                </div>
 
+                <div class="form-group row">
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
                             Ship Date
                         </label>
                     </div>
 
-                    <div class="col-sm-3">
-                        <div class="input-group date" id="id-timepicker">
+                    <div class="col-sm-2" style="max-width:13%">
+                        <div class="input-group date">
                             @Html.TextBoxFor(m => m.ShipStartDate,
-                            new { @placeholder = "Ship Date", @class = "form-control" })
+                            new { @placeholder = "Start Date", @class = "form-control" })
+
+                            <div class="input-group-addon input-group-append">
+                                <div class="input-group-text">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1" style="min-width:12%">
+                        <div class="input-group date" id="datetimepicker3">
+                            @Html.TextBoxFor(m => m.ShipStartTime,
+                            new { @placeholder = "Start Time", @class = "form-control" })
 
                             <div class="input-group-addon input-group-append">
                                 <div class="input-group-text">
@@ -128,8 +173,39 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            End Time
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2" style="max-width:13%">
+                        <div class="input-group date">
+                            @Html.TextBoxFor(m => m.ShipEndDate,
+                            new { @placeholder = "End Date", @class = "form-control" })
+
+                            <div class="input-group-addon input-group-append">
+                                <div class="input-group-text">
+                                    <i class="far fa-calendar"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1" style="min-width:12%">
+                        <div class="input-group date" id="datetimepicker4">
+                            @Html.TextBoxFor(m => m.ShipEndTime,
+                            new { @placeholder = "End Time", @class = "form-control" })
+
+                            <div class="input-group-addon input-group-append">
+                                <div class="input-group-text">
+                                    <i class="far fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
                 <div class="form-group row" id="ApartmentIdPenal" style="display:none">
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
@@ -142,18 +218,12 @@
                        "Select Apartment", new { @class = "form-control chosen-select", @multiple = "", @placeholder = "Select Apartment" })
                         <span asp-validation-for="ApartmentId" class="text-danger"></span>
                     </div>
-
-
-
-
                 </div>
 
                 <div class="form-group row">
-
-
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            Re-Occurence
+                            Recurrence
                         </label>
                     </div>
 
@@ -170,13 +240,13 @@
                     <div class="form-group row">
                         <div class="col-sm-2 col-form-label text-sm-right pr-0">
                             <label for="id-form-field-1" class="mb-0">
-                                ReOccurence From
+                                Recurrence From
                             </label>
                         </div>
                         <div class="col-sm-3">
                             <div class="input-group date">
                                 @Html.TextBoxFor(m => m.ReOccurenceStartDate,
-                                new { id = "ReOccurenceStartDate", @placeholder = "ReOccurence Date From", @class = "form-control" })
+                                new { id = "ReOccurenceStartDate", @placeholder = "Recurrence Date From", @class = "form-control" })
                                 <div class="input-group-addon input-group-append">
                                     <div class="input-group-text">
                                         <i class="far fa-calendar"></i>
@@ -187,13 +257,13 @@
                         </div>
                         <div class="col-sm-2 col-form-label text-sm-right pr-0">
                             <label for="id-form-field-1" class="mb-0">
-                                ReOccurence To
+                                Recurrence To
                             </label>
                         </div>
                         <div class="col-sm-3">
                             <div class="input-group date">
                                 @Html.TextBoxFor(m => m.ReOccurenceEndDate,
-                                 new { id = "ReOccurenceEndDate", @placeholder = "ReOccurence Date To", @class = "form-control" })
+                                 new { id = "ReOccurenceEndDate", @placeholder = "Recurrence Date To", @class = "form-control" })
                                 <div class="input-group-addon input-group-append">
                                     <div class="input-group-text">
                                         <i class="far fa-calendar"></i>
@@ -209,7 +279,7 @@
 
                         <div class="col-sm-2 col-form-label text-sm-right pr-0">
                             <label for="id-form-field-1" class="mb-0">
-                                Re-Occurence In
+                                Recurrence In
                             </label>
                         </div>
 
@@ -247,65 +317,88 @@
                     Item detail
                 </h3>
                 <hr />
+                <div id="itemPanel">
+                    @for (int i = 0; i < Model.OrderItemList.Count(); i++)
+                    {
+                        @Html.HiddenFor(h => h.OrderItemList[i].OrderDetailId);
 
-                <div class="form-group row">
+                        <div class="form-group row" style="margin-bottom:0px">
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    <span>@(i + 1).</span> Item
+                                </label>
+                            </div>
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Price
+                                </label>
+                            </div>
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Quantity
+                                </label>
+                            </div>
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Total Price
+                                </label>
+                            </div>
+                            <div class="col-sm-2 col-form-label text-sm-left pr-0">
+                                <label for="id-form-field-1" class="mb-0">
+                                    Description
+                                </label>
+                            </div>
 
-                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Item
-                        </label>
-                    </div>
-                    <div class="col-sm-2">
-                        @Html.DropDownListFor(model => model.ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control chosen-select", @placeholder = "Select Item" })
-                        <span asp-validation-for="ItemId" class="text-danger"></span>
-                    </div>
 
-                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Price
-                        </label>
-                    </div>
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.PerUnitPrice,
-                           new { @placeholder = "Price", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="PerUnitPrice" class="text-danger"></span>
-                    </div>
+                        </div>
+                        <div class="form-group row">
 
-                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Quantity
-                        </label>
-                    </div>
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.Quantity,
-                         new { @placeholder = "Quantity", @class = "form-control" })
-                        <span asp-validation-for="Quantity" class="text-danger"></span>
-                    </div>
-                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Total Price
-                        </label>
-                    </div>
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.TotalPrice,
-                       new { @placeholder = "Total Price", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="TotalPrice" class="text-danger"></span>
-                        @*<a href="#" class="btn btn-link text-primary-d1">Add More</a>*@
-                    </div>
+                            <div class="col-sm-2">
+                                @Html.DropDownListFor(model => model.OrderItemList[i].ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control ItemId", @placeholder = "Select Item" })
+                                <span asp-validation-for="OrderItemList[i].ItemId" class="text-danger"></span>
+                            </div>
 
+
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.OrderItemList[i].PerUnitPrice,
+                                   new { @placeholder = "Price", @class = "form-control PerUnitPrice" })
+                                <span asp-validation-for="OrderItemList[i].PerUnitPrice" class="text-danger"></span>
+                            </div>
+
+
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.OrderItemList[i].Quantity,
+                                 new { @placeholder = "Quantity", @class = "form-control Quantity" })
+                                <span asp-validation-for="OrderItemList[i].Quantity" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(m => m.OrderItemList[i].TotalPrice,
+                               new { @placeholder = "Total Price", @class = "form-control TotalPrice", @readonly = "@readonly" })
+                                <span asp-validation-for="OrderItemList[i].TotalPrice" class="text-danger"></span>
+                                @*<a href="#" class="btn btn-link text-primary-d1">Add More</a>*@
+                            </div>
+                            <div class="col-sm-3">
+                                @Html.TextBoxFor(m => m.OrderItemList[i].Description,
+                                 new { @placeholder = "Description", @class = "form-control Description", @readonly = "@readonly" })
+                                <span asp-validation-for="OrderItemList[i].Description" class="text-danger"></span>
+                            </div>
+                            <div class="col-lg-1" style="width:30px">
+                                @if (Model.OrderItemList.Count() == (i + 1))
+                                {
+                                    <button onclick="addItems('@i')" type="button"
+                                            class="btnAdd btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                                        <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                                    </button>
+                                }
+
+                            </div>
+                        </div>
+
+                    }
                 </div>
-                <div class="form-group row">
-                    <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Description
-                        </label>
-                    </div>
-                    <div class="col-sm-5">
-                        @Html.TextBoxFor(m => m.Description,
-                         new { @placeholder = "Description", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
-                </div>
+
+
 
                 <hr />
                 <div class="form-group row">
@@ -352,17 +445,13 @@
                             <i class="fa fa-check mr-1"></i>
                             Submit
                         </button>
-
-                        <a href="~/Order/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
-                            <i class="fa fa-undo mr-1"></i>
-                            Cancel
-                        </a>
+ 
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
 
+            </div>
+        </div>
+    </form>
 </div>
 
 
@@ -376,9 +465,15 @@
         <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
     </environment>
     <style>
-        hr {
-            /*margin-bottom: 2rem !important;*/
+
+        #sidebar {
+            display: none !important;
         }
+
+        .navbar {
+            display: none !important;
+        }    
+    
     </style>
 }
 
@@ -388,7 +483,6 @@
         <script src="~/lib/moment/moment.js"></script>
         <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
         <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
-        <script src="~/pages/form-basic/@@page-script.js"></script>
         <script src="~/lib/chosen-js/chosen.jquery.js"></script>
     </environment>
     <script type="text/javascript">
@@ -413,23 +507,123 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
-              var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
+
+
+              var TinyDatePicker1 = DateRangePicker.TinyDatePicker;
+                          TinyDatePicker1('#ShipStartDate', {
+                             mode: 'dp-below',
+                              date: new Date(),
+                    })
+                          .on('statechange', function (ev) {
+                               var shipStartDate = new Date($("#ShipStartDate").val());
+                var shipEndDate = shipStartDate;
+                //shipEndDate.setMinutes(shipEndDate.getMinutes() + 30);
+                $("#ShipEndDate").val(new moment(shipEndDate).format("MM/DD/YYYY").toString());
+                window.reOccurenceStartDateSetBy = "System";
+                $('#ReOccurenceStartDate').val(new moment(shipStartDate).format("MM/DD/YYYY"));
+                var reOccurenceendDate = new moment($("#ReOccurenceStartDate").val()).add(12, 'M');
+                $('#ReOccurenceEndDate').val(new moment(reOccurenceendDate).format("MM/DD/YYYY"));
+              });
+
+
+             var TinyDatePicker2 = DateRangePicker.TinyDatePicker;
+                          TinyDatePicker2('#ShipEndDate', {
+                             mode: 'dp-below',
+                              date: new Date(),
+
+                         })
+                          .on('statechange', function (ev) {
+
+                          });
+
+             var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
                            TinyDatePicker3('#ReOccurenceStartDate', {
                             mode: 'dp-below',
-                            date : new Date()
+                               date: new Date(),
+
                         })
-                           .on('statechange', function (ev) {
+                               .on('statechange', function (ev) {
+                                   window.reOccurenceStartDateSetBy = "User";
+                                   //$('#ReOccurenceStartDate').val(new moment(shipStartDate).format("MM/DD/YYYY"));
+                                   if ($("#ReOccurenceStartDate").val()) {
+                                       var reOccurenceendDate = new moment($("#ReOccurenceStartDate").val()).add(12, 'M');
+                                       $('#ReOccurenceEndDate').val(new moment(reOccurenceendDate).format("MM/DD/YYYY"));
+                                   }
 
                             });
 
              var TinyDatePicker4 = DateRangePicker.TinyDatePicker;
                           TinyDatePicker4('#ReOccurenceEndDate', {
                              mode: 'dp-below',
-                             date : new Date()
+                             date: new Date()
                          })
                           .on('statechange', function (ev) {
 
-                             });
+                          });
+
+            var TinyDatePicker5 = DateRangePicker.TinyDatePicker;
+                          TinyDatePicker5('#OrderDate', {
+                             mode: 'dp-below',
+                              date: new Date(),
+
+                         })
+                          .on('statechange', function (ev) {
+
+                          });
+
+
+            $('#datetimepicker3').datetimepicker({
+               icons: {
+            time: 'far fa-clock text-green-d1 text-120',
+            date: 'far fa-calendar text-blue-d1 text-120',
+
+            up: 'fa fa-chevron-up text-secondary',
+            down: 'fa fa-chevron-down text-secondary',
+            previous: 'fa fa-chevron-left text-secondary',
+            next: 'fa fa-chevron-right text-secondary',
+
+            today: 'far fa-calendar-check text-purple-d1 text-120',
+            clear: 'fa fa-trash-alt text-orange-d2 text-120',
+            close: 'fa fa-times text-danger text-120'
+        },
+               toolbarPlacement: "top",
+               allowInputToggle: true,
+               showTodayButton: true,
+               "format": "HH:mm:ss",
+                 format: 'LT'
+              });
+
+            $("#datetimepicker3").on('dp.change', function (event) {
+            if ($("#ShipStartTime").val()) {
+               // $("#ShipEndDateTime").val($("#ShipStartDateTime").val())
+                var shipStartDate = new Date("01/01/2001 "+ $("#ShipStartTime").val());
+                var shipEndDate = shipStartDate;
+                shipEndDate.setMinutes(shipEndDate.getMinutes() + 30);
+                 $("#ShipEndTime").val(new moment(shipEndDate).format("hh:mm a").toString().toUpperCase());
+            }
+        });
+
+            $('#datetimepicker4').datetimepicker({
+                 icons: {
+            time: 'far fa-clock text-green-d1 text-120',
+            date: 'far fa-calendar text-blue-d1 text-120',
+
+            up: 'fa fa-chevron-up text-secondary',
+            down: 'fa fa-chevron-down text-secondary',
+            previous: 'fa fa-chevron-left text-secondary',
+            next: 'fa fa-chevron-right text-secondary',
+
+            today: 'far fa-calendar-check text-purple-d1 text-120',
+            clear: 'fa fa-trash-alt text-orange-d2 text-120',
+            close: 'fa fa-times text-danger text-120'
+        },
+                 toolbarPlacement: "top",
+                 allowInputToggle: true,
+                 showTodayButton: true,
+                 "format": "HH:mm:ss",
+                   format: 'LT'
+              });
+
 
             if ( $("#ReOccurenceStartDate").val()) {
                  $("#ReOccurenceStartDate").val(new moment('@Model.ReOccurenceStartDate').format("MM/DD/YYYY"));
@@ -437,8 +631,6 @@
              if ( $("#ReOccurenceEndDate").val()) {
                  $("#ReOccurenceEndDate").val(new moment('@Model.ReOccurenceEndDate').format("MM/DD/YYYY"));
             }
-
-
 
 
 
@@ -462,8 +654,36 @@
 
             var shipId = '@Model.ShipId';
             setTimeout(function () {
-                  $("#id-date-1").val(new moment().format("MM/DD/YYYY"));
+                try {
+                    if ($("#OrderDate").val()) {
+                    $("#OrderDate").val(new moment($("#OrderDate").val()).format("MM/DD/YYYY"));
+                }
+                var shipStartDate = new moment($("#ShipStartDate").val());
+                var shipEndDate = new moment($("#ShipEndDate").val());
+
+                if ($("#ShipStartDate").val()) {
+                    $("#ShipStartDate").val(new moment($("#ShipStartDate").val()).format("MM/DD/YYYY"));
+                }
+                if ($("#ShipEndDate").val()) {
+                    $("#ShipEndDate").val(new moment($("#ShipEndDate").val()).format("MM/DD/YYYY"));
+                    }
+                    
+                   if ($("#ShipStartDate").val()) {
+                        $("#ShipStartTime").val(shipStartDate.format("hh:mm a").toString().toUpperCase());
+                    }
+                    if ($("#ShipEndDate").val()) {
+                        $("#ShipEndTime").val(shipEndDate.format("hh:mm a").toString().toUpperCase());
+                    }
+
+
+                } catch (e) {
+                    console.log(e);
+                }
+
+
             }, 0);
+
+
 
             // ship date
             // order date
@@ -488,6 +708,7 @@
                 }
                     $('#ShipId').append(options);
                     $('#ShipId').val(shipId);
+                    $('#ShipId').trigger("chosen:updated");
             }
                 }
             })
@@ -501,71 +722,127 @@
         var ErrorMessage = '@ViewBag.ErrorMessage';
         if (SuccessMessage) {
             swal(SuccessMessage, "", "success");
-           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Order/List"; }, 750);
+           //setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Order/List"; }, 750);
 
         }
         if (ErrorMessage) {
             swal(ErrorMessage, "", "error");
         }
 
-            $("#ItemId").on("change", function () {
-                if ($("#ItemId").val()) {
-                    var price = getItemPrice($("#ItemId").val());
-                      var description = getItemDescription($("#ItemId").val());
-                    $("#PerUnitPrice").val(price);
-                    $("#Description").val(description);
-                    if ($("#Quantity").val()) {
-                        if ($("#Quantity").val().toString()=="0") {
-                               $("#Quantity").val('1');
-                               $("#Quantity").trigger('change');
+            $(".ItemId").on("change", function () {
+               
+                if ($(this).val()) {
+                    var price = getItemPrice($(this).val());
+                     var description = getItemDescription($(this).val());
+                    debugger;
+                    $(this).parent().parent().find(".PerUnitPrice").val(price);
+                    $(this).parent().parent().find(".Description").val(description);
+                  if ($(this).parent().parent().find(".Quantity").val()) {
+                  var quantity = Number($(this).parent().parent().find(".Quantity").val());
+                  var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
+                  $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
+                      if ($("#TotalAmount").val()) {
+                         // $("#TotalAmount").val(Number($("#TotalAmount").val())+ quantity * perUnitPrice);
+                      }
 
-                        }
-                        else {
-                                 var quantity = Number($("#Quantity").val());
-                                 var perUnitPrice = Number($("#PerUnitPrice").val());
-                                 $("#TotalPrice").val(quantity * perUnitPrice);
-                                 $("#TotalAmount").val(quantity * perUnitPrice);
-
-                        }
               }
-                  else {
-
-                  $("#TotalPrice").val('');
-                      $("#TotalAmount").val('');
-                       $("#Quantity").val('1');
-                      $("#Quantity").trigger('change');
+              else {
+                  $(this).parent().parent().find(".TotalPrice").val('');
+                 // $("#TotalAmount").val('');
               }
               }
               else {
-                      $("#PerUnitPrice").val('');
-                    $("#Description").val('');
+                  $(this).parent().parent().find(".PerUnitPrice").val('');
+                    $(this).parent().parent().find(".Description").val('');
+                }
 
-              }
-
+                setTotalAmount();
 
           });
 
-            $("#Quantity").on("change", function () {
-              if ($("#Quantity").val()) {
-                  var quantity = Number($("#Quantity").val());
-                  var perUnitPrice = Number($("#PerUnitPrice").val());
-                  $("#TotalPrice").val(quantity * perUnitPrice);
-                  $("#TotalAmount").val(quantity * perUnitPrice);
+            $(".PerUnitPrice").on("change", function () {
+                console.log('event');
+                if ($(this).val()) {
+                    var price = $(this).val();
+                    if ($(this).parent().parent().find(".Quantity").val()) {
+                        if ($(this).parent().parent().find(".Quantity").val().toString()=="0") {
+                             $(this).parent().parent().find(".TotalPrice").val('');
+                             $(this).parent().parent().find(".Quantity").val('1');
+                             $(this).parent().parent().find(".Quantity").trigger('change');
+
+                        }
+                        else {
+                            var quantity = Number($(this).parent().parent().find(".Quantity").val());
+                            var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
+                             $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
+                             if ($("#TotalAmount").val()) {
+                         // $("#TotalAmount").val(Number($("#TotalAmount").val())+ quantity * perUnitPrice);
+                      }
+                        }
+
+
               }
               else {
-                  $("#TotalPrice").val('');
-                  $("#TotalAmount").val('');
+                      $(this).parent().parent().find(".TotalPrice").val('');
+                      $(this).parent().parent().find(".Quantity").val('1');
+                      $(this).parent().parent().find(".Quantity").trigger('change');
+
+                 // $("#TotalAmount").val('');
+              }
+              }
+              else {
+                  $(this).parent().parent().find(".PerUnitPrice").val('');
+                    $(this).parent().parent().find(".Description").val('');
+                }
+
+                setTotalAmount();
+
+         });
+
+            $(".Quantity").on("change", function () {
+              if ($(this).val()) {
+                  var quantity = Number($(this).val());
+                  var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
+                  $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
+                  //$("#TotalAmount").val(quantity * perUnitPrice);
+              }
+              else {
+                  $(this).parent().parent().find(".TotalPrice").val('');
+
               }
 
-
-            });
+                setTotalAmount();
+          });
 
             $("#ReOccurence").trigger("change");
 
             $("#ReOccurenceCycle").trigger("change");
 
 
-      });
+        });
+
+         $("#ShipStartDate").on("change", function () {
+              if ($(this).val()) {
+                 var shipStartDate = new Date($(this).val());
+                 var shipEndDate = new Date();
+                 shipEndDate.setMinutes(shipEndDate.getMinutes()+30);
+                  $("#ShipEndDate").val(shipEndDate);
+              }
+
+
+          });
+
+          function setTotalAmount() {
+            // $("#TotalAmount").val('');
+            var total = 0;
+            $("#itemPanel .TotalPrice").each(function (index, item) {
+                if ($(item).val()) {
+                    total = total + Number($(item).val());
+                }
+
+            });
+            $("#TotalAmount").val(total)
+        }
 
         function getItemPrice(itemId) {
             var price = 0;
@@ -615,7 +892,14 @@
                 for (var i = 0; i < response.length; i++) {
                     options += '<option value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
                 }
-                $('#ShipId').append(options);
+                       $('#ShipId').append(options);
+                        $('#ShipId').trigger("chosen:updated");
+
+                        if (response.length==1) {
+                           $('#ShipId').val(response[0]['ShipId']);
+                           $('#ShipId').trigger("chosen:updated");
+                            $('#ShipId').trigger("change");
+                       }
             }
                 }
             })
@@ -648,6 +932,12 @@
                 for (var i = 0; i < response.length; i++) {
                     options += '<option value="' + response[i]['ApartmentId'] + '">' + response[i]['ApartmentNo'] + '</option>';
                 }
+                         if ($("#ShipId option").length>1000) {
+                            var customerId = $($($("#ShipId option:selected"))[0]).attr("cust");
+
+                            $("#CustomerId").val(customerId);
+                            $('#CustomerId').trigger("chosen:updated");
+                       }
 
                          $('#ApartmentId').empty(); //remove all child nodes
                          $('#ApartmentId').append(options);
@@ -732,19 +1022,38 @@
         });
 
         $("#ReOccurenceCycle").on("change", function () {
-
             if ($("#ReOccurenceCycle").val()=="WeekDay") {
                 $("#weekdayPanel").show();
             }
             else {
                  $("#weekdayPanel").hide();
             }
-
         });
+
+
 
         function checkNonWorkingDay() {
 
+            $("#ReOccurenceStartDateSetBy").val(window.reOccurenceStartDateSetBy);
 
+             var shipStartDate = $("#ShipStartDate").val();
+            var shipEndDate = $("#ShipEndDate").val();
+            var shipStartTime = $("#ShipStartTime").val();
+            var shipEndTime = $("#ShipEndTime").val();
+
+             if ((shipStartDate) && (shipEndDate)) {
+                     if (( new moment(shipStartDate)  > new moment(shipEndDate))) {
+                        swal("Order end date should be greater than start date", "", "error");
+                        return false;
+                  }
+
+                  if (new moment(shipStartDate).format("MM/DD/YYYY") == new moment(shipEndDate).format("MM/DD/YYYY")) {
+                 if (( new moment(shipStartDate+" "+shipStartTime)  > new moment(shipStartDate+" "+shipEndTime))) {
+                        swal("Order end time should be greater than start date", "", "error");
+                        return false;
+                    }
+            }
+            }
 
 
             if ($("#ReOccurence").val() == "Yes") {
@@ -755,25 +1064,30 @@
                 var reOccurenceWeekday = $("#ReOccurenceWeekday").val();
 
 
-               if (((reoccurrenceFromDate) && (!reoccurrenceDateTo)) || ((!reoccurrenceFromDate) && (reoccurrenceDateTo))) {
-                   swal("Please select both reoccurrence dates", "", "error");
+              if (((!reoccurrenceFromDate))) {
+                   swal("Please select recurrence start date", "", "error");
                    return false;
                 }
 
-               if ((reoccurrenceFromDate) && (reoccurrenceDateTo)) {
-                     if (reoccurrenceFromDate > reoccurrenceDateTo) {
-                        swal("Reoccurrence From date should be less or equal to Reoccurrence To date", "", "error");
+                if ((reoccurrenceFromDate) && (reoccurrenceDateTo)) {
+                     if (( new moment(reoccurrenceFromDate)  > new moment(reoccurrenceDateTo))) {
+                        swal("Recurrence From date should be less or equal to recurrence To date", "", "error");
                         return false;
                     }
                 }
 
+                 if (( new moment(reoccurrenceDateTo)).diff((new moment(reoccurrenceFromDate)), 'months', true) > 12) {
+                    swal("Recurrence to date should be within 12 months from recurrence start date", "", "error");
+                        return false;
+                }
+
                 if (!reOccurrenceFrequency) {
-                      swal("Please enter in  Re-Occurence In field", "", "error");
+                      swal("Please enter in  Recurrence In field", "", "error");
                         return false;
                 }
 
                  if (!reOccurenceCycle) {
-                         swal("Please select Re-Occurence field", "", "error");
+                         swal("Please select Recurrence field", "", "error");
                         return false;
                 }
 
@@ -792,7 +1106,7 @@
                 }
                 else {
                        swal({
-                            title: "Change detail for all following or only the selected order",
+                            title: "Do you want to change all future",
                             type: "warning",
                             showCancelButton: true,
                             cancelButtonText: "No",
@@ -863,7 +1177,7 @@
                 }
                 else {
                        swal({
-                            title: "Change ship date for all following or only the selected order",
+                            title: "Do you want to change all future",
                             type: "warning",
                             showCancelButton: true,
                             cancelButtonText: "No",
@@ -959,6 +1273,92 @@
             }
 
         }
+
+    </script>
+    <script type="text/javascript">
+
+        function addItems(i) {
+            debugger;
+            var index = $(".btnAdd").length;
+
+            $.ajax({
+                url: "/Order/GetOrderDetail/" + index,
+
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "html",
+                success: function (response) {
+                    $("#itemPanel").append(response);
+                    $(".btnAdd").each(function (ind, ele) {
+                        if (ind != index) {
+                            $(ele).hide();
+                        }
+                    });
+
+
+                    $("#itemPanel .form-control").each(function (ind, ele) {
+                        if ($(ele).attr('name1')) {
+                            $(ele).attr('name', $(ele).attr('name1'));
+                        }
+
+                    });
+
+                    bindEvent();
+
+                }
+            })
+        };
+
+
+        function bindEvent() {
+            $(".ItemId").on("change", function () {
+                debugger;
+                if ($(this).val()) {
+                    var price = getItemPrice($(this).val());
+                    var description = getItemDescription($(this).val());
+                    debugger;
+                    $(this).parent().parent().find(".PerUnitPrice").val(price);
+                    $(this).parent().parent().find(".Description").val(description);
+                    if ($(this).parent().parent().find(".Quantity").val()) {
+                        var quantity = Number($(this).parent().parent().find(".Quantity").val());
+                        var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
+                        $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
+                        if ($("#TotalAmount").val()) {
+                            // $("#TotalAmount").val(Number($("#TotalAmount").val())+ quantity * perUnitPrice);
+                        }
+
+                    }
+                    else {
+                        $(this).parent().parent().find(".TotalPrice").val('');
+                        // $("#TotalAmount").val('');
+                    }
+                }
+                else {
+                    $(this).parent().parent().find(".PerUnitPrice").val('');
+                    $(this).parent().parent().find(".Description").val('');
+                }
+
+                setTotalAmount();
+
+            });
+
+            $(".Quantity").on("change", function () {
+                console.log('event');
+                if ($(this).val()) {
+                    var quantity = Number($(this).val());
+                    var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
+                    $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
+                    //$("#TotalAmount").val(quantity * perUnitPrice);
+                }
+                else {
+                    $(this).parent().parent().find(".TotalPrice").val('');
+
+                }
+
+                setTotalAmount();
+            });
+        }
+
 
     </script>
 }

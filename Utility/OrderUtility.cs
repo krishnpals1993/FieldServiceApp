@@ -25,10 +25,50 @@ namespace FieldServiceApp.Utility
             var checkOrderNo = _dbContext.tbl_OrderMaster.Max(m => m.OrderNo) + 1;
 
             order.ReOccurenceParentOrderId = orderId;
+            order.ReOccurence = 0;
+            order.ReOccurenceCycle = null;
+            order.ReOccurenceStartDate = null;
+            order.ReOccurenceFrequency = null;
+            order.ReOccurenceStartDate = null;
+            order.ReOccurenceWeekday = null;
             order.OrderId = 0;
             order.OrderNo = checkOrderNo;
             order.ShipDate = shipdate;
-            order.ShipStartDate = shipdate;
+
+            if (order.ShipStartDate != null)
+            {
+
+                order.ShipStartDate = Convert.ToDateTime(shipdate.ToString("MM/dd/yyyy") + " " + order.ShipStartDate.Value.ToString("HH:mm"));
+                order.ShipDate = Convert.ToDateTime(shipdate.ToString("MM/dd/yyyy") + " " + order.ShipDate.Value.ToString("HH:mm"));
+            }
+            else
+            {
+                var curDayName = shipdate.DayOfWeek.ToString();
+                var checkCalenderDate1 = _dbContext.tbl_CalenderWorkingHours.Where(w => w.DayName == curDayName).FirstOrDefault();
+                if (checkCalenderDate1 != null)
+                {
+                    order.ShipStartDate = Convert.ToDateTime(shipdate.ToString("MM/dd/yyyy") + " " + checkCalenderDate1.StartTime.Value.ToString("HH:mm"));
+                }
+            }
+
+            if (order.ShipEndDate != null)
+            {
+                try
+                {
+                    order.ShipEndDate = order.ShipStartDate.Value.AddMinutes((order.ShipEndDate.Value - order.ShipStartDate.Value).TotalMinutes);
+                }
+                catch (Exception)
+                {
+
+                    order.ShipEndDate = null;
+                }
+
+            }
+            else
+            {
+                order.ShipEndDate = order.ShipStartDate.Value.AddMinutes(30);
+            }
+
 
             _dbContext.tbl_OrderMaster.Add(order);
             _dbContext.SaveChanges();
@@ -64,28 +104,93 @@ namespace FieldServiceApp.Utility
 
         }
 
+        public void updateReOccurenceOrder(int orderId, OrderMaster order, List<OrderDetailViewModel> orderItemList, OrderAssignment orderAssignment, DateTime shipdate)
+        {
+            var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == orderId).FirstOrDefault();
+            checkOrder.ShipId = order.ShipId;
+            checkOrder.CustomerId = order.CustomerId;
+            checkOrder.TotalAmount = order.TotalAmount;
+            checkOrder.TaxAmount = order.TaxAmount;
 
+            if (order.ShipStartDate != null)
+            {
+                checkOrder.ShipStartDate = Convert.ToDateTime(checkOrder.ShipStartDate.Value.ToString("MM/dd/yyyy") + " " + order.ShipStartDate.Value.ToString("HH:mm"));
+                checkOrder.ShipDate = Convert.ToDateTime(checkOrder.ShipStartDate.Value.ToString("MM/dd/yyyy") + " " + order.ShipDate.Value.ToString("HH:mm"));
+            }
+            else
+            {
+                var curDayName = shipdate.DayOfWeek.ToString();
+                var checkCalenderDate1 = _dbContext.tbl_CalenderWorkingHours.Where(w => w.DayName == curDayName).FirstOrDefault();
+                if (checkCalenderDate1 != null)
+                {
+                    checkOrder.ShipStartDate = Convert.ToDateTime(checkOrder.ShipStartDate.Value.ToString("MM/dd/yyyy") + " " + checkCalenderDate1.StartTime.Value.ToString("HH:mm"));
+                }
+            }
+
+            if (order.ShipEndDate != null)
+            {
+                try
+                {
+                    checkOrder.ShipEndDate = checkOrder.ShipStartDate.Value.AddMinutes((order.ShipEndDate.Value - order.ShipStartDate.Value).TotalMinutes);
+                }
+                catch (Exception)
+                {
+
+                    checkOrder.ShipEndDate = null;
+                }
+
+            }
+            else
+            {
+                checkOrder.ShipEndDate = checkOrder.ShipStartDate.Value.AddMinutes(30);
+            }
+
+            _dbContext.SaveChanges();
+
+
+
+            var checkOrderAssignment = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == checkOrder.OrderId).FirstOrDefault();
+            if (checkOrderAssignment != null)
+            {
+                if (orderAssignment != null)
+                {
+                    checkOrderAssignment.EmployeeId = orderAssignment.EmployeeId;
+                    _dbContext.SaveChanges();
+                }
+                else
+                {
+                    _dbContext.tbl_OrderAssignment.Remove(checkOrderAssignment);
+                    _dbContext.SaveChanges();
+
+                }
+            }
+            else
+            {
+                if (orderAssignment != null)
+                {
+                    orderAssignment.OrderId = checkOrder.OrderId;
+                    orderAssignment.OrderAssignmentId = 0;
+                    _dbContext.tbl_OrderAssignment.Add(orderAssignment);
+                    _dbContext.SaveChanges();
+                }
+            }
+
+
+
+
+        }
         public List<CustomerMasterViewModel> GetCustomerListWithShipAddress()
         {
             return ((from cust in _dbContext.tbl_CustomerMaster
-                     //join ship in _dbContext.tbl_CustmoerShipping on cust.CustomerId equals ship.CustomerId
-                     //into ship
-                     //from ship1 in ship.DefaultIfEmpty()
-                     //join city in _dbContext.tbl_Cities on ship1.CityId equals city.CityId
-                     //into city
-                     //from city1 in city.DefaultIfEmpty()
-                     //join state in _dbContext.tbl_States on ship1.StateId equals state.StateId
-                     //into state
-                     //from state1 in state.DefaultIfEmpty()
-                     where cust.IsActive == 1 
+                     join billing in _dbContext.tbl_CustomerBillings on cust.CustomerId equals billing.CustomerId
+                     where cust.IsActive == 1
                      select new CustomerMasterViewModel
                      {
-                         CustmoerId = cust.CustomerId,
+                         CustmoerId = billing.CustomerBillingId,
                          //CompanyName = cust.CompanyName + (ship1 != null ? (" (" + (ship1.Address1 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (ship1.Zip1 ?? "") + ")") : ""),
-                         CompanyName = cust.CompanyName,
-
+                         CompanyName = cust.CompanyName+" "+ (billing.Address1??"")+" "+ (billing.Address2 ?? "")
                      }
-                     ).ToList());
+                     ).OrderBy(o=>o.CompanyName).ToList());
 
         }
 

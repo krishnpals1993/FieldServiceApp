@@ -195,7 +195,8 @@ namespace FieldServiceApp.Models
             Shippings = new List<CustmoerShippingViewModel>();
             Billings = new List<CustomerBillingViewModel>();
         }
-
+        public int ShipId { get; set; }
+        public int CustomerBillingId { get; set; }
         public string Notes { get; set; }
         public int CustmoerId { get; set; }
         public string CompanyName { get; set; }
@@ -230,7 +231,11 @@ namespace FieldServiceApp.Models
     }
     public class CustomerMasterViewModel_datatable
     {
-      
+
+        public CustomerMasterViewModel_datatable()
+        {
+            BillingDetail = new List<CustomerBillingViewModel_Datatable>();
+        }
         public int CustmoerId { get; set; }
 
         [Sortable]
@@ -248,6 +253,8 @@ namespace FieldServiceApp.Models
         public Int16 IsActive { get; set; }
 
         public string Action { get; set; }
+
+        public List<CustomerBillingViewModel_Datatable> BillingDetail { get; set; }
 
     }
     public class CustmoerContactViewModel
@@ -310,6 +317,8 @@ namespace FieldServiceApp.Models
         public string CityName { get; internal set; }
         public string StateName { get; internal set; }
         public string Notes { get; set; }
+        public int CustomerBillingId { get; set; }
+        public decimal? Tax { get; set; }
     }
     public class ItemMasterViewModel
     {
@@ -407,7 +416,9 @@ namespace FieldServiceApp.Models
         //[Display(Name = "Shil Date")]
         //[Required(ErrorMessage = "Please select ship date")]
         public DateTime? ShipStartDate { get; set; }
+        public DateTime? ShipStartTime { get; set; }
         public DateTime? ShipEndDate { get; set; }
+        public DateTime? ShipEndTime { get; set; }
         public DateTime? ShipDate { get; set; }
         public DateTime? CancelDate { get; set; }
         public string CancelReason { get; set; }
@@ -421,8 +432,8 @@ namespace FieldServiceApp.Models
         public string Description { get; set; }
         public int UnitId { get; set; }
         public int Quantity { get; set; }
-       public decimal PerUnitPrice { get; set; }
-       public decimal TotalPrice { get; set; }
+        public decimal PerUnitPrice { get; set; }
+        public decimal TotalPrice { get; set; }
         public int EmployeeId { get; set; }
 
         public string AssigneeId { get; set; }
@@ -441,6 +452,7 @@ namespace FieldServiceApp.Models
         public string ReOccurenceWeekday { get; set; }
         public DateTime? ReOccurenceStartDate { get; set; }
         public DateTime? ReOccurenceEndDate { get; set; }
+        public DateTime? MaxReOccurenceEndDate { get; set; }
         public int? ReOccurenceParentOrderId { get; set; }
         public int ReOccurenceOrderCount { get; set; }
         public CustomerMasterViewModel CustomerDetail { get; set; }
@@ -454,13 +466,83 @@ namespace FieldServiceApp.Models
         public List<ServiceFormOrderViewModel> OrderList { get; set; }
         public int ReOccurenceOrders { get; set; }
         public bool ScheduledOnNonWorkingDay { get; set; }
+        public string Color { get; set; }
+        public int? ReoccurrenceOrderNo { get; set; }
+        public string ReOccurenceStartDateSetBy { get; set; }
+        public string ItemName { get; set; }
+        public decimal? Tax { get; set; }
+        public decimal? TaxAmount { get; set; }
+        public decimal? GrossAmount { get; set; }
     }
 
-    
+    public class OrderMasterViewModel_Datatable
+    {
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Order No")]
+        public int OrderId { get; set; }
+
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Order No")]
+        public int OrderNo { get; set; }
+
+        [Display(Name = "Main Order No")]
+        public int? ReOccurenceParentOrderId { get; set; }
+
+
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Order Date")]
+        public DateTime OrderDate { get; set; }
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Customer")]
+        public string CustomerName { get; set; }
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Ship Date")]
+        public DateTime? ShipStartDate { get; set; }
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Amount($)")]
+
+        public decimal TotalAmount { get; set; }
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Assigned To")]
+        public string EmployeeName { get; set; }
+        [Sortable]
+        [SearchableString]
+        [Display(Name = "Ship Address")]
+        public string CustomerShipAddress { get; set; }
+
+        [Display(Name = "Status")]
+        public Int16 IsActive { get; set; }
+        public bool ScheduledOnNonWorkingDay { get; set; }
+        public string Action { get; set; }
+        public string ShipStartDateFormatted { get; set; }
+       
+    }
+
+    public class CustmoerShippingViewModel_Datatable
+    {
+
+        public int CustomerBillingId { get; set; }
+        public string Address { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string CityName { get; internal set; }
+        public string StateName { get; internal set; }
+        public int ShipId { get; set; }
+    }
+
 
     public class OrderDetailViewModel
     {
-        
+
         public OrderDetailViewModel()
         {
             ItemList = new List<ItemMasterViewModel>();
@@ -506,6 +588,9 @@ namespace FieldServiceApp.Models
 
         [Required(ErrorMessage = "Please select state")]
         public int StateId { get; set; }
+
+        [MaxValue(100,ErrorMessage ="Value must be less than 100")]
+        public Decimal? Tax { get; set; }
         public string StateName { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
@@ -577,6 +662,8 @@ namespace FieldServiceApp.Models
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
 
+        public string Color { get; set; }
+
     }
     public class EmployeeMasterEditViewModel
     {
@@ -601,8 +688,7 @@ namespace FieldServiceApp.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int? UserId { get; set; }
-
-
+        public string Color { get; set; }
     }
     public class DashboardViewModel
     {
@@ -635,6 +721,9 @@ namespace FieldServiceApp.Models
         public string ItemName { get; set; }
         public string ItemDescription { get; set; }
         public List<EmployeeMasterViewModel> EmployeeList { get; set; }
+        public string Color { get; set; }
+        public string Apartments { get; set; }
+        public int ReOccurenceParentOrderId { get; set; }
     }
     public class ServiceFormViewModel
     {
@@ -729,6 +818,7 @@ namespace FieldServiceApp.Models
         public string OrderNo { get; set; }
 
 
+
     }
     public class CalenderWorkingHourViewModel
     {
@@ -816,7 +906,7 @@ namespace FieldServiceApp.Models
         {
             Shippings = new List<CustmoerShippingViewModel>();
         }
-        
+
         public int CustomerBillingId { get; set; }
         public int CustomerId { get; set; }
         public string FirstName { get; set; }
@@ -837,5 +927,48 @@ namespace FieldServiceApp.Models
         public List<CustmoerShippingViewModel> Shippings { get; set; }
 
     }
+
+    public class CustomerBillingViewModel_Datatable
+    {
+        public CustomerBillingViewModel_Datatable()
+        {
+            Shippings = new List<CustmoerShippingViewModel_Datatable>();
+        }
+
+        public int CustomerBillingId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public List<CustmoerShippingViewModel_Datatable> Shippings { get; set; }
+
+    }
+
+    public class MaxValueAttribute : ValidationAttribute
+    {
+        private readonly int _maxValue;
+
+        public MaxValueAttribute(int maxValue)
+        {
+            _maxValue = maxValue;
+        }
+
+        public override bool IsValid(object value)
+        {
+            if (value != null)
+            {
+                return Convert.ToDecimal(value)   <= Convert.ToDecimal(_maxValue);
+            }
+            else
+            {
+                return true;
+            }
+            
+        }
+    }
+
 
 }

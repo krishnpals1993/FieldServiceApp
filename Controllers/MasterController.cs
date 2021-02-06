@@ -188,7 +188,8 @@ namespace FieldServiceApp.Controllers
                               StateId = state.StateId,
                               IsActive = city.IsActive,
                               CityName = city.CityName,
-                              StateName = state.StateName
+                              StateName = state.StateName,
+                              Tax = city.Tax
 
                           }).ToList();
 
@@ -228,6 +229,7 @@ namespace FieldServiceApp.Controllers
                         {
                             CityName = model.CityName,
                             StateId = model.StateId,
+                            Tax= model.Tax,
                             IsActive = 1,
                             CreatedBy = 1,
                             CreatedDate = DateTime.Now
@@ -264,6 +266,7 @@ namespace FieldServiceApp.Controllers
                 model.CityId = checkCity.CityId;
                 model.StateId = checkCity.StateId;
                 model.CityName = checkCity.CityName;
+                model.Tax = checkCity.Tax;
             }
             model.StateList = _dbContext.tbl_States.Where(w => w.IsActive == 1).Select(s => new StateViewModel
             {
@@ -283,7 +286,7 @@ namespace FieldServiceApp.Controllers
                 if (ModelState.IsValid)
                 {
 
-                    var checkCity = _dbContext.tbl_Cities.Where(w => w.CityId != model.CityId && w.CityName == model.CityName).FirstOrDefault();
+                    var checkCity = _dbContext.tbl_Cities.Where(w => w.CityId != model.CityId && w.CityName == model.CityName && model.IsActive ==1).FirstOrDefault();
                     if (checkCity != null)
                     {
                         ViewBag.ErrorMessage = "City already exists with this name";
@@ -295,7 +298,7 @@ namespace FieldServiceApp.Controllers
                         checkCity.StateId = model.StateId;
                         checkCity.ModifiedBy = _userId;
                         checkCity.ModifiedDate = DateTime.Now;
-
+                        checkCity.Tax = model.Tax;
                         _dbContext.SaveChanges();
                         ViewBag.SuccessMessage = "City updated successfully";
 

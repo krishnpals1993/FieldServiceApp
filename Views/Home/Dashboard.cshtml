@@ -1,6 +1,8 @@
 ﻿@model FieldServiceApp.Models.DashboardViewModel
 @using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options;
 @using  Newtonsoft.Json;
+@inject IOptions<Appsettings> Settings
 @inject IHttpContextAccessor HttpContextAccessor
 @{
 
@@ -33,195 +35,7 @@
 
     @if (RoleName == "Admin")
     {
-        <div class="row px-2 mt-3">
-            <div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
-                <div class="bcard h-100 d-flex align-items-center p-3">
-                    <div>
-                        <span class="d-inline-block bgc-green-d1 p-3 radius-round text-center border-4 brc-green-l2">
-                            <i class="fa fa-dollar-sign text-white text-180 w-4 h-4"></i>
-                        </span>
-                    </div>
 
-                    <div class="ml-3">
-                        <div class="pos-rel">
-                            <span class="text-dark-tp4 text-140">$</span>
-                            <span class="text-dark-tp3 text-180">85k</span>
-
-                            <span class="text-blue-m1 text-600 text-90 ml-2 text-nowrap">
-                                8%
-                                <i class="fa fa-arrow-up"></i>
-                            </span>
-                        </div>
-                        <div class="text-dark-tp4">today's earnings</div>
-                    </div>
-
-                    <div class="position-tr m-1">
-                        <!-- the dropdown used in some boxes (cards) -->
-                        <div class="dropdown dd-backdrop dd-backdrop-none-md">
-                            <button type="button" class="btn btn-sm btn-text-pale btn-brc-tp btn-outline-lightgrey btn-h-light-default btn-a-light-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-ellipsis-h"></i>
-                            </button>
-
-                            <div class="dropdown-menu p-3px mw-auto shadow-sm dropdown-menu-right dropdown-caret dropdown-animated dd-appear-center dd-slide-none-md radius-1 brc-secondary-l1">
-                                <div class="dropdown-inner">
-                                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
-                                        <i class="fa fa-cog text-blue mr-1"></i>
-                                        Some action
-                                    </a>
-
-                                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
-                                        <i class="fas fa-tools text-blue mr-1"></i>
-                                        Another action
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
-            <div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
-                <div class="bcard h-100 d-flex align-items-center p-3">
-
-                    <div>
-                        <span class="d-inline-block bgc-warning-d1 p-3 radius-round text-center border-4 brc-warning-l2">
-                            <i class="fa fa-shopping-cart text-white text-170 w-4 h-4"></i>
-                        </span>
-                    </div>
-
-                    <div class="ml-3">
-                        <div class="pos-rel">
-                            <span class="text-dark-tp3 text-180">369</span>
-                            <span class="text-danger-m2 text-600 text-90 ml-2 text-nowrap">
-                                2%
-                                <i class="fa fa-arrow-down"></i>
-                            </span>
-                        </div>
-                        <div class="text-dark-tp4 text-110">new orders</div>
-                    </div>
-
-                    <!-- this is a dropdown with tooltips -->
-                    <div class="position-tr m-1 dropdown dd-backdrop dd-backdrop-none-md">
-                        <button type="button" class="btn btn-sm btn-brc-tp btn-bgc-tp btn-text-pale btn-light-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-ellipsis-h"></i>
-                        </button>
-
-                        <div class="dropdown-menu p-3px mw-auto shadow-sm dropdown-menu-right dropdown-caret dropdown-animated dd-appear-center dd-slide-none-md radius-1 brc-secondary-l1">
-                            <div class="dropdown-inner">
-                                <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#" title="Some action" data-toggle="tooltip">
-                                    <i class="fa fa-cog mr-1 text-blue"></i>
-                                    <span class="d-md-none">Some action</span>
-                                </a>
-
-                                <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#" title="Another action" data-toggle="tooltip">
-                                    <i class="fas fa-tools text-orange mr-1"></i>
-                                    <span class="d-md-none">Another action</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-
-
-            <div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
-                <div class="bcard h-100 d-flex align-items-center p-3">
-
-                    <div>
-                        <span class="d-inline-block bgc-primary p-3 radius-round text-center border-4 brc-primary-l2">
-                            <i class="fas fa-chart-line text-white text-170 w-4 h-4"></i>
-                        </span>
-                    </div>
-
-                    <div class="ml-3 flex-grow-1">
-                        <div>
-                            <span class="text-dark-tp3 text-180">520k</span>
-
-                            <span class="text-blue-m1 text-600 text-90 ml-2 text-nowrap">
-                                3%
-                                <i class="fa fa-arrow-up"></i>
-                            </span>
-                        </div>
-                        <div class="text-dark-tp4 text-110">total tasks</div>
-                    </div>
-
-                    <div class="mr-auto">
-                        <canvas id="infobox-chart1" style="width: 70px;"></canvas>
-                    </div>
-
-                    <div class="position-tr m-1">
-                        <!-- the dropdown used in some boxes (cards) -->
-                        <div class="dropdown dd-backdrop dd-backdrop-none-md">
-                            <button type="button" class="btn btn-sm btn-text-pale btn-brc-tp btn-outline-lightgrey btn-h-light-default btn-a-light-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-ellipsis-h"></i>
-                            </button>
-
-                            <div class="dropdown-menu p-3px mw-auto shadow-sm dropdown-menu-right dropdown-caret dropdown-animated dd-appear-center dd-slide-none-md radius-1 brc-secondary-l1">
-                                <div class="dropdown-inner">
-                                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
-                                        <i class="fa fa-cog text-blue mr-1"></i>
-                                        Some action
-                                    </a>
-
-                                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
-                                        <i class="fas fa-tools text-blue mr-1"></i>
-                                        Another action
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-
-            <div class="col-12 col-sm-6 col-lg-3 px-2 mb-2 mb-lg-0">
-                <div class="bcard h-100 d-flex align-items-center p-3">
-
-                    <div class="text-center pos-rel ml-1">
-                        <canvas id="task-progress-piechart" style="height: 75px; width: 75px; max-height: 75px; max-width: 75px;"></canvas>
-
-                        <span class="position-center text-dark-tp3 text-600">71%</span>
-                    </div>
-
-                    <div class="ml-3 flex-grow-1">
-                        <div>
-                            <span class="text-dark-tp3 text-125">Task Progress</span>
-                        </div>
-                        <div class="text-dark-tp4 text-110">3 remaining</div>
-                    </div>
-
-                    <div class="position-tr m-1">
-                        <!-- the dropdown used in some boxes (cards) -->
-                        <div class="dropdown dd-backdrop dd-backdrop-none-md">
-                            <button type="button" class="btn btn-sm btn-text-pale btn-brc-tp btn-outline-lightgrey btn-h-light-default btn-a-light-default dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-ellipsis-h"></i>
-                            </button>
-
-                            <div class="dropdown-menu p-3px mw-auto shadow-sm dropdown-menu-right dropdown-caret dropdown-animated dd-appear-center dd-slide-none-md radius-1 brc-secondary-l1">
-                                <div class="dropdown-inner">
-                                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
-                                        <i class="fa fa-cog text-blue mr-1"></i>
-                                        Some action
-                                    </a>
-
-                                    <a class="dropdown-item btn btn-light-grey btn-h-lighter-default btn-a-lighter-primary btn-bgc-tp px-3" href="#">
-                                        <i class="fas fa-tools text-blue mr-1"></i>
-                                        Another action
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
     }
 
 
@@ -244,7 +58,7 @@
 
 
             <div class="row">
-                <div class="col-12 col-md-9" id='calendar-container'>
+                <div class="col-12 col-md-10" id='calendar-container'>
                     <div class="card bcard">
                         <div class="card-body p-lg-4">
                             <div id='calendar' class="text-blue-d1"></div>
@@ -252,7 +66,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-md-3 mt-3 mt-md-0" id='external-events'>
+                <div class="col-12 col-md-2 mt-2 mt-md-0" id='external-events'>
                     <div class="bgc-white shadow-sm p-35 radius-1">
                         <p class="text-120 text-primary-d2">
                             Order (Without Ship Date)
@@ -291,24 +105,23 @@
                 <div class="col-12 col-lg-12">
                     <div class="bcard card h-100">
 
-
                         <div class="card-body p-0">
-                            <div class="table-responsive-md">
-                                <table class="table table-border-x brc-secondary-l3 mb-0">
+                            <div>
+                                <table id="datatable" class="d-style w-100 table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed">
                                     <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
-                                        <tr class="text-80 text-white bgc-blue">
-                                            <th class="pl-2 pl-lg-4">No</th>
-                                            <th>Order Date</th>
-                                            <th>Customer</th>
-                                            <th>Ship Date</th>
-                                            <th> Amount($)</th>
-                                            <th>Assigned To</th>
-                                            <th>Status</th>
+                                        <tr>
+                                            <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">No</th>
+                                            <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">Order Date</th>
+                                            <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">Customer</th>
+                                            <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">Ship Date</th>
+                                            <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm"> Amount($)</th>
+                                            <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">Assigned To</th>
+                                            @*<th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">Status</th>*@
                                         </tr>
                                     </thead>
 
                                     <tbody>
-                                        @foreach (var item in Model.OrderList)
+                                        @foreach (var item in (Model.OrderList.Take(50)))
                                         {
                                             <tr class="bgc-h-secondary-l4 @(item.ScheduledOnNonWorkingDay?"nonWkDayOrder":"")">
                                                 <td class="pl-2 pl-lg-4">
@@ -338,10 +151,10 @@
                                                     @item.EmployeeName
 
                                                 </td>
-                                                <td class="text-secondary-d3 text-95">
-                                                    @item.Status
+                                                @*<td class="text-secondary-d3 text-95">
+                                                        @item.Status
 
-                                                </td>
+                                                    </td>*@
                                             </tr>
                                         }
                                         @if (Model.OrderList.Count() == 0)
@@ -369,11 +182,41 @@
     </div>
 
 </div>
+<button type="button" class="btn px-4 btn-info mb-1" onclick="openAddOrder()" style="display:none">
+    Fullscreen
+</button>
+<button type="button" class="btn px-4 btn-info mb-1" id="mdlBtn" data-toggle="modal" data-target="#modalFullscreen" style="display:none">
+    Fullscreen
+</button>
+<div class="modal fade modal-fs" id="modalFullscreen" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
 
+            <div class="modal-body holds-the-iframe">
+
+                <iframe src="" style="overflow:hidden;
+                        height:95%;width:100%"></iframe>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Styles {
     <environment names="Development,Staging,Production">
         <link rel="stylesheet" href="~/lib/fullcalendar/main.css" />
+        <link rel="stylesheet" href="~/lib//datatable/dataTables.bootstrap4.css" />
+        <link rel="stylesheet" href="~/lib//datatable/buttons.bootstrap4.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
     </environment>
     <style>
         .topBar {
@@ -391,12 +234,24 @@
         .nonWkDayOrder {
             background-color: #ffbc002b;
         }
+
+        iframe #sidebar {
+            display: none
+        }
+
+        iframe .navbar {
+            display: none
+        }
+
+        .holds-the-iframe {
+            background: url(@(Settings.Value.WebBaseURL)/images/25.gif) center center no-repeat;
+        }
     </style>
 }
 
 @section scripts {
     <script type="text/javascript">
-
+        window.roleName = '@RoleName';
     window.calenderHourId = '@Model.CalenderWorkingHour.Id';
     if (window.calenderHourId != '0') {
         {
@@ -407,13 +262,51 @@
     }
 
 
+        function openAddOrder(dt) {
+            if ( window.roleName=='Admin') {
+                 $("#mdlBtn").trigger('click');
+            $('.modal-body').html('')
+            $('.modal-body').append('<iframe src="/Order/AddModal/2020-12-02" style="overflow:hidden;height:95%;width:100%"></iframe>');
+
+            $("iframe").attr('src','/Order/AddModal/'+dt);
+            }
+
+
+           
+        }
+         function openEditOrder(dt) {
+             if (window.roleName == 'Admin') {
+                 $("#dshbrdClose").trigger('click');
+            $('.modal-body').html('')
+            $('.modal-body').append('<iframe src="/Order/AddModal/2020-12-02" style="overflow:hidden;height:95%;width:100%"></iframe>');
+            $("#mdlBtn").trigger('click');
+            $("iframe").attr('src','/Order/EditModal/'+dt);
+             }
+             
+        }
+
+
     </script>
     <environment names="Development,Staging,Production">
+        <script src="~/lib//datatable/jquery.dataTables.js"></script>
+        <script src="~/lib//datatable/dataTables.bootstrap4.js"></script>
+        <script src="~/lib//datatable/dataTables.colReorder.js"></script>
+        <script src="~/lib//datatable/dataTables.select.js"></script>
+        <script src="~/lib//datatable/dataTables.buttons.js"></script>
+        <script src="~/lib//datatable/buttons.bootstrap4.js"></script>
+        <script src="~/lib//datatable/buttons.colVis.js"></script>
+        <script src="~/lib//datatable/buttons.html5.js"></script>
+        <script src="~/lib//datatable/buttons.print.js"></script>
         <script src="~/lib/moment/moment.js"></script>
         <script src="~/lib/fullcalendar/main.js"></script>
+        <script src="~/lib/fullcalendar/tooltip.min.js"></script>
         <script src="~/js/Chart.js"></script>
         <script src="~/pages/dashboard/page-script.js"></script>
         <script src="~/pages/calendar/@@page-script.js"></script>
+        <script src="~/pages/datatable/@@page-script.js"></script>
+        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+        <script src="~/lib/inputmask/jquery.inputmask.js"></script>
     </environment>
     <script type="text/javascript">
         window.orderList = '@Json.Serialize(Model.OrderList)';
@@ -430,12 +323,19 @@
                     arr.push({
                         id: window.orderList[i]['OrderId'],
                         resourceId: window.orderList[i]['EmployeeId'],
-                        title: window.orderList[i]['CustomerName'] + '<br/>' + window.orderList[i]['EmployeeName'],
+                        title: window.orderList[i]['CustomerShipAddress'] + '<br/>' + window.orderList[i]['ItemName'],
                         start: new Date(window.orderList[i]['ShipStartDate']),
                         end: window.orderList[i]['ShipEndDate'] == null ? null : new Date(window.orderList[i]['ShipEndDate']),
                         allDay: false,
                         extendedProps: window.orderList[i],
-                        className: 'bgc-info text-white text-75'
+                         description: window.orderList[i]['ItemName'],
+                        //backgroundColor:window.orderList[i]['Color'],
+                        //eventColor: window.orderList[i]['Color'],
+                        //eventTextColor:'black'
+                        className: 'text-75 ',
+                        color: window.orderList[i]['Color'],   // a non-ajax option
+                         textColor: 'white'
+                        //eventTextColor:(window.orderList[i]['ShipEndDate'] == null ? (window.orderList[i]['Color'] ? window.orderList[i]['Color']:'blue') :'white' )
                     });
             }
             }
@@ -502,7 +402,7 @@
                      callback(data)
                 },
                 error: function (data) {
-                    debugger;
+
 
                 }
             })
@@ -524,7 +424,7 @@
                      callback(data)
                 },
                 error: function (data) {
-                    debugger;
+
 
                 }
             })
@@ -547,13 +447,15 @@
                    'employeeId': employeeId
                 };
             console.log(data);
+
             $.ajax({
                 url: "/Order/UpdateOrderAssignee",
                 type: "POST",
                 dataType: "json",
                 data: data,
                 success: function (data) {
-                    $("#btnSumbit").trigger('click');
+                    window.assingEmployeeColor = data.Message;
+                   $("#btnSumbit").trigger('click');
                 }
             })
         }

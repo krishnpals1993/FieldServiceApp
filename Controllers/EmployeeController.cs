@@ -34,6 +34,7 @@ namespace FieldServiceApp.Controllers
                 LastName = s.LastName,
                 Phone = s.Phone,
                 Email = s.Email,
+                Color = s.Color,
                 EmployeeId = s.EmployeeId,
                 IsActive = s.IsActive
             }).ToList();
@@ -43,6 +44,7 @@ namespace FieldServiceApp.Controllers
         public IActionResult Add()
         {
             EmployeeMasterViewModel model = new EmployeeMasterViewModel();
+            model.Color = "#269faf";
             return View(model);
         }
 
@@ -91,6 +93,7 @@ namespace FieldServiceApp.Controllers
                                 LastName = model.LastName,
                                 Email = model.Email,
                                 Phone = model.Phone,
+                               Color = model.Color,
                                 IsActive = 1,
                                 CreatedBy = 1,
                                 CreatedDate = DateTime.Now,
@@ -130,6 +133,7 @@ namespace FieldServiceApp.Controllers
                 model.Email = checkEmployee.Email;
                 model.Phone = checkEmployee.Phone;
                 model.EmployeeId = checkEmployee.EmployeeId;
+                model.Color = String.IsNullOrEmpty(checkEmployee.Color) ? "#269faf": checkEmployee.Color;
             }
 
 
@@ -159,6 +163,7 @@ namespace FieldServiceApp.Controllers
                         checkEmployee.LastName = model.LastName;
                         checkEmployee.Email = model.Email;
                         checkEmployee.Phone = model.Phone;
+                        checkEmployee.Color = model.Color;
                         _dbContext.SaveChanges();
 
                         ViewBag.SuccessMessage = "Employee updated successfully";

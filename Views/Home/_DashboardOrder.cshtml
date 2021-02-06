@@ -17,8 +17,37 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p class="text-orange-d3 text-125 text-center" style="margin-bottom:0px">OrderNo: #@Model.OrderId</p>
-                <p class="text-primary text-105 mt-1 text-center" style="margin-bottom:0px">Customer: @Model.EmployeeName <br />Address: (@Model.CustomerShipAddress)</p>
+                <p class="text-orange-d3 text-125 text-center" style="margin-bottom:0px">
+
+                    @if (Model.ReOccurenceParentOrderId != 0)
+                    {
+                        <i class='fa fa-asterisk'></i>
+                    }
+
+                    OrderNo: #@Model.OrderId
+                    @if (RoleName == "Admin")
+                    {
+                        <span style="margin-left:10px;cursor:pointer" onclick="openEditOrder(@Model.OrderId)"><i class="fa fa-edit"></i></span>
+                    }
+
+                </p>
+                <p class="text-primary text-105 mt-1 text-center" style="margin-bottom:0px">
+                    Customer: @Model.CustomerName <br />
+
+                    @if (!String.IsNullOrEmpty(Model.Apartments))
+                    {
+                             <span>Apartment: @Model.Apartments </span><br />
+
+                    }
+                
+                    
+
+
+
+
+
+                    Address: (@Model.CustomerShipAddress )
+                </p>
                 <p class="text-primary text-105 mt-1 text-center" style="margin-bottom:0px">Item: @Model.ItemName (@Model.ItemDescription)</p>
                 <form class="m-2">
                     <div class="input-group">
@@ -37,7 +66,7 @@
                             <div class="input-group-append">
                                 <button type="button" onclick="updateOrder('@Model.OrderId')" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
                                 <button type="submit" style="display:none" id="btnSumbit" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" id="dshbrdClose" data-dismiss="modal">Close</button>
                             </div>
                         }
                         else
@@ -52,7 +81,7 @@
 
                              })
                             <div class="input-group-append">
-                                @Html.ActionLink("Submit Form/ Complete Job","Work","Service",new { id = Model.OrderId }, new {@class="btn btn-sm btn-orange btn-bold ml-2px" } )
+                                @Html.ActionLink("Submit Form/ Complete Job", "Work", "Service", new { id = Model.OrderId }, new { @class = "btn btn-sm btn-orange btn-bold ml-2px" })
                                 <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" data-dismiss="modal">Close</button>
                             </div>
                         }

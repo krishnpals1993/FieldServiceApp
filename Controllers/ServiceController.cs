@@ -71,13 +71,13 @@ namespace FieldServiceApp.Controllers
             ServiceFormViewModel model = new ServiceFormViewModel();
             try
             {
-                
-                if (id>0)
+
+                if (id > 0)
                 {
                     var orderDetail = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == id).FirstOrDefault();
-                    if (orderDetail!=null)
+                    if (orderDetail != null)
                     {
-                        
+
                         model.OrderId = orderDetail.OrderId;
                         model.ShipId = orderDetail.ShipId;
                     }
@@ -165,9 +165,9 @@ namespace FieldServiceApp.Controllers
                     _dbContext.SaveChanges();
 
                     var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).FirstOrDefault();
-                    if (checkOrder!= null)
+                    if (checkOrder != null)
                     {
-                        if (model.IsFollowUp== "Yes")
+                        if (model.IsFollowUp == "Yes")
                         {
                             checkOrder.IsFollowUp = 1;
                         }
@@ -183,7 +183,7 @@ namespace FieldServiceApp.Controllers
 
 
                 }
-                
+
 
 
             }
@@ -245,7 +245,7 @@ namespace FieldServiceApp.Controllers
 
                 var shipId = orderDetail.ShipId;
 
-                if ((orderDetail.IsFollowUp??0)==0)
+                if ((orderDetail.IsFollowUp ?? 0) == 0)
                 {
                     model.IsFollowUp = "No";
                 }
@@ -407,12 +407,15 @@ namespace FieldServiceApp.Controllers
                 var orderDetail = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == OrderId).FirstOrDefault();
                 CustomerShipingAddress = (from shipping in _dbContext.tbl_CustmoerShipping
                                           join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                          into city
+                                          from city1 in city.DefaultIfEmpty()
                                           join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                          into state
+                                          from state1 in state.DefaultIfEmpty()
                                           where shipping.CustomerShipId == orderDetail.ShipId
-                                          select city.CityName + " " + state.StateName + " " + shipping.Address ?? ""
-                                           )
-                                              .FirstOrDefault();
-               
+                                          select (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + " " + (shipping.Address2 ?? ""))
+                                    .FirstOrDefault();
+
                 model.Address = CustomerShipingAddress;
                 model.ApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == orderDetail.ShipId).
                     Select(s => new CustomerShippingApartmentViewModel()
@@ -423,7 +426,7 @@ namespace FieldServiceApp.Controllers
                     }).ToList();
 
                 orderDetail.ApartmentIds = orderDetail.ApartmentIds ?? "";
-                if (orderDetail.ApartmentIds!="")
+                if (orderDetail.ApartmentIds != "")
                 {
                     model.ApartmentList = model.ApartmentList.Where(w => orderDetail.ApartmentIds.Contains("/" + w.ApartmentId.ToString() + "/")).ToList();
 
@@ -472,28 +475,41 @@ namespace FieldServiceApp.Controllers
         public IActionResult GetOrderPopup(int id)
         {
             DashboardOrderViewModel model = new DashboardOrderViewModel();
-            model = (from order in _dbContext.tbl_OrderMaster
-                     join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
-                     join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
-                     into orderAssign
-                     from orderAssign1 in orderAssign.DefaultIfEmpty()
-                     join employee in _dbContext.tbl_EmployeeMaster on orderAssign1.EmployeeId equals employee.EmployeeId
-                      into employee
-                     from employee1 in employee.DefaultIfEmpty()
-                     join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.CustomerShipId
-                     join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
-                     join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                     where order.OrderId == id
-                     select new DashboardOrderViewModel
-                     {
-                         OrderId = order.OrderId,
-                         ShipStartDate = order.ShipStartDate,
-                         ShipEndDate = order.ShipEndDate,
-                         CustomerName = customer.CompanyName,
-                         EmployeeName = employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName,
-                         EmployeeId = orderAssign1.EmployeeId,
-                         CustomerShipAddress = city.CityName + " " + state.StateName + " " + shipping.Address,
-                     }).FirstOrDefault();
+            try
+            {
+                model = (from order in _dbContext.tbl_OrderMaster
+                         join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
+                         join orderAssign in _dbContext.tbl_OrderAssignment on order.OrderId equals orderAssign.OrderId
+                         into orderAssign
+                         from orderAssign1 in orderAssign.DefaultIfEmpty()
+                         join employee in _dbContext.tbl_EmployeeMaster on orderAssign1.EmployeeId equals employee.EmployeeId
+                          into employee
+                         from employee1 in employee.DefaultIfEmpty()
+                         join shipping in _dbContext.tbl_CustmoerShipping on order.ShipId equals shipping.CustomerShipId
+                         join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                          into city
+                         from city1 in city.DefaultIfEmpty()
+                         join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                         into state
+                         from state1 in state.DefaultIfEmpty()
+                         where order.OrderId == id
+                         select new DashboardOrderViewModel
+                         {
+                             OrderId = order.OrderId,
+                             ShipStartDate = order.ShipStartDate,
+                             ShipEndDate = order.ShipEndDate,
+                             CustomerName = customer.CompanyName,
+                             EmployeeName = employee1.FirstName + " " + (employee1.MiddleName ?? "") + " " + employee1.LastName,
+                             EmployeeId = orderAssign1.EmployeeId,
+                             CustomerShipAddress = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + " " + (shipping.Address2 ?? "")
+                         }).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+
+
+            }
+
 
 
 

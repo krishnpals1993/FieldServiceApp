@@ -116,6 +116,36 @@
 
                 </div>
 
+                <div class="row form-group">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Color
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div id="cp-component" class="input-group">
+                            @Html.TextBoxFor(m => m.Color,
+                            new { @placeholder = "Color", @class = "form-control", maxlength = "100"  })
+
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                        @*<select class="form-control" id="color" name="color">
+                                <option value="">select color</option>
+                                <option style="background-color:#767679" value="#767679">Grey</option>
+                                <option style="background-color:#fbe77a" value="#fbe77a">Yellow</option>
+                                <option style="background-color:#776bbe" value="#776bbe">Purple</option>
+                                <option style="background-color:#da3776" value="#da3776">Pink</option>
+                                <option style="background-color:#b6703f" value="#b6703f">Brown</option>
+                                <option style="background-color:#2d81e7" value="#2d81e7">Blue</option>
+                                <option style="background-color:#eb4343" value="#eb4343">Red</option>
+                                <option style="background-color:#29916c" value="#29916c">Green</option>
+                                <option style="background-color:#ff8d03" value="#ff8d03">Orange</option>
+                            </select>*@
+                    </div>
+
+                </div>
+
                 <p class="text-danger">
                     @ViewBag.ErrorMessage
                 </p>
@@ -147,19 +177,27 @@
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/css/bootstrap-colorpicker.css"
+              rel="stylesheet">
     </environment>
     <style>
         hr {
             /*margin-bottom: 2rem !important;*/
+        }
+
+        .input-group-addon i {
+            height: 100% !important;
+            width: 35px !important;
         }
     </style>
 }
 
 @section scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<environment names="Development,Staging,Production">
-    <script src="~/lib/inputmask/jquery.inputmask.js"></script>
-</environment>
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/inputmask/jquery.inputmask.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/js/bootstrap-colorpicker.js"></script>
+    </environment>
     <script type="text/javascript">
 
         $(document).ready(function () {
@@ -176,6 +214,8 @@
             swal(ErrorMessage, "", "error");
         }
 
+
+        $('#cp-component').colorpicker();
 
         })
 

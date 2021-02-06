@@ -17,7 +17,7 @@
           novalidate action="@Settings.Value.WebBaseURL/Service/Work" method="post">
         <div class="card bcard mt-2 mt-lg-3">
             <div class="card-header">
-               
+
             </div>
             <div class="card-header">
                 <div class="card-title ">
@@ -139,17 +139,17 @@
 
 
                 @*<div class="form-group row">
-                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                    <label for="id-form-field-1" class="mb-0">
-                        Signature
-                    </label>
-                </div>
+                        <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                            <label for="id-form-field-1" class="mb-0">
+                                Signature
+                            </label>
+                        </div>
 
-                <div class="col-sm-3">
-                    <input type="file" name="file" class="form-control" placeholder="Signature" />
+                        <div class="col-sm-3">
+                            <input type="file" name="file" class="form-control" placeholder="Signature" />
 
-                </div>
-            </div>*@
+                        </div>
+                    </div>*@
 
                 <div id="itemPanel" style="display:none">
 
@@ -177,7 +177,7 @@
                             </label>
                         </div>
                         <div class="col-sm-2">
-                            @Html.DropDownListFor(model => model.ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control", @placeholder = "Select Item" })
+                            @Html.DropDownListFor(model => model.ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control chosen-select", @placeholder = "Select Item" })
                             <span asp-validation-for="ItemId" class="text-danger"></span>
                         </div>
 
@@ -242,6 +242,7 @@
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+        <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
     </environment>
     <style>
         hr {
@@ -252,12 +253,13 @@
 
 @section scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <environment names="Development,Staging,Production">
-        <script src="~/lib/moment/moment.js"></script>
-        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
-        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
-        <script src="~/pages/form-basic/@@page-script.js"></script>
-    </environment>
+<environment names="Development,Staging,Production">
+    <script src="~/lib/moment/moment.js"></script>
+    <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+    <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+    <script src="~/pages/form-basic/@@page-script.js"></script>
+    <script src="~/lib/chosen-js/chosen.jquery.js"></script>
+</environment>
 
     <script type="text/javascript">
         // Restricts input for each element in the set of matched elements to the given inputFilter.
@@ -281,6 +283,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+              $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
 
             $("#Quantity").inputFilter(function(value) {
                  return /^-?\d*[.,]?\d*$/.test(value); });
@@ -419,7 +422,10 @@
                 for (var i = 0; i < response.length; i++) {
                     options += '<option value="' + response[i]['ItemId'] + '">' + response[i]['ItemCd'] + '</option>';
                 }
-                $('#ItemId').append(options);
+                        $('#ItemId').append(options);
+                         $('#ItemId').trigger("chosen:updated");
+
+
             }
                 }
             })

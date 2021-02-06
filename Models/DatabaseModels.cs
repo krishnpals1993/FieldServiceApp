@@ -34,6 +34,7 @@ namespace FieldServiceApp.Models
         public DbSet<CalenderWorkingDay> tbl_CalenderWorkingDays { get; set; }
         public DbSet<BilHeader> tbl_BilHeaders { get; set; }
         public DbSet<BilDetail> tbl_BilDetail { get; set; }
+        public DbSet<GlobalSetting> tbl_GlobalSetting { get; set; }
 
     }
 
@@ -166,6 +167,7 @@ namespace FieldServiceApp.Models
         public DateTime? ReOccurenceStartDate { get; set; }
         public DateTime? ReOccurenceEndDate { get; set; }
         public int? ReOccurenceParentOrderId { get; set; }
+        public decimal? TaxAmount { get; set; }
     }
 
     [Table("OrderDetail")]
@@ -212,13 +214,13 @@ namespace FieldServiceApp.Models
         public int CityId { get; set; }
 
         public string CityName { get; set; }
-
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int StateId { get; set; }
+        public Decimal? Tax { get; set; }
     }
 
     [Table("States")]
@@ -269,6 +271,7 @@ namespace FieldServiceApp.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public int UserId { get; set; }
+        public string Color { get; set; }
     }
 
 
@@ -485,4 +488,18 @@ namespace FieldServiceApp.Models
         public string Notes { get; set; }
     }
 
+    [Table("GlobalSetting")]
+    public class GlobalSetting
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
 }

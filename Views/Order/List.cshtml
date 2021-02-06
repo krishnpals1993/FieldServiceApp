@@ -1,4 +1,4 @@
-﻿@model FieldServiceApp.Models.OrderListViewModel
+﻿@model FieldServiceApp.Models.OrderMasterViewModel_Datatable
 @using Microsoft.Extensions.Options;
 @inject IOptions<Appsettings> Settings
 @{
@@ -21,221 +21,20 @@
 
 
         <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Order/List" method="post">
-            <div class="form-group row">
-                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                    <label for="id-form-field-1" class="mb-0">
-                        Ship Date From
-                    </label>
-                </div>
-                <div class="col-sm-2">
-                    <div class="input-group date">
-                        @Html.TextBoxFor(m => m.ShipDateFrom,
-                        new { id = "id-date-1", @placeholder = "Ship Date From", @class = "form-control" })
-                        <div class="input-group-addon input-group-append">
-                            <div class="input-group-text">
-                                <i class="far fa-calendar"></i>
-                            </div>
-                        </div>
-                    </div>
 
-                </div>
-                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                    <label for="id-form-field-1" class="mb-0">
-                        Ship Date To
-                    </label>
-                </div>
-                <div class="col-sm-2">
-                    <div class="input-group date">
-                        @Html.TextBoxFor(m => m.ShipDateTo,
-                         new { id = "id-date-2", @placeholder = "Ship Date To", @class = "form-control" })
-                        <div class="input-group-addon input-group-append">
-                            <div class="input-group-text">
-                                <i class="far fa-calendar"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                    <label for="id-form-field-1" class="mb-0">
-                        Order Date From
-                    </label>
-                </div>
-                <div class="col-sm-2">
-                    <div class="input-group date">
-                        @Html.TextBoxFor(m => m.OrderDateFrom,
-                           new { id = "id-date-3", @placeholder = "Order Date From", @class = "form-control" })
-
-                        <div class="input-group-addon input-group-append">
-                            <div class="input-group-text">
-                                <i class="far fa-calendar"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                    <label for="id-form-field-1" class="mb-0">
-                        Order Date To
-                    </label>
-                </div>
-                <div class="col-sm-2">
-                    <div class="input-group date">
-
-                        @Html.TextBoxFor(m => m.OrderDateTo,
-                           new { id = "id-date-4", @placeholder = "Order Date To", @class = "form-control" })
-                        <div class="input-group-addon input-group-append">
-                            <div class="input-group-text">
-                                <i class="far fa-calendar"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                    <label for="id-form-field-1" class="mb-0">
-                        Order No
-                    </label>
-                </div>
-                <div class="col-sm-2">
-                    <div class="input-group date">
-                        @Html.TextBoxFor(m => m.OrderNo,
-                           new { @placeholder = "Order No", @class = "form-control" })
-
-                    </div>
-
-                </div>
-                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                    <label for="id-form-field-1" class="mb-0">
-                        Customer
-                    </label>
-                </div>
-                <div class="col-sm-2">
-                    <div class="input-group date">
-                        @Html.TextBoxFor(m => m.CustomerName,
-                           new { @placeholder = "Customer", @class = "form-control" })
-
-                    </div>
-
-                </div>
-                <div class="col-lg-1">
-                    <button type="submit" onclick="return checkDate()"
-                            class=" btn btn-primary btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                        Search
-
-                    </button>
-                </div>
+            <div class="table-responsive">
+                <jquery-datatables id="datatable"
+                                   class="d-style  table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed nowrap"
+                                   model="@Model"
+                                   search-row-th-class="p-0"
+                                   search-input-class="form-control form-control-sm"
+                                   search-input-style="width:100%"
+                                   thead-class="text-center">
+                </jquery-datatables>
 
             </div>
 
         </form>
-
-        <table id="datatable" class="d-style w-100 table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed">
-            <!-- add `collapsed` by default ... it will be removed by default -->
-            <!-- thead with .sticky-nav -->
-            <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
-                <tr>
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Order No
-                    </th>
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Order Date
-                    </th>
-
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Customer
-                    </th>
-
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Ship Date
-                    </th>
-
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Amount($)
-                    </th>
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Assigned To
-                    </th>
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-
-                        Ship Address
-                    </th>
-
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Status
-                    </th>
-                    <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                        Action
-                    </th>
-                </tr>
-            </thead>
-
-            <tbody class="pos-rel">
-                @foreach (var item in Model.OrderList)
-                {
-                    <tr class="d-style bgc-h-default-l4 @(item.ScheduledOnNonWorkingDay?"nonWkDayOrder":"")">
-
-                        <td class="text-grey">
-                            @item.OrderNo
-                        </td>
-                        <td>
-                            @item.OrderDate.ToString("MM/dd/yyyy")
-                        </td>
-
-                        <td class="text-grey">
-                            @item.CustomerName
-                        </td>
-
-                        <td class="text-grey">
-                            @if (item.ShipStartDate != null)
-                            {
-                                <span>@item.ShipStartDate?.DayOfWeek ,</span>
-                            }
-                            @item.ShipStartDate?.ToString("MM/dd/yyyy hh:mm tt")
-
-                        </td>
-
-                        <td class="text-grey">
-                            @item.TotalAmount
-                        </td>
-
-                        <td class="text-grey">
-                            @item.EmployeeName
-                        </td>
-
-                        <td class="text-grey">
-                            @item.CustomerShipAddress
-                        </td>
-
-                        <td>
-                            @if (item.IsActive == 1)
-                            {
-                                <span class="badge badge-success mr-1">
-                                    Active
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-danger mr-1">
-                                    In Active
-                                </span>
-
-                            }
-                        </td>
-
-
-                        <td class="text-grey">
-                            @Html.ActionLink("Edit", "Edit", "Order", new { id = item.OrderId }) |
-                            <a href="#" onclick="deleteFun('@item.OrderId')">Delete</a>
-                        </td>
-
-                    </tr>
-                }
-
-            </tbody>
-        </table>
 
 
     </div>
@@ -247,14 +46,29 @@
     <environment names="Development,Staging,Production">
         <link rel="stylesheet" href="~/lib//datatable/dataTables.bootstrap4.css" />
         <link rel="stylesheet" href="~/lib//datatable/buttons.bootstrap4.css" />
+        <link rel="stylesheet" href="~/lib//datatable/dataTables.colReorder.css" />
         <link rel="stylesheet" href="~/pages/datatable/@@page-style.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
         <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
     </environment>
 
     <style>
+        .dataTables_wrapper {
+            margin: 0 auto;
+        }
+
+        .datatable {
+            width: 95% !important;
+        }
+
         .nonWkDayOrder {
             background-color: #ffbc002b;
+        }
+
+        @@media (min-width: 1368px) {
+            .datatable {
+                 width:  98% !important;
+            }
         }
     </style>
 
@@ -271,52 +85,61 @@
         <script src="~/lib//datatable/buttons.colVis.js"></script>
         <script src="~/lib//datatable/buttons.html5.js"></script>
         <script src="~/lib//datatable/buttons.print.js"></script>
+        <script src="~/lib//datatable/buttons.colVis.js"></script>
         <script src="~/lib/moment/moment.js"></script>
         <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
-        <script src="~/pages/datatable/@@page-script.js"></script>
+        <script src="~/js/order_list.js"></script>
+
+
         <script type="text/javascript">
+
+            $(document).ready(function () {
+                $(".dataTables_wrapper").
+                    width(($(".dataTables_wrapper").parent().parent().parent().width() - 10) + "px");
+                console.log( $(".dataTables_wrapper").width());
+            });
 
 
             window.baseUrl = '@Settings.Value.WebBaseURL';
 
-            $(document).ready(function () {
+    //        $(document).ready(function () {
 
-     var TinyDatePicker = DateRangePicker.TinyDatePicker;
-                          TinyDatePicker('#id-date-1', {
-                        mode: 'dp-below',
-                        date : new Date()
-                    })
-                          .on('statechange', function (ev) {
+    // var TinyDatePicker = DateRangePicker.TinyDatePicker;
+    //                      TinyDatePicker('#id-date-1', {
+    //                    mode: 'dp-below',
+    //                    date : new Date()
+    //                })
+    //                      .on('statechange', function (ev) {
 
-                        });
-    var TinyDatePicker2 = DateRangePicker.TinyDatePicker;
-                          TinyDatePicker2('#id-date-2', {
-                        mode: 'dp-below',
-                        date : new Date()
-                    })
-                          .on('statechange', function (ev) {
+    //                    });
+    //var TinyDatePicker2 = DateRangePicker.TinyDatePicker;
+    //                      TinyDatePicker2('#id-date-2', {
+    //                    mode: 'dp-below',
+    //                    date : new Date()
+    //                })
+    //                      .on('statechange', function (ev) {
 
-                        });
+    //                    });
 
-     var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
-                           TinyDatePicker3('#id-date-3', {
-                            mode: 'dp-below',
-                            date : new Date()
-                        })
-                           .on('statechange', function (ev) {
+    // var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
+    //                       TinyDatePicker3('#id-date-3', {
+    //                        mode: 'dp-below',
+    //                        date : new Date()
+    //                    })
+    //                       .on('statechange', function (ev) {
 
-                            });
+    //                        });
 
-    var TinyDatePicker4 = DateRangePicker.TinyDatePicker;
-                          TinyDatePicker4('#id-date-4', {
-                             mode: 'dp-below',
-                             date : new Date()
-                         })
-                          .on('statechange', function (ev) {
+    //var TinyDatePicker4 = DateRangePicker.TinyDatePicker;
+    //                      TinyDatePicker4('#id-date-4', {
+    //                         mode: 'dp-below',
+    //                         date : new Date()
+    //                     })
+    //                      .on('statechange', function (ev) {
 
-                             });
+    //                         });
 
-            });
+    //        });
 
 
             function add() {

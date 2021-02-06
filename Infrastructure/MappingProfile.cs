@@ -9,7 +9,10 @@ namespace FieldServiceApp.Infrastructure
         {
             CreateMap<CustomerMasterViewModel_datatable, CustomerMasterViewModel_datatable>()
                 .ReverseMap();
-         
+
+            CreateMap<OrderMasterViewModel_Datatable, OrderMasterViewModel_Datatable>()
+                .ReverseMap();
+
         }
     }
 }

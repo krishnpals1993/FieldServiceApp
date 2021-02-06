@@ -10,16 +10,18 @@
 
 
     var $_table = $('#datatable').DataTable({
-        //"scrollX": true,
-        //"scrollY": "" + (window.outerHeight - 375) + "px",
+        "scrollY": "" + (window.outerHeight - 440) + "px",
+        "scrollCollapse": true,
+        "sScrollX": '100%',
         responsive: true,
+        colReorder: true,
         renderer: 'bootstrap',
         language: {
             search: '<i class="fa fa-search pos-abs mt-2 pt-3px ml-25 text-blue-m2"></i>',
             searchPlaceholder: " Search ...",
             processing: "Loading Data...",
             zeroRecords: "No matching records found"
-         
+
         },
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         processing: true,
@@ -35,7 +37,7 @@
         dom: '<"html5buttons"B>lTfgitp',
         ajax: {
             type: "POST",
-            url: '/Customer/LoadTable/',
+            url: '/Order/LoadTable/',
             contentType: "application/json; charset=utf-8",
             async: true,
             data: function (data) {
@@ -52,68 +54,81 @@
                 );
             }
         },
-        "drawCallback": function (settings) {
-            if ($("#datatable_filter input[type='search']").val()) {
-                $_table.rows(':not(.parent)').nodes().to$().find('td:first-child').trigger('click');
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.ScheduledOnNonWorkingDay.toString() === "true") {
+                $(nRow).addClass('nonWkDayOrder');
             }
-            
+
         },
         columns: [
+
             {
-                'className': 'details-control',
-                'orderable': false,
-                 searchable: false,
-                'data': null,
-                'defaultContent': ''
+                //'className': 'details-control',
+                title: "Order No",
+                data: "OrderNo",
+                name: "co",
+
+            },
+            {
+                title: "Main Order No",
+                data: "ReoccurrenceOrderNo",
+                name: "co",
+                render: function (data, type, row) {
+                    try {
+                        if (row.ReOccurenceParentOrderId.toString() == "0") {
+                            return "";
+                        }
+                        else {
+                            return "#" + row.ReOccurenceParentOrderId.toString();
+                        }
+                    } catch (e) {
+                        return "";
+                    }
+
+
+                }
+            },
+            {
+                title: "Order Date",
+                data: "OrderDate",
+                name: "co",
+                render: function (data, type, row) {
+                    return new moment(row.OrderDate).format("MM/DD/YYYY");
+
+                }
             },
             {
                 title: "Customer",
-                data: "CompanyName",
-                name: "co",
-                render: function (data, type, row) {
-                    if ($("input[type='search']").val()) {
-                        if (row.CompanyName) {
-                            if (row.CompanyName.toString().indexOf($("input[type='search']").val()) > -1) {
-                                return '<span class="highlight">' + row.CompanyName +'</span>';
-                            }
-                            else {
-                                return row.CompanyName;
-                            }
-                        }
-                        else {
-                            return row.CompanyName;
-                        }
-                        
-                    }
-                    else {
-                        return row.CompanyName;
-                    }
-                }
+                data: "CustomerName",
+                name: "co"
 
             },
             {
-                title: "Company Type",
-                data: "CompanyType",
+                title: "Ship Date",
+                data: "ShipStartDate",
                 name: "co",
                 render: function (data, type, row) {
-                    if ($("input[type='search']").val()) {
-                        if (row.CompanyType) {
-                            if (row.CompanyType.toString().indexOf($("input[type='search']").val()) > -1) {
-                                return '<span class="highlight">' + row.CompanyType + '</span>';
-                            }
-                            else {
-                                return row.CompanyType;
-                            }
-                        }
-                        else {
-                            return row.CompanyType;
-                        }
+                    return new moment(row.ShipStartDate).format("dddd") + " ," +
+                        new moment(row.ShipStartDate).format("MM/DD/YYYY hh:mm a");
 
-                    }
-                    else {
-                        return row.CompanyType;
-                    }
                 }
+            },
+            {
+                title: "Amount($)",
+                data: "TotalAmount",
+                name: "co"
+
+            },
+            {
+                title: "Assigned To",
+                data: "EmployeeName",
+                name: "co"
+
+            },
+            {
+                title: "Ship Address",
+                data: "CustomerShipAddress",
+                name: "co"
             },
             {
                 title: "Status",
@@ -133,16 +148,16 @@
                 data: "UserId",
                 searchable: false,
                 render: function (data, type, row) {
-                    return '<span><a href="/Customer/Edit/' + row.CustmoerId + '">Edit</a>|</span >' +
-                        '<a href="#" onclick="deleteFun(' + row.CustmoerId + ')">Delete</a>';
+                    return '<span><a href="/Order/Edit/' + row.OrderId + '">Edit</a>|</span >' +
+                        '<a href="#" onclick="deleteFun(' + row.OrderId + ')">Delete</a>';
                 }
             }
         ],
-        colReorder: {
-            //disable column reordering for first and last columns
-            fixedColumnsLeft: 1,
-            fixedColumnsRight: 1
-        },
+        //colReorder: {
+        //    //disable column reordering for first and last columns
+        //    fixedColumnsLeft: 1,
+        //    fixedColumnsRight: 1
+        //},
         classes: {
             sLength: "dataTables_length text-left w-auto",
         },
@@ -157,7 +172,12 @@
             },
 
             buttons: [
-
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)',
+                    text: 'Select Column',
+                    "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                },
                 {
                     "extend": "copy",
                     "text": "<i class='far fa-copy text-125 text-purple'></i> <span class='d-none'>Copy to clipboard</span>",
@@ -179,7 +199,7 @@
                 }
             ]
         },
-        "order": [[1]]
+        "order": [[0, "desc"]],
 
     });
 
@@ -323,21 +343,24 @@
 
         $("#datatable_info").appendTo("#dtFooterLeft");
         $("#datatable_paginate").appendTo("#dtFooterRight");
-        
-        
 
-          $('.dataTables_filter').appendTo('.page-tools').find('input').addClass('pl-45 radius-round').removeClass('form-control-sm')
+
+
+        $('.dataTables_filter').appendTo('.page-tools').find('input').addClass('pl-45 radius-round').removeClass('form-control-sm')
             // and add a "+" button
             .end().append('<button data-rel="tooltip" id="btnAdd" onclick="add()" type="button" class="btn radius-round btn-outline-primary border-2 btn-sm ml-2" title="Add New"><i class="fa fa-plus"></i></button>')
 
 
+        $($("thead tr")[0]).remove();
+
+
     }, 10);
 
-      
 
-       
 
-    
+
+
+
 
 
 

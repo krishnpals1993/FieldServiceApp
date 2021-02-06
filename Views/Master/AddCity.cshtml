@@ -40,7 +40,21 @@
                         <span asp-validation-for="StateId" class="text-danger"></span>
                     </div>
                 </div>
-              <p class="text-danger">
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Tax
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.Tax,
+                           new { @placeholder = "Tax", @class = "form-control", maxlength = "5" })
+                        <span asp-validation-for="Tax" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <p class="text-danger">
                     @ViewBag.ErrorMessage
                 </p>
 

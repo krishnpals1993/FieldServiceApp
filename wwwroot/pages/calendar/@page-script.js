@@ -1,3 +1,5 @@
+ 
+
 jQuery(function ($) {
     if (!window.Intl) {
         console.log("Calendar can't be displayed because your browser doesn's support `Intl`. You may use a polyfill!");
@@ -81,6 +83,12 @@ jQuery(function ($) {
             events: getEvents(),
             eventDidMount: function (info) {
                 info.el.querySelector('.fc-event-title').innerHTML = info.el.querySelector('.fc-event-title').innerText;
+                var tooltip = new Tooltip(info.el, {
+                    title: info.event.extendedProps.description,
+                    placement: 'top',
+                    trigger: 'hover',
+                    container: 'body'
+                });
             },
             selectable: true,
             selectLongPressDelay: 200,
@@ -94,12 +102,15 @@ jQuery(function ($) {
                             window.calendar.addEvent({
                                 id: data['OrderId'],
                                 resourceId: data['EmployeeId'],
-                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                title: data.CustomerShipAddress + '<br/>' + data['ItemName'],
+                                description: data['ItemName'],
                                 start: new Date(data['ShipStartDate']),
                                 end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
                                 allDay: false,
                                 extendedProps: data,
-                                className: 'bgc-info text-white text-75'
+                                className: 'text-75 ',
+                                color: data['Color'],   // a non-ajax option
+                                textColor: 'white'
                             });
                         });
                     info.draggedEl.parentNode.removeChild(info.draggedEl);
@@ -121,12 +132,16 @@ jQuery(function ($) {
                             window.calendar.addEvent({
                                 id: data['OrderId'],
                                 resourceId: data['EmployeeId'],
-                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                title: data.CustomerShipAddress + '<br/>' + data['ItemName'],
+                                description: data['ItemName'],
                                 start: new Date(data['ShipStartDate']),
                                 end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
                                 allDay: false,
                                 extendedProps: data,
-                                className: 'bgc-info text-white text-75'
+                              //  className: 'bgc-info text-white text-75'
+                                className: 'text-75 ',
+                                color: data['Color'],   // a non-ajax option
+                                textColor: 'white'
                             });
 
                         });
@@ -199,12 +214,15 @@ jQuery(function ($) {
                             window.calendar.addEvent({
                                 id: inf.event._def.extendedProps['OrderId'],
                                 resourceId: $("#EmployeeId").val(),
-                                title: inf.event._def.extendedProps.CustomerName + '<br/>' + $("#EmployeeId option:selected").text(),
+                                title: inf.event._def.extendedProps.CustomerName + '<br/>' + inf.event._def.extendedProps.ItemName,
+                                description: inf.event._def.extendedProps.ItemName,
                                 start: new Date(inf.event._def.extendedProps['ShipStartDate']),
                                 end: inf.event._def.extendedProps['ShipEndDate'] == null ? null : new Date(inf.event._def.extendedProps['ShipEndDate']),
                                 allDay: false,
                                 extendedProps: inf.event._def.extendedProps,
-                                className: 'bgc-info text-white text-75'
+                                className: 'text-75 ',
+                                color: window.assingEmployeeColor,   // a non-ajax option
+                                textColor: 'white'
                             });
 
                             modal.modal("hide");
@@ -223,21 +241,56 @@ jQuery(function ($) {
         });
     }
     else {
+        
         window.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             themeSystem: 'bootstrap',
-            height: 650,
-            // initialView: 'resourceTimeGridDay',
+            height: 1100,
+            initialView: (window.roleName === 'Admin' ? 'resourceTimeGridDay' : 'timeGridDay' ),
             //resourceGroupField: 'groupdId',
             resources: getResource(),
             headerToolbar: {
                 start: 'prev,next today',
                 center: 'title',
-                end: 'dayGridMonth,timeGridWeek,resourceTimeGridDay'
+                end: (window.roleName === 'Admin' ? 'dayGridMonth,timeGridWeek,resourceTimeGridDay' : 'dayGridMonth,timeGridWeek,timeGridDay') //resourceTimeGridDay
             },
             events: getEvents(),
-            eventDidMount: function (info) {
+            eventDidMount: function (info, element, view) {
+                
+                //ReOccurenceParentOrderId
+                try {
+
+                     
+                    if (info.event._def.extendedProps.ReOccurenceParentOrderId.toString() != "0") {
+                        $(info.el).find('.fc-daygrid-event-dot').html('').html("<i class='fa fa-asterisk'></i>");
+                    }
+                } catch (e) {
+
+                }
+                
+
+               
+
+                if (info.event._def.extendedProps.Color) {
+                    // debugger;
+                    if (info.view.type == 'dayGridMonth') {
+                        $(info.el).css('background-color', info.event._def.extendedProps.Color);
+                    }
+                    else {
+                        debugger;
+                        $(info.el).find('.fc-event-time').prepend(" <i style='margin-right:5px;font-size:10px;margin-top:1px;' class='fa fa-asterisk'></i>");
+                        //
+                    }
+                    //  $(info.el).css('background-color', info.event._def.extendedProps.Color);
+                }
                 info.el.querySelector('.fc-event-title').innerHTML = info.el.querySelector('.fc-event-title').innerText;
+
+                var tooltip = new Tooltip(info.el, {
+                    title: "dfshfjsafhs",
+                    placement: 'top',
+                    trigger: 'hover',
+                    container: 'body'
+                });
             },
             selectable: true,
             selectLongPressDelay: 200,
@@ -251,12 +304,15 @@ jQuery(function ($) {
                             window.calendar.addEvent({
                                 id: data['OrderId'],
                                 resourceId: data['EmployeeId'],
-                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                title: data.CustomerShipAddress + '<br/>' + data['ItemName'],
+                                description: + data['ItemName'],
                                 start: new Date(data['ShipStartDate']),
                                 end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
                                 allDay: false,
                                 extendedProps: data,
-                                className: 'bgc-info text-white text-75'
+                                className: 'text-75 ',
+                                color: data['Color'],   // a non-ajax option
+                                textColor: 'white'
                             });
                         });
                     info.draggedEl.parentNode.removeChild(info.draggedEl);
@@ -278,12 +334,16 @@ jQuery(function ($) {
                             window.calendar.addEvent({
                                 id: data['OrderId'],
                                 resourceId: data['EmployeeId'],
-                                title: data.CustomerName + '<br/>' + data['EmployeeName'],
+                                title: data.CustomerShipAddress + '<br/>' + data['ItemName'],
+                                description: data['ItemName'],
                                 start: new Date(data['ShipStartDate']),
                                 end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
                                 allDay: false,
                                 extendedProps: data,
-                                className: 'bgc-info text-white text-75'
+                                className: 'text-75',
+                                color: data['Color'],   // a non-ajax option
+                                textColor: 'white'
+                                
                             });
 
                         });
@@ -353,15 +413,23 @@ jQuery(function ($) {
                             if (inf) {
                                 inf.event.remove();
                             }
+                            
+                            var props = {};
+                            Object.assign(props, inf.event._def.extendedProps);
+                            props.Color = window.assingEmployeeColor;
                             window.calendar.addEvent({
+                               
                                 id: inf.event._def.extendedProps['OrderId'],
                                 resourceId: $("#EmployeeId").val(),
-                                title: inf.event._def.extendedProps.CustomerName + '<br/>' + $("#EmployeeId option:selected").text(),
+                                title: inf.event._def.extendedProps.CustomerName + '<br/>' + inf.event._def.extendedProps.ItemName,
+                                description: inf.event._def.extendedProps.ItemName,
                                 start: new Date(inf.event._def.extendedProps['ShipStartDate']),
                                 end: inf.event._def.extendedProps['ShipEndDate'] == null ? null : new Date(inf.event._def.extendedProps['ShipEndDate']),
                                 allDay: false,
-                                extendedProps: inf.event._def.extendedProps,
-                                className: 'bgc-info text-white text-75'
+                                extendedProps: props,
+                                className: 'text-75 ',
+                                color: window.assingEmployeeColor,   // a non-ajax option
+                                textColor: 'white'
                             });
 
                             modal.modal("hide");
@@ -378,10 +446,37 @@ jQuery(function ($) {
             },
             scrollTime: window.startTime,
             viewDidMount: function (args) {
+               
+                if (args.view.type == "resourceTimeGridDay" || args.view.type=="timeGridDay") {
+                   
+                    $("#goToDateCalendar").show();
+                    if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length>0) {
+                        $($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().eq(0).remove();
+                    }
+                    $($($(".fc-toolbar-chunk")[1]).children().eq(0)).append('<span> (' + new moment(window.calendar.getDate()).format('dddd') + ')</span>');
+                    
+                }
+                else {
+                    if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length > 0) {
+                        $($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().eq(0).remove();
+                    }
+                    $("#goToDateCalendar").hide();
+                }
                 getDayTimeDetail(window.calendar.getDate().getDay() + 1, function () {
-                    debugger;
+
                     setTimeSlotColor();
                 });
+            },
+            eventRender: function (event, element, view) {
+                
+                $(info.el).find('.fc-daygrid-event-dot').html('').html("<i class='fa fa-asterisk'></i>");
+                //element.find(".fc-title").prepend("<i class='fa fa-asterisk'></i>");
+                //if (info.event._def.extendedProps.Color) {
+                //    $(info.el).css('background-color', info.event._def.extendedProps.Color);
+                //}
+            },
+            dateClick: function (info) {
+                openAddOrder(info.dateStr);
             }
             //slotMinTime: window.startTime,
             //slotMaxTime: window.endTime
@@ -390,25 +485,87 @@ jQuery(function ($) {
 
     }
 
-   
-    window.calendar.render();
 
+    window.calendar.render();
    
+     
+    $($(".fc-toolbar-chunk")[1]).append('<input type="text" id="goToDateCalendar" placeholder="MM/DD/YYYY" style="display:none;margin-top: 8px;margin-left: 25%;width: 50%;" class="form-control"  />');
+
+    setTimeout(function () {
+
+        $("#goToDateCalendar").val(new moment().format("MM/DD/YYYY"));
+
+        var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
+        TinyDatePicker3('#goToDateCalendar', {
+            mode: 'dp-below',
+            date: new Date()
+        })
+            .on('statechange', function (ev) {
+                if ($("#goToDateCalendar").val()) {
+                   // console.log('f');
+                   // window.calendar.gotoDate('2020-01-12');
+                    if (new moment($("#goToDateCalendar").val())._d.toString() != "Invalid Date") {
+                        
+                        if ($("#goToDateCalendar").val().toString().length == "10" || $("#goToDateCalendar").val().toString().length == "9") {
+                            window.calendar.gotoDate(new moment($("#goToDateCalendar").val()).format("YYYY-MM-DD"));
+                        }
+                    }
+                }
+            });
+
+        $("#goToDateCalendar").show();
+       
+
+    }, 500);
 
     $('.fc-prev-button').click(function () {
-        getDayTimeDetail(window.calendar.getDate().getDay()+1, function () {
+
+        
+        if (window.calendar.view.type =="resourceTimeGridDay") {
+            if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length > 0) {
+                $($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().eq(0).remove();
+            }
+            $($($(".fc-toolbar-chunk")[1]).children().eq(0)).append('<span> (' + new moment(window.calendar.getDate()).format('dddd') + ')</span>');
+
+        }
+
+        getDayTimeDetail(window.calendar.getDate().getDay() + 1, function () {
             setTimeSlotColor();
         });
     });
 
     $('.fc-next-button').click(function () {
-        getDayTimeDetail(window.calendar.getDate().getDay()+1,function () {
+        if (window.calendar.view.type == "resourceTimeGridDay") {
+            if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length > 0) {
+                $($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().eq(0).remove();
+            }
+            $($($(".fc-toolbar-chunk")[1]).children().eq(0)).append('<span> (' + new moment(window.calendar.getDate()).format('dddd') + ')</span>');
+
+        }
+
+        getDayTimeDetail(window.calendar.getDate().getDay() + 1, function () {
             setTimeSlotColor();
         });
     });
 
+    $('.fc-today-button').click(function () {
+        if (window.calendar.view.type == "resourceTimeGridDay") {
+            if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length > 0) {
+                $($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().eq(0).remove();
+            }
+            $($($(".fc-toolbar-chunk")[1]).children().eq(0)).append('<span> (' + new moment(window.calendar.getDate()).format('dddd') + ')</span>');
+
+        }
+
+        getDayTimeDetail(window.calendar.getDate().getDay() + 1, function () {
+            setTimeSlotColor();
+        });
+    });
+
+    //fc-today-button
+
     function getDayTimeDetail(day, callback) {
-        if (day==0) {
+        if (day == 0) {
             day = 7;
         }
         var data = {
@@ -421,14 +578,14 @@ jQuery(function ($) {
             dataType: "json",
             data: data,
             success: function (data) {
-                
-                debugger;
+
+
                 window.startTime = data.StartTimeFormatted;
                 window.endTime = data.EndTimeFormatted;
                 callback();
             },
             error: function (data) {
-                
+
 
             }
         })
@@ -438,6 +595,7 @@ jQuery(function ($) {
 
         removeTimeSlotColor();
 
+        $(".fc-timegrid-slot").css({ 'background-color': '#fceed7' });
 
         if (!window.startTime) {
             return;
@@ -453,32 +611,32 @@ jQuery(function ($) {
                 if (i < endHr) {
                     if (i == startHr) {
                         if (startMin == 30) {
-                            $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'white' });
                         }
                         else {
-                            $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'white' });
                         }
                     }
                     else {
-                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='0" + i + ":45:00']").css({ 'background-color': 'white' });
                     }
                 }
                 else {
                     if (endMin == 30) {
-                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='0" + i + ":15:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='0" + i + ":30:00']").css({ 'background-color': 'white' });
 
                     }
                     else {
-                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='0" + i + ":00:00']").css({ 'background-color': 'white' });
 
                     }
                 }
@@ -487,37 +645,37 @@ jQuery(function ($) {
                 if (i < endHr) {
                     if (i == startHr) {
                         if (startMin == 30) {
-                            $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'white' });
                         }
                         else {
-                            $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                            $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                            $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'white' });
+                            $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'white' });
                         }
                     }
                     else {
-                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='" + i + ":45:00']").css({ 'background-color': 'white' });
                     }
                 }
                 else {
                     if (endMin == 30) {
-                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'rgb(152 228 120)' });
-                        $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='" + i + ":15:00']").css({ 'background-color': 'white' });
+                        $("td[data-time='" + i + ":30:00']").css({ 'background-color': 'white' });
 
                     }
                     else {
-                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'rgb(152 228 120)' });
+                        $("td[data-time='" + i + ":00:00']").css({ 'background-color': 'white' });
 
                     }
                 }
             }
-           
+
         }
 
 
@@ -531,11 +689,9 @@ jQuery(function ($) {
             $(this).css({ 'background-color': '' });
 
         });
-      
-       
-    }
-   
 
+
+    }
     var isEventOverDiv = function (x, y) {
 
         var external_events = $('#external-events');
@@ -551,6 +707,8 @@ jQuery(function ($) {
         return false;
 
     }
+
+    //
 
 });
 

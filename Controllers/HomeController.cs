@@ -63,7 +63,7 @@ namespace FieldServiceApp.Controllers
         public IActionResult GetOrderPopup(int id)
         {
             DashboardUtility _dashboardUtility = new DashboardUtility(_dbContext);
-            var model = _dashboardUtility.getOrderDetail(id);
+            var model = _dashboardUtility.getOrderDetailWithApartemt(id);
             return PartialView("_DashboardOrder", model);
 
         }

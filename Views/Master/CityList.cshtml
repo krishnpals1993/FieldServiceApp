@@ -31,6 +31,9 @@
                             State Name
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Tax
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                             Status
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
@@ -48,6 +51,12 @@
                         </td>
                         <td>
                             @item.StateName
+                        </td>
+                        <td>
+                            @if (item.Tax!=null)
+                            {
+                            <span>   @item.Tax.Value</span>
+                            }
                         </td>
                         <td>
                             @if (item.IsActive == 1)
