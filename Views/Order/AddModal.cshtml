@@ -1000,7 +1000,7 @@
     </script>
     <script type="text/javascript">
         $(document).ready(function () {
-            debugger;
+           
             var modelDt = '@ViewBag.dt';
             if (modelDt) {
                 modelDt = new moment(modelDt);
@@ -1433,7 +1433,7 @@
                 data: data,
                 success: function (response) {
                         if (response) {
-                            debugger;
+                            
                             $("#ItemId").val(response.ItemId);
                             $("#PerUnitPrice").val(response.PerUnitPrice);
                             $("#Quantity").val(response.Quantity);
@@ -1701,7 +1701,7 @@
     <script type="text/javascript">
 
         function addItems(i) {
-            debugger;
+            
             var index = $(".btnAdd").length;
 
             $.ajax({
@@ -1841,7 +1841,7 @@
         }
 
         function deleteItem(index) {
-            debugger;
+            
             $(event.currentTarget).parent().parent().parent().remove();
             $(".btnAdd").each(function (ind, ele) {
                 if (ind == (index - 1)) {

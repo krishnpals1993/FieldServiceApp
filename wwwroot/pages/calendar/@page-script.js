@@ -277,7 +277,7 @@ jQuery(function ($) {
                         $(info.el).css('background-color', info.event._def.extendedProps.Color);
                     }
                     else {
-                        debugger;
+                        
                         $(info.el).find('.fc-event-time').prepend(" <i style='margin-right:5px;font-size:10px;margin-top:1px;' class='fa fa-asterisk'></i>");
                         //
                     }
@@ -506,9 +506,11 @@ jQuery(function ($) {
                    // window.calendar.gotoDate('2020-01-12');
                     if (new moment($("#goToDateCalendar").val())._d.toString() != "Invalid Date") {
                         
-                        if ($("#goToDateCalendar").val().toString().length == "10" || $("#goToDateCalendar").val().toString().length == "9") {
-                            window.calendar.gotoDate(new moment($("#goToDateCalendar").val()).format("YYYY-MM-DD"));
-                        }
+                        /*if ($("#goToDateCalendar").val().toString().length == "10" || $("#goToDateCalendar").val().toString().length == "9") {*/
+                        window.calendar.gotoDate(new moment($("#goToDateCalendar").val()).format("YYYY-MM-DD"));
+                        
+                    /*}*/
+                        $("#calendar .fc-toolbar-title span").text("("+new moment($("#goToDateCalendar").val()).format("dddd")+")");
                     }
                 }
             });

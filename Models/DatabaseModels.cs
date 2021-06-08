@@ -121,6 +121,8 @@ namespace FieldServiceApp.Models
         public string Taxable { get; set; }
         public string Sellable { get; set; }
         public string Service { get; set; }
+        public string QBID { get; set; }
+        public string QBDesc { get; set; }
     }
 
     [Table("ItemPrice")]
@@ -387,6 +389,7 @@ namespace FieldServiceApp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CustomerId { get; set; }
         public string CompanyName { get; set; }
+        public string CompanyName1 { get; set; }
         public string CompanyType { get; set; }
         public string CompanyCode { get; set; }
         public string Notes { get; set; }
@@ -395,6 +398,16 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string FullName { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string Phone { get; set; }
+        public string Mobile { get; set; }
+        public string ID { get; set; }
+        public string Email { get; set; }
+        public string AltPhone { get; set; }
+        public string Fax { get; set; }
     }
 
     [Table("CustomerBilling")]
@@ -419,7 +432,11 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
-
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Country { get; set; }
+        public string Address4 { get; set; }
+        public string Address5 { get; set; }
     }
 
     [Table("CustomerContact")]
@@ -428,7 +445,7 @@ namespace FieldServiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CustomerContactId { get; set; }
-        public int CustomerShipId { get; set; }
+        public int CustomerShipId { get; set; } 
         public int CustomerId { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
@@ -468,7 +485,14 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string Country { get; set; }
+        public string Name { get; set; }
+        public string Address4 { get; set; }
+        public string Address5 { get; set; }
 
+        public string QBID { get; set; }
     }
 
     [Table("CustomerShippingApartment")]

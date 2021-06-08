@@ -18,7 +18,9 @@
     ReOccurenceList.Add("Weeks");
     ReOccurenceList.Add("Months");
     ReOccurenceList.Add("WeekDay");
+    ReOccurenceList.Add("WeekDay(Weekly)");
     ReOccurenceList.Add("Month's Day");
+    ReOccurenceList = ReOccurenceList.OrderBy(o=>o).ToList();
 
     List<string> WeekDayList = new List<string>();
     WeekDayList.Add("Sunday");
@@ -1212,7 +1214,9 @@
                allowInputToggle: true,
                showTodayButton: true,
                "format": "HH:mm:ss",
-                 format: 'LT'
+                format: 'LT',
+                stepping: 5
+                 
               });
 
             $("#datetimepicker3").on('dp.change', function (event) {
@@ -1243,7 +1247,8 @@
                  allowInputToggle: true,
                  showTodayButton: true,
                  "format": "HH:mm:ss",
-                   format: 'LT'
+                format: 'LT',
+                   stepping: 5
               });
 
             $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
@@ -1279,7 +1284,6 @@
             //}
 
             }, 0);
-
             window.itemList = '@Json.Serialize(Model.ItemList)';
             window.itemList = JSON.parse(itemList);
             console.log(window.itemList);
@@ -1433,8 +1437,15 @@
 
         function getItemPrice(itemId) {
             var price = 0;
+              
             for (var i = 0; i <  window.itemList.length; i++) {
-                if (window.itemList[i]["ItemId"].toString()== itemId) {
+                //if (window.itemList[i]["ItemId"].toString()== itemId) {
+                //    price = window.itemList[i]["ItemPrice"];
+                //    i = window.itemList.length;
+                //    break;
+                //}
+               
+                if (parseInt(window.itemList[i]["ItemId"]) == itemId) {
                     price = window.itemList[i]["ItemPrice"];
                     i = window.itemList.length;
                     break;
@@ -1444,9 +1455,14 @@
         }
 
         function getItemDescription(itemId) {
-            var description = 0;
+            var description = "";
             for (var i = 0; i <  window.itemList.length; i++) {
-                if (window.itemList[i]["ItemId"].toString()== itemId) {
+                //if (window.itemList[i]["ItemId"].toString()== itemId) {
+                //    description = window.itemList[i]["ItemDescription"];
+                //    i = window.itemList.length;
+                //    break;
+                //}
+                if (parseInt(window.itemList[i]["ItemId"]) == itemId) {
                     description = window.itemList[i]["ItemDescription"];
                     i = window.itemList.length;
                     break;
@@ -1481,7 +1497,7 @@
                 success: function (response) {
 
                     if (response.length > 0) {
-                        debugger;
+                        
                 $('#ShipId').html('');
                        var options = '';
 
@@ -1530,7 +1546,7 @@
                  {
                 $('#ApartmentId').html('');
                         var options = '';
-                        debugger;
+                        
                         var tax = response.tax;
                         response = response.aList;
                         $("#Tax").val(tax);
@@ -1570,7 +1586,7 @@
                 data: data,
                 success: function (response) {
                         if (response) {
-                            debugger;
+                            
                             $("#ItemId").val(response.ItemId);
                             $("#PerUnitPrice").val(response.PerUnitPrice);
                             $("#Quantity").val(response.Quantity);
@@ -1631,7 +1647,7 @@
 
         $("#ReOccurenceCycle").on("change", function () {
 
-            if ($("#ReOccurenceCycle").val()=="WeekDay") {
+            if ($("#ReOccurenceCycle").val()=="WeekDay" || $("#ReOccurenceCycle").val()=="WeekDay(Weekly)") {
                 $("#weekdayPanel").show();
             }
             else {
@@ -1708,11 +1724,11 @@
                         return false;
                 }
 
-                if (reOccurenceCycle=="WeekDay") {
+                if (reOccurenceCycle=="WeekDay" || reOccurenceCycle=="WeekDay(Weekly)") {
                      if (!reOccurenceWeekday) {
                          swal("Please select weekday", "", "error");
                         return false;
-                }
+                   }
                 }
             }
 
@@ -1833,7 +1849,7 @@
                 dataType: "json",
                 data: data,
                 success: function (response) {
-                    debugger;
+                    
                     console.log(response);
                     $("#mApartmentNo").val('');
                     $("#mApartmentName").val('');
@@ -1899,7 +1915,7 @@
     <script type="text/javascript">
 
         function addItems(i) {
-            debugger;
+            
             var index = $(".btnAdd").length;
 
             $.ajax({
@@ -2039,7 +2055,7 @@
         }
 
         function deleteItem(index) {
-            debugger;
+           
             $(event.currentTarget).parent().parent().parent().remove();
             $(".btnAdd").each(function (ind, ele) {
                 if (ind == (index - 1)) {

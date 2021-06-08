@@ -55,7 +55,7 @@ namespace FieldServiceApp.Controllers
                                 select new CustomerMasterViewModel_datatable
                                 {
                                     CustmoerId = customer.CustomerId,
-                                    CompanyName = customer.CompanyName,
+                                    CompanyName = customer.CompanyName + (Convert.ToString(customer.CompanyName1).Trim()=="" ?"" : " ("+ customer.CompanyName1+")") ,
                                     CompanyType = customer.CompanyType,
                                     IsActive = customer.IsActive
                                 });
@@ -103,7 +103,7 @@ namespace FieldServiceApp.Controllers
                                                select new CustmoerShippingViewModel
                                                {
                                                    ShipId = shipping.CustomerShipId,
-                                                   Address = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + (shipping.Address2 ?? "") + (shipping.Address2 ?? ""),
+                                                   Address =   (shipping.Address ?? "") + (shipping.Address2 ?? "") + (shipping.Address2 ?? "") +" "+ (city1.CityName ?? "") + " " + (state1.StateName ?? ""),
                                                    Zip1 = shipping.Zip1,
                                                    Zip2 = shipping.Zip2,
                                                    CustmoerId = shipping.CustomerId,

@@ -361,6 +361,14 @@ namespace FieldServiceApp.Models
         public List<ItemCategoryViewModel> ItemCategoryList { get; set; }
         public string CategoryName { get; set; }
     }
+
+    public class OrderItemViewModel
+    {
+        public int ItemId { get; set; }
+        public string ItemCd { get; set; }
+        public decimal? ItemPrice { get; set; }
+        public string ItemDescription { get; set; }
+    }
     public class ItemPriceViewModel
     {
         public ItemPriceViewModel()
@@ -382,7 +390,7 @@ namespace FieldServiceApp.Models
     {
         public OrderMasterViewModel()
         {
-            ItemList = new List<ItemMasterViewModel>();
+            ItemList = new List<OrderItemViewModel>();
             EmployeeList = new List<EmployeeMasterViewModel>();
             CustomerList = new List<CustomerMasterViewModel>();
             CustomerShipingAddressList = new List<CustmoerShippingViewModel>();
@@ -457,7 +465,7 @@ namespace FieldServiceApp.Models
         public int ReOccurenceOrderCount { get; set; }
         public CustomerMasterViewModel CustomerDetail { get; set; }
         public CustmoerShippingViewModel CustomerShippingDetail { get; set; }
-        public List<ItemMasterViewModel> ItemList { get; set; }
+        public List<OrderItemViewModel> ItemList { get; set; }
         public List<EmployeeMasterViewModel> EmployeeList { get; set; }
         public List<CustomerMasterViewModel> CustomerList { get; set; }
         public List<CustmoerShippingViewModel> CustomerShipingAddressList { get; set; }
@@ -522,7 +530,7 @@ namespace FieldServiceApp.Models
         public bool ScheduledOnNonWorkingDay { get; set; }
         public string Action { get; set; }
         public string ShipStartDateFormatted { get; set; }
-       
+
     }
 
     public class CustmoerShippingViewModel_Datatable
@@ -589,7 +597,7 @@ namespace FieldServiceApp.Models
         [Required(ErrorMessage = "Please select state")]
         public int StateId { get; set; }
 
-        [MaxValue(100,ErrorMessage ="Value must be less than 100")]
+        [MaxValue(100, ErrorMessage = "Value must be less than 100")]
         public Decimal? Tax { get; set; }
         public string StateName { get; set; }
         public Int16 IsActive { get; set; }
@@ -960,13 +968,13 @@ namespace FieldServiceApp.Models
         {
             if (value != null)
             {
-                return Convert.ToDecimal(value)   <= Convert.ToDecimal(_maxValue);
+                return Convert.ToDecimal(value) <= Convert.ToDecimal(_maxValue);
             }
             else
             {
                 return true;
             }
-            
+
         }
     }
 

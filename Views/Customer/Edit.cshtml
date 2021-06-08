@@ -698,8 +698,7 @@
         }
 
         function deleteItem(i,mainParent,index) {
-            debugger;
-
+            
             $(event.currentTarget).parent().parent().remove()
             index = index - 1;
 
@@ -735,7 +734,7 @@
         }
 
            function addShippingApartment(i,mainParent) {
-               debugger;
+              
                var index = $("#billing_"+mainParent+"_apartmentPanel_"+i+" .btnAddApartment").length;
               var data = i+"_"+index+"_"+mainParent;
             $.ajax({

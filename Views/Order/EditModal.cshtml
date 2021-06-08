@@ -734,7 +734,7 @@
                 if ($(this).val()) {
                     var price = getItemPrice($(this).val());
                      var description = getItemDescription($(this).val());
-                    debugger;
+                    
                     $(this).parent().parent().find(".PerUnitPrice").val(price);
                     $(this).parent().parent().find(".Description").val(description);
                   if ($(this).parent().parent().find(".Quantity").val()) {
@@ -884,7 +884,7 @@
                 dataType: "json",
                 data: data,
                 success: function (response) {
-                    debugger;
+                  
                    if (response.length > 0) {
                 $('#ShipId').html('');
                 var options = '';
@@ -924,7 +924,7 @@
                 dataType: "json",
                 data: data,
                 success: function (response) {
-                    debugger;
+                   
                  {
                 $('#ApartmentId').html('');
                 var options = '';
@@ -962,7 +962,7 @@
                 data: data,
                 success: function (response) {
                         if (response) {
-                            debugger;
+                            
                             $("#ItemId").val(response.ItemId);
                             $("#PerUnitPrice").val(response.PerUnitPrice);
                             $("#Quantity").val(response.Quantity);
@@ -1278,7 +1278,7 @@
     <script type="text/javascript">
 
         function addItems(i) {
-            debugger;
+           
             var index = $(".btnAdd").length;
 
             $.ajax({
@@ -1312,11 +1312,11 @@
 
         function bindEvent() {
             $(".ItemId").on("change", function () {
-                debugger;
+               
                 if ($(this).val()) {
                     var price = getItemPrice($(this).val());
                     var description = getItemDescription($(this).val());
-                    debugger;
+                   
                     $(this).parent().parent().find(".PerUnitPrice").val(price);
                     $(this).parent().parent().find(".Description").val(description);
                     if ($(this).parent().parent().find(".Quantity").val()) {

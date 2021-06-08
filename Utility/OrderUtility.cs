@@ -23,7 +23,7 @@ namespace FieldServiceApp.Utility
         public void SaveReOccurenceOrder(int orderId, OrderMaster order, List<OrderDetailViewModel> orderItemList, OrderAssignment orderAssignment, DateTime shipdate)
         {
             var checkOrderNo = _dbContext.tbl_OrderMaster.Max(m => m.OrderNo) + 1;
-
+            var org_order = order;
             order.ReOccurenceParentOrderId = orderId;
             order.ReOccurence = 0;
             order.ReOccurenceCycle = null;
@@ -55,7 +55,15 @@ namespace FieldServiceApp.Utility
             {
                 try
                 {
-                    order.ShipEndDate = order.ShipStartDate.Value.AddMinutes((order.ShipEndDate.Value - order.ShipStartDate.Value).TotalMinutes);
+                    if (org_order.ShipEndDate.Value > org_order.ShipStartDate.Value)
+                    {
+                        order.ShipEndDate = order.ShipStartDate.Value.AddMinutes((org_order.ShipEndDate.Value - org_order.ShipStartDate.Value).Minutes);
+                    }
+                    else
+                    {
+                        order.ShipEndDate = order.ShipStartDate.Value.AddMinutes((org_order.ShipStartDate.Value - org_order.ShipEndDate.Value).Minutes);
+                    }
+                    
                 }
                 catch (Exception)
                 {
@@ -188,7 +196,7 @@ namespace FieldServiceApp.Utility
                      {
                          CustmoerId = billing.CustomerBillingId,
                          //CompanyName = cust.CompanyName + (ship1 != null ? (" (" + (ship1.Address1 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (ship1.Zip1 ?? "") + ")") : ""),
-                         CompanyName = cust.CompanyName+" "+ (billing.Address1??"")+" "+ (billing.Address2 ?? "")
+                         CompanyName = cust.CompanyName + (Convert.ToString(cust.CompanyName1).Trim() == "" ? "" : " (" + cust.CompanyName1 + ")") + " "+ (billing.Address1??"")+" "+ (billing.Address2 ?? "")
                      }
                      ).OrderBy(o=>o.CompanyName).ToList());
 
