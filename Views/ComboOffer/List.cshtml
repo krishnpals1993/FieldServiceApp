@@ -1,9 +1,9 @@
-﻿@model IEnumerable<FieldServiceApp.Models.CalenderWorkingHourViewModel>
+﻿@model IEnumerable<LaCafelogy.Models.ComboOfferMasterViewModel>
 @using Microsoft.Extensions.Options;
 @inject IOptions<Appsettings> Settings
 @{
 
-    ViewData["Title"] = "Calender Working Hour";
+    ViewData["Title"] = "Order List";
 }
 <div role="main" class="page-content container container-plus">
     <div class="page-header mb-2 pb-2 flex-column flex-sm-row align-items-start align-items-sm-center py-25 px-1">
@@ -11,8 +11,9 @@
             @ViewData["Title"]
         </h1>
 
-       
-
+        <div class="page-tools mt-3 mt-sm-0 mb-sm-n1">
+            <!-- dataTables search box will be inserted here dynamically -->
+        </div>
     </div>
 
     <div class="card bcard h-auto">
@@ -24,52 +25,48 @@
                 <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
                     <tr>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Week Day
+                           Name
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Start Time
+                            Amount
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            End Time
+                           Type
                         </th>
+                        
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Action
+                            Description
                         </th>
                     </tr>
                 </thead>
 
                 <tbody class="pos-rel">
-
                     @foreach (var item in Model)
                     {
                         <tr class="d-style bgc-h-default-l4">
                             <td>
-                                @item.DayName
+                                @item.ComboOfferName
                             </td>
                             <td>
-                                @if (item.StartTime != null)
-                                {
-                                    @item.StartTime.Value.ToString("hh:mm tt")
+                                @item.Price
+                            </td>
+                            <td>
+                                @item.Type
+                            </td>
+                           
+                            <td>
+                               @foreach(var orderItem in item.ItemList ){
+                                    <span>  <span>@orderItem.ItemName</span>
+                                        Qty- @orderItem.Quantity
+                                        </span>
+                                   
+                                    <br />
+
                                 }
-
                             </td>
-                            <td>
-                                @if (item.EndTime != null)
-                                {
-                                    @item.EndTime.Value.ToString("hh:mm tt")
-                                }
-                            </td>
-                            <td>
-                                @Html.ActionLink("Edit", "Edit", "CalenderHour", new { id = item.Id })
-                            </td>
-
-
-
+                            
                         </tr>
                     }
-
-
-
 
                 </tbody>
             </table>
@@ -103,11 +100,50 @@
         <script src="~/pages/datatable/@@page-script.js"></script>
     </environment>
     <script type="text/javascript">
-            window.baseUrl = '@Settings.Value.WebBaseURL';
 
-            function add() {
-                window.location = window.baseUrl + "/CalenderHour/Add";
-            }
+        window.baseUrl = '@Settings.Value.WebBaseURL';
+
+        function add() {
+            window.location = window.baseUrl + "/ComboOffer/Add";
+        }
+
+        function deleteFun(id) {
+
+            swal({
+                title: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "No",
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            },
+                function (isConfirm) {
+                    if (!isConfirm)
+                        return;
+
+                    $.ajax({
+                        url: "/Master/DeleteCity",
+                        type: "POST",
+                        dataType: "json",
+                        data: { id: id },
+                        success: function (data) {
+                            if (data.Status == "1") {
+                                swal(data.Message, "", "success")
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 750);
+
+                            }
+                            else {
+                                swal(data.Message, "", "error")
+                            }
+                        }
+                    })
+
+                });
+
+        }
 
     </script>
 }

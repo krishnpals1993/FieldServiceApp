@@ -1,4 +1,4 @@
-﻿@model FieldServiceApp.Models.DashboardViewModel
+﻿@model LaCafelogy.Models.DashboardViewModel
 @using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Options;
 @using  Newtonsoft.Json;
@@ -53,52 +53,6 @@
             <!-- message to be displayed on touch devices -->
             <div id="alert-1" class="d-none alert bgc-white border-none border-l-4 brc-purple-m1 shadow-sm" role="alert">
                 Touch a date slot and hold down to add a new event
-            </div>
-
-
-
-            <div class="row">
-                <div class="col-12 col-md-10" id='calendar-container'>
-                    <div class="card bcard">
-                        <div class="card-body p-lg-4">
-                            <div id='calendar' class="text-blue-d1"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-md-2 mt-2 mt-md-0" id='external-events'>
-                    <div class="bgc-white shadow-sm p-35 radius-1">
-                        <p class="text-120 text-primary-d2">
-                            Order (Without Ship Date)
-                        </p>
-
-                        <p id="alert-2" class="alert bgc-grey-l4 border-none border-l-4 brc-purple-m1">
-                            Drag and drop the following order to calender for setup ship date
-                        </p>
-
-                        <div id='external-events-listing'>
-                            @foreach (var item in Model.OrderList.Where(w => w.ShipStartDate == null))
-                            {
-
-                                <div style="cursor:pointer" onclick="showOrderDetail(@item.OrderId)"
-                                     class="fc-event badge bgc-blue-d1 text-white border-0 py-2 text-90 mb-1 radius-2px"
-                                     data-class="bgc-blue-d1 text-white text-95">
-                                    Order #<span>@item.OrderId</span> <br />
-                                    @item.EmployeeName
-
-                                </div>
-
-                            }
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
-
-
             </div>
 
             <div class="row" style="margin-top:15px">
@@ -208,7 +162,7 @@
         </div>
     </div>
 </div>
-
+<div id="exampleModal"></div>
 @section Styles {
     <environment names="Development,Staging,Production">
         <link rel="stylesheet" href="~/lib/fullcalendar/main.css" />
@@ -252,38 +206,7 @@
 @section scripts {
     <script type="text/javascript">
         window.roleName = '@RoleName';
-    window.calenderHourId = '@Model.CalenderWorkingHour.Id';
-    if (window.calenderHourId != '0') {
-        {
-
-                window.startTime = '@(Model.CalenderWorkingHour.StartTime != null ?Model.CalenderWorkingHour.StartTime.Value.ToString("HH:mm:ss") :"00:00:00") ';
-                window.endTime = '@(Model.CalenderWorkingHour.EndTime != null ?Model.CalenderWorkingHour.EndTime.Value.ToString("HH:mm:ss") :"23:30:00") ';
-          }
-    }
-
-
-        function openAddOrder(dt) {
-            if ( window.roleName=='Admin') {
-                 $("#mdlBtn").trigger('click');
-            $('.modal-body').html('')
-            $('.modal-body').append('<iframe src="/Order/AddModal/2020-12-02" style="overflow:hidden;height:95%;width:100%"></iframe>');
-
-            $("iframe").attr('src','/Order/AddModal/'+dt);
-            }
-
-
-           
-        }
-         function openEditOrder(dt) {
-             if (window.roleName == 'Admin') {
-                 $("#dshbrdClose").trigger('click');
-            $('.modal-body').html('')
-            $('.modal-body').append('<iframe src="/Order/AddModal/2020-12-02" style="overflow:hidden;height:95%;width:100%"></iframe>');
-            $("#mdlBtn").trigger('click');
-            $("iframe").attr('src','/Order/EditModal/'+dt);
-             }
-             
-        }
+   
 
 
     </script>
@@ -298,8 +221,6 @@
         <script src="~/lib//datatable/buttons.html5.js"></script>
         <script src="~/lib//datatable/buttons.print.js"></script>
         <script src="~/lib/moment/moment.js"></script>
-        <script src="~/lib/fullcalendar/main.js"></script>
-        <script src="~/lib/fullcalendar/tooltip.min.js"></script>
         <script src="~/js/Chart.js"></script>
         <script src="~/pages/dashboard/page-script.js"></script>
         <script src="~/pages/calendar/@@page-script.js"></script>
@@ -314,176 +235,104 @@
         window.orderList = JSON.parse(window.orderList);
         window.employeeList = JSON.parse(window.employeeList);
 
-        function getEvents() {
-            var arr = [];
-            for (var i = 0; i < window.orderList.length; i++) {
-                if (window.orderList[i]['ShipStartDate'] != null) {
+          
 
-                for (var i = 0; i <  window.orderList.length; i++) {
-                    arr.push({
-                        id: window.orderList[i]['OrderId'],
-                        resourceId: window.orderList[i]['EmployeeId'],
-                        title: window.orderList[i]['CustomerShipAddress'] + '<br/>' + window.orderList[i]['ItemName'],
-                        start: new Date(window.orderList[i]['ShipStartDate']),
-                        end: window.orderList[i]['ShipEndDate'] == null ? null : new Date(window.orderList[i]['ShipEndDate']),
-                        allDay: false,
-                        extendedProps: window.orderList[i],
-                         description: window.orderList[i]['ItemName'],
-                        //backgroundColor:window.orderList[i]['Color'],
-                        //eventColor: window.orderList[i]['Color'],
-                        //eventTextColor:'black'
-                        className: 'text-75 ',
-                        color: window.orderList[i]['Color'],   // a non-ajax option
-                         textColor: 'white'
-                        //eventTextColor:(window.orderList[i]['ShipEndDate'] == null ? (window.orderList[i]['Color'] ? window.orderList[i]['Color']:'blue') :'white' )
-                    });
-            }
-            }
-            }
-            window.calenderEvents = arr;
-            return arr;
-
-        }
-
-        function getResource() {
-            console.log(window.employeeList);
-            var arr = [];
-             var filterArray = [];
-            for (var i = 0; i <  window.employeeList.length; i++) {
-                {
-                    arr.push(window.employeeList[i]['EmployeeId']);
-                    filterArray.push(window.employeeList[i]);
-                }
-            }
-            arr.push(0);
-
-            arr = $.unique(arr);
-            var resourceArray = [];
-            for (var i = 0; i < arr.length; i++) {
-                var empName = getEmloyeeName(filterArray, arr[i]);
-                resourceArray.push({
-                    id: arr[i],
-                    title: arr[i].toString()=="0"? "Not Assigned":empName
-                });
-
-            }
-            console.log(resourceArray);
-            return resourceArray;
-
-        }
-
-        function getEmloyeeName(filterArray,id) {
-            var name = "";
-            for (var i = 0; i < filterArray.length; i++) {
-                if (filterArray[i]["EmployeeId"] == id) {
-                    name = filterArray[i]["FirstName"] +" "+filterArray[i]["LastName"];
-                    break;
-                }
-
-            }
-            return name;
-        }
-
-         function updateOrderAssignee(orderId,start,end,employeeId,callback) {
-            var data = {
-                'orderId': orderId,
-                'start': (start==null ? null : new moment(start).format("MM/DD/YYYY HH:mm")) ,
-                'end': (end==null ? null : new moment(end).format("MM/DD/YYYY HH:mm")),
-                'employeeId': employeeId,
-                'status' : "day"
-            };
-            console.log(data);
-            $.ajax({
-                url: "/Order/UpdateOrderDate",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (data) {
-                     callback(data)
-                },
-                error: function (data) {
-
-
-                }
-            })
-
-        }
-
-        function updateOrderDate(orderId,start,end,callback) {
-            var data = {
-                'orderId': orderId, 'start': (start==null ? null : new moment(start).format("MM/DD/YYYY HH:mm")) ,
-                'end': (end==null ? null : new moment(end).format("MM/DD/YYYY HH:mm"))
-            };
-            console.log(data);
-            $.ajax({
-                url: "/Order/UpdateOrderDate",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (data) {
-                     callback(data)
-                },
-                error: function (data) {
-
-
-                }
-            })
-
-        }
-
-
-        function updateOrder(orderId) {
-
-            var employeeId = $("#EmployeeId").val();
-
-            if (!employeeId) {
-                alert("Please select assignee");
-                return;
-            }
-
-
-              var data = {
-                  'orderId': orderId,
-                   'employeeId': employeeId
-                };
-            console.log(data);
-
-            $.ajax({
-                url: "/Order/UpdateOrderAssignee",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (data) {
-                    window.assingEmployeeColor = data.Message;
-                   $("#btnSumbit").trigger('click');
-                }
-            })
-        }
-
-        function showOrderDetail(id) {
-             $.ajax({
-                 url: "/Home/GetOrderPopup/" + id,
+        function viewImageDetail(id) {
+                 $.ajax({
+                url: "/JobImages/GetImagesPopup/" + id,
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 dataType: "html",
                 success: function (response) {
                     var modal = response;
-                    modal = $(modal).appendTo('body');
-                    modal.find('form').on('submit', function (ev) {
-                        ev.preventDefault();
-                        //info.event.setProp('title', info.event._def.extendedProps.CustomerName + '<br />' + $("#EmployeeId option:selected").text());
-                        window.location.reload();
-                        modal.modal("hide");
-                    });
-                    modal.find('button[data-action=delete]').on('click', function () {
-                        modal.modal("hide");
-                    });
-                    modal.modal('show').on('hidden.bs.modal', function () {
-                        modal.remove();
-                    });
+                    $("#exampleModal").html(modal);
                 }
             });
         }
+
+        function closeModel() {
+          $("#exampleModal").html('');
+        }
+         
+        function openEmail(id) {
+             $.ajax({
+                url: "/JobImages/GetImageShareEmail/" + id,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "html",
+                success: function (response) {
+                    var modal = response;
+                    $("#exampleModal").html(modal);
+                }
+            });
+        }
+
+        function openWhatsapp(id,urlPath,CustomerName,orderid) {
+               var whatsapp_url = "whatsapp://send?text=Customer: " + CustomerName + "   OrderId: " + orderid + " Image-link: " + urlPath;
+                window.open(whatsapp_url, "_blank");
+                
+
+        }
+            
+        function shareEmail(orderId) {
+
+            if ((!$("#email1").val()) && (!$("#email2").val()) && (!$("#email3").val())) {
+                swal("Please enter atleast one email", "", "error");
+                return;
+            }
+            if ($("#email1").val()) {
+                if (!isEmail($("#email1").val())) {
+                    swal("Please enter valid email 1", "", "error");
+                    return;
+                }
+            }
+
+            if ($("#email2").val()) {
+                if (!isEmail($("#email2").val())) {
+                     swal("Please enter valid email 2", "", "error");
+                     return;
+                    }
+            }
+
+            if ($("#email3").val()) {
+                if (!isEmail($("#email3").val())) {
+                     swal("Please enter valid email 3", "", "error");
+                     return;
+                    }
+            }
+
+
+
+
+
+
+
+           var data = {
+                   'OrderId': orderId,
+                   'Email1': $("#email1").val(),
+                   'Email2': $("#email2").val(),
+                   'Email3': $("#email3").val()
+            };
+
+            console.log(data);
+
+            $.ajax({
+                url: "/JobImages/ShareWithEmail",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (data) {
+                   swal("Email sent successfully","","success");
+                    closeModel();
+                }
+            })
+        }
+
+        function isEmail(email) {
+        var EmailRegex = /^([a-zA-Z0-9_.+-])+\@@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return EmailRegex.test(email);
+      }
+
 
     </script>
 }

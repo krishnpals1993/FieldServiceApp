@@ -1,4 +1,4 @@
-﻿@model FieldServiceApp.Models.CustomerMasterViewModel_datatable
+﻿@model LaCafelogy.Models.CustomerMasterViewModel_datatable
 @using Microsoft.Extensions.Options;
 @inject IOptions<Appsettings> Settings
 @{
@@ -12,7 +12,7 @@
         </h1>
 
         <div class="page-tools mt-3 mt-sm-0 mb-sm-n1">
-            @*<button data-rel="tooltip" id="btnAdd" onclick="add()" type="button" class="btn radius-round btn-outline-primary border-2 btn-sm ml-2" title="" data-original-title="Add New"><i class="fa fa-plus"></i></button>*@
+          
         </div>
     </div>
 
@@ -41,9 +41,7 @@
         <link rel="stylesheet" href="~/lib//datatable/buttons.bootstrap4.css" />
         <link rel="stylesheet" href="~/pages/datatable/@@page-style.css" />
         <style>
-            #btnAdd {
-                display: none;
-            }
+            
 
             td.details-control {
                 background: url('https://cdn.rawgit.com/DataTables/DataTables/6c7ada53ebc228ea9bc28b1b216e793b1825d188/examples/resources/details_open.png') no-repeat center center;
@@ -51,6 +49,7 @@
             }
 
             tr.shown td.details-control {
+
                 background: url('https://cdn.rawgit.com/DataTables/DataTables/6c7ada53ebc228ea9bc28b1b216e793b1825d188/examples/resources/details_close.png') no-repeat center center;
             }
             .tblBilling th, .tblBilling td{
@@ -62,7 +61,9 @@
             .highlight {
             background-color:yellow;
             }
-           
+            .tblBilling span{
+            margin-right:5px;
+            }
         </style>
     </environment>
 
@@ -80,7 +81,7 @@
         <script src="~/lib//datatable/buttons.html5.js"></script>
         <script src="~/lib//datatable/buttons.print.js"></script>
         @*<script src="~/pages/datatable/@@page-script.js"></script>*@
-        <script src="~/js/customer_list.js"></script>
+        <script src="~/js/customer_list.js?v=2"></script>
 
     </environment>
 
@@ -150,37 +151,58 @@
             }
         }
 
+        function getAllShipping(billings)
+        {
+
+            var shippingList = [];
+
+            for (var i = 0; i < billings.length; i++) {
+                for (var j = 0; j < billings[i].Shippings.length; j++) {
+                    billings[i].Shippings[j].BillingDetail = billings[i];
+                }
+                shippingList = shippingList.concat(billings[i].Shippings);
+            }
+
+            return shippingList;
+        }
+
+
         function format(d) {
+             
+            var shippingList = getAllShipping( d.BillingDetail)
 
             var tblBillDetail = '<table class="tblBilling mb-0 table table-borderless table-bordered-x brc-secondary-l3 text-dark-m2 radius-1 overflow-hidden">' +
                 '<tbody>';
                 
-            for (var i = 0; i < d.BillingDetail.length; i++) {
-                tblBillDetail=tblBillDetail+'<tr onclick="goToEdit('+d.CustmoerId+','+d.BillingDetail[i].CustomerBillingId+')" class="bgc-info-l4"><td>'+(i+1)+'</td><td>'+getHighLight(d.BillingDetail[i].FirstName)+'</td>'+
-                    '<td>' + getHighLight(d.BillingDetail[i].LastName) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Address1) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Address2) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Address3) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Zip1) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Zip2) + '</td>' +
+            for (var i = 0; i < shippingList.length; i++) {
+                tblBillDetail = tblBillDetail + '<tr  class="bgc-info-l4">'+
+                    '<td><span> '+getHighLight( shippingList[i].Address)+'  '+
+                    '<span>' + getHighLight(shippingList[i].Address2) + '</span>' +
+                    '<span>' + getHighLight(shippingList[i].Address3) + '</span>' +
+                    '<span>' + getHighLight(shippingList[i].CityName) + '</span>' +
+                    '<span>' + getHighLight(shippingList[i].StateName) + '</span>' +
+                    '<span>' + getHighLight(shippingList[i].Zip1) + '</span>' +
+                    '<span>' + getHighLight(shippingList[i].Zip2) + '</span></td>' +
+                    '<td><i onclick="goToDetail('+ shippingList[i].ShipId+')" class="far fa-eye" style="font-size: medium;cursor: pointer;color:cadetblue"></i><i onclick="goToEdit('+d.CustmoerId+','+ shippingList[i].ShipId+')" style="margin-left:5px;font-size: medium;cursor: pointer;color:cadetblue" class="far fa-edit"></i></td>' +
                     '</tr>'
+                //<i onclick="goToDetail1('+ shippingList[i].ShipId+')" class="far fa-eye" style="font-size: medium;cursor: pointer;"></i>
 
-                tblBillDetail = tblBillDetail + '<tr><td colspan="8" align="center" >';
-                tblBillDetail =tblBillDetail+ '<table style="width:95%" class="tblShipping mb-0 table table-borderless table-bordered-x brc-secondary-l3 text-dark-m2 radius-1 overflow-hidden">' +
-                '<tbody>' +
-                '';
+               // tblBillDetail = tblBillDetail + '<tr><td colspan="8" align="center" >';
+               // tblBillDetail =tblBillDetail+ '<table style="width:95%" class="tblShipping mb-0 table table-borderless table-bordered-x brc-secondary-l3 text-dark-m2 radius-1 overflow-hidden">' +
+               // '<tbody>' +
+               // '';
 
-                for (var j = 0; j < d.BillingDetail[i].Shippings.length; j++) {
-                      tblBillDetail=tblBillDetail+'<tr onclick="goToEdit('+d.CustmoerId+','+d.BillingDetail[i].CustomerBillingId+','+d.BillingDetail[i].Shippings[j].ShipId+')" class="bgc-grey-l4"><td>'+(j+1)+'</td><td>'+getHighLight(d.BillingDetail[i].Shippings[j].Address)+'</td>'+
-                    '<td>' + getHighLight(d.BillingDetail[i].Shippings[j].Address2) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Shippings[j].Address3) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Shippings[j].CityName) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Shippings[j].StateName) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Shippings[j].Zip1) + '</td>' +
-                    '<td>' + getHighLight(d.BillingDetail[i].Shippings[j].Zip2) + '</td>' +
-                    '</tr>'
-                }
-                tblBillDetail = tblBillDetail + '</tbody></table></td></tr>';
+               //{
+               //       tblBillDetail=tblBillDetail+'<tr onclick="goToEdit('+d.CustmoerId+','+  shippingList[i].ShipId+')" class="bgc-grey-l4"><td> </td><td>'+getHighLight( shippingList[i].BillingDetail.FirstName)+'</td>'+
+               //     '<td>' + getHighLight(shippingList[i].BillingDetail.LastName) + '</td>' +
+               //     '<td>' + getHighLight(shippingList[i].BillingDetail.Address1) + '</td>' +
+               //     '<td>' + getHighLight(shippingList[i].BillingDetail.Address2) + '</td>' +
+               //     '<td>' + getHighLight(shippingList[i].BillingDetail.Address3) + '</td>' +
+               //     '<td>' + getHighLight(shippingList[i].BillingDetail.Zip1) + '</td>' +
+               //     '<td>' + getHighLight(shippingList[i].BillingDetail.Zip2) + '</td>' +
+               //     '</tr>'
+               // }
+               // tblBillDetail = tblBillDetail + '</tbody></table></td></tr>';
 
             }
 
@@ -191,17 +213,50 @@
 
         function goToEdit(id, billingId, shipId) {
             
-            if (billingId && shipId) {
-                 window.location = window.baseUrl + "/Customer/Edit/"+(id+"-"+billingId+"-"+shipId);
-            }
-            else if (billingId) {
-                 window.location = window.baseUrl + "/Customer/Edit/"+(id+"-"+billingId);
+            if (billingId) {
+              
+                window.location = window.baseUrl + "/Customer/EditV2/" + (id + "-" + billingId );
             }
             else {
-                 window.location = window.baseUrl + "/Customer/Edit/"+id;
+                 window.location = window.baseUrl + "/Customer/EditV2/"+billingId;
             }
             
         }
+
+        function goToDetail1(id) {
+            window.location = window.baseUrl + "/Customer/Detail/" + id;
+        }
+
+        
+        function goToDetail(id) {
+            openCustomerPopup(id);
+        }
+
+
+            function openCustomerPopup(id) {
+    $.ajax({
+        url: "/Customer/GetCustomerDetailPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+            modal.find('form').on('submit', function (ev) {
+                ev.preventDefault();
+                //info.event.setProp('title', info.event._def.extendedProps.CustomerName + '<br />' + $("#EmployeeId option:selected").text());
+                window.location.reload();
+                modal.modal("hide");
+            });
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+}
 
 
     </script>

@@ -1,4 +1,4 @@
-﻿namespace FieldServiceApp.Models
+﻿namespace LaCafelogy.Models
 {
     public class EmailSettings
     {

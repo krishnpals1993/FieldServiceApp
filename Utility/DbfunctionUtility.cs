@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
-using FieldServiceApp.Models;
+using LaCafelogy.Models;
 using System;
 using System.Data;
 using Npgsql;
 
-namespace FieldServiceApp.Utility
+namespace LaCafelogy.Utility
 {
     public class DbfunctionUtility
     {

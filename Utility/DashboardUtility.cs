@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using FieldServiceApp.Models;
+using LaCafelogy.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 
-namespace FieldServiceApp.Utility
+namespace LaCafelogy.Utility
 {
     public class DashboardUtility
     {
@@ -228,7 +228,7 @@ namespace FieldServiceApp.Utility
                                                     join item in _dbContext.tbl_ItemMaster on orderDetail.ItemId equals item.ItemId
                                                     where item.ItemId == orderDetail.ItemId && orderDetail.OrderId == order.OrderId && order.IsActive == 1
                                                     select item.ItemCd).Distinct().ToList()
-                                       where order.IsActive == 1
+                                       where order.IsActive == 1  
                                        select new OrderMasterViewModel
                                        {
                                            OrderNo = order.OrderNo,
@@ -245,7 +245,7 @@ namespace FieldServiceApp.Utility
                                            CustomerShipAddress = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + (shipping.Address2 ?? ""),
                                            Status = (orderAssign1 == null ? "New" : (orderAssign1.CompletedDate == null ? "Assigned" : "Completed")),
                                            Color = employee1.Color ?? "rgb(228 211 91 / 63%)",
-                                           ReOccurenceParentOrderId = (order.ReOccurence == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
+                                           ReOccurenceParentOrderId = ((order.ReOccurence??0) == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
                                        })
                                                .ToList();
                 }
@@ -288,34 +288,17 @@ namespace FieldServiceApp.Utility
                                            CustomerShipAddress = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + (shipping.Address2 ?? ""),
                                            Status = (orderAssign1 == null ? "New" : (orderAssign1.CompletedDate == null ? "Assigned" : "Completed")),
                                            Color = employee1.Color ?? "rgb(228 211 91 / 63%)",
-                                           ReOccurenceParentOrderId = (order.ReOccurence == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
+                                           ReOccurenceParentOrderId = ((order.ReOccurence??0) == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
                                            // Color = employee.Color
                                        })
                                   .ToList();
                 }
 
 
-                var checkWeekOffs = _dbContext.tbl_CalenderWorkingDays.Where(w => w.DayName != null).Select(s => s.DayName).ToList();
-                var checkHolidays = _dbContext.tbl_CalenderWorkingDays.Where(w => w.HolidayDate != null).Select(s => s.HolidayDate).ToList();
-
+                
                 model.OrderList = model.OrderList.OrderByDescending(o => o.OrderId).ToList();
 
-                foreach (var order in model.OrderList)
-                {
-                    if (checkWeekOffs.Contains(order.ShipStartDate?.DayOfWeek.ToString()))
-                    {
-                        order.ScheduledOnNonWorkingDay = true;
-                    }
-                    else
-                    {
-                        var checkHoliday = checkHolidays.Where(w => w.Value.Day == order.ShipStartDate?.Day && w.Value.Month == order.ShipStartDate?.Month).Count();
-                        if (checkHoliday > 0)
-                        {
-                            order.ScheduledOnNonWorkingDay = true;
-                        }
-
-                    }
-                }
+              
 
                 return (model);
 

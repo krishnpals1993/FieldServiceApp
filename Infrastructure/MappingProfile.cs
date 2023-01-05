@@ -1,4 +1,4 @@
-﻿using FieldServiceApp.Models;
+﻿using LaCafelogy.Models;
 using AutoMapper;
 
 namespace FieldServiceApp.Infrastructure

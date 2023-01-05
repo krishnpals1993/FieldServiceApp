@@ -1,5 +1,5 @@
 ﻿using FieldServiceApp.Contracts;
-using FieldServiceApp.Models;
+using LaCafelogy.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using JqueryDataTables.ServerSide.AspNetCoreWeb.Infrastructure;

@@ -1,6 +1,8 @@
-﻿@model FieldServiceApp.Models.DashboardOrderViewModel
+﻿@model LaCafelogy.Models.DashboardOrderViewModel
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+@using Microsoft.Extensions.Options;
+@inject IOptions<Appsettings> Settings
 @{
     String RoleName = Convert.ToString(@HttpContextAccessor.HttpContext.Session.GetString("RoleName"));
     Model.EmployeeName = Model.EmployeeList.Where(w => w.EmployeeId == Model.EmployeeId).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault();
@@ -36,11 +38,11 @@
 
                     @if (!String.IsNullOrEmpty(Model.Apartments))
                     {
-                             <span>Apartment: @Model.Apartments </span><br />
+                        <span>Apartment: @Model.Apartments </span><br />
 
                     }
-                
-                    
+
+
 
 
 
@@ -49,7 +51,7 @@
                     Address: (@Model.CustomerShipAddress )
                 </p>
                 <p class="text-primary text-105 mt-1 text-center" style="margin-bottom:0px">Item: @Model.ItemName (@Model.ItemDescription)</p>
-                <form class="m-2">
+                <div class="m-2">
                     <div class="input-group">
                         <div class="input-groupp-repend align-self-center mr-2">
                         </div>
@@ -71,6 +73,8 @@
                         }
                         else
                         {
+
+
                             @Html.TextBoxFor(m => m.EmployeeName,
                              new
                              {
@@ -82,13 +86,149 @@
                              })
                             <div class="input-group-append">
                                 @Html.ActionLink("Submit Form/ Complete Job", "Work", "Service", new { id = Model.OrderId }, new { @class = "btn btn-sm btn-orange btn-bold ml-2px" })
-                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" id="btnClsModelOrderDetail" data-dismiss="modal">Close</button>
                             </div>
                         }
 
 
                     </div>
-                </form>
+
+                </div>
+                @if (RoleName != "Admin")
+                {
+
+                    <hr />
+                    <div class="m-2">
+                        <form class="mt-lg-3" autocomplete="off" enctype="multipart/form-data"
+                              novalidate action="AddImage" method="post">
+                            <div class="card bcard mt-2 mt-lg-3">
+
+                                <div class="card-body px-3 pb-1">
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3 col-form-label text-sm-right pr-0">
+                                            <label for="id-form-field-1" class="mb-0">
+                                                Picture
+                                            </label>
+                                        </div>
+
+                                        <div class="col-sm-9">
+                                            <input type="file" name="file" class="form-control" placeholder="Picture" accept="image/*" />
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3 col-form-label text-sm-right pr-0">
+                                            <label for="id-form-field-1" class="mb-0">
+                                                Description
+                                            </label>
+                                        </div>
+
+                                        <div class="col-sm-9">
+                                            @Html.TextAreaFor(m => m.Description,
+                                                  new { @placeholder = "Description", @class = "form-control" })
+
+                                        </div>
+                                    </div>
+                                    <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                                        <div class="offset-md-2 col-md-9 text-nowrap">
+                                            <button class="btn btn-info btn-bold px-4" type="button" onclick="uploadOrderImage(@Model.OrderId)">
+                                                <i class="fa fa-check mr-1"></i>
+                                                Save Image
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                }
+
+                <div class="m-2">
+
+                    <table id="datatable" class="d-style w-100 table text-dark-m1 text-95 border-y-1 brc-black-tp11 collapsed">
+                        <!-- add `collapsed` by default ... it will be removed by default -->
+                        <!-- thead with .sticky-nav -->
+                        <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
+                            <tr>
+
+                                <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                                    Description
+                                </th>
+                                <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+
+                                </th>
+
+                                <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                                    Status
+                                </th>
+                                <th> Share </th>
+                                <th> Action </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="pos-rel">
+                            @foreach (var item in Model.OrderImageList)
+                            {
+                                <tr class="d-style bgc-h-default-l4">
+                                    <td class="text-grey">
+                                        @item.Description
+                                    </td>
+
+                                    <td class="text-grey">
+                                        <img src="data:image/png;base64,@(Convert.ToBase64String(item.Base64))" onclick="viewImageDetail(@(item.JobImageId))" class="img-circle"
+                                             style="height:35px;width:35px;border-radius:20px;cursor:pointer;" />
+                                    </td>
+                                    <td>
+                                        @if (item.IsActive == 1)
+                                        {
+                                            <span class="badge badge-success mr-1">
+                                                Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger mr-1">
+                                                In Active
+                                            </span>
+
+                                        }
+                                    </td>
+                                    <td>
+                                        <button onclick="openEmail(@item.JobImageId)" class="btn btn-danger btn-circle btn-sm btn-outline" type="button">
+                                            <i class="fa fa-envelope"></i>
+                                        </button>
+                                        <button onclick="openWhatsapp(@item.JobImageId,'@Settings.Value.WebBaseURL/Download/LoadBase64/@item.JobImageId','@item.CustomerName','@item.OrderId')" class="btn btn-success btn-circle btn-sm btn-outline" type="button">
+                                            <i class="fab fa-whatsapp"></i>
+                                        </button>
+
+                                    </td>
+                                    <td class="text-grey">
+                                        @if (item.IsActive == 1)
+                                        {
+                                            <a href="#" onclick="deleteFun('@item.JobImageId')">Delete</a>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                            @if (Model.OrderImageList.Count() == 0)
+                            {
+                                <tr>
+                                    <td colspan="5">No Picture available</td>
+                                </tr>
+
+                            }
+
+                        </tbody>
+                    </table>
+
+                </div>
+
             </div>
         </div>
     </div>

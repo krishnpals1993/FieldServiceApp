@@ -1,2077 +1,322 @@
-﻿@using Microsoft.Extensions.Options;
-@using Newtonsoft.Json;
-@model FieldServiceApp.Models.OrderMasterViewModel
-@inject IOptions<Appsettings> Settings
-@inject IOptions<Appsettings> Settings
+﻿@model LaCafelogy.Models.OrderViewModel
+
 @{
-    ViewData["Title"] = "New Order";
-    List<string> CompanyTypeList = new List<string>();
-    CompanyTypeList.Add("Business");
-    CompanyTypeList.Add("Residential");
-
-    List<string> CheckboxSelectionList = new List<string>();
-    CheckboxSelectionList.Add("Yes");
-    CheckboxSelectionList.Add("No");
-
-    List<string> ReOccurenceList = new List<string>();
-    ReOccurenceList.Add("Days");
-    ReOccurenceList.Add("Weeks");
-    ReOccurenceList.Add("Months");
-    ReOccurenceList.Add("WeekDay");
-    ReOccurenceList.Add("WeekDay(Weekly)");
-    ReOccurenceList.Add("Month's Day");
-    ReOccurenceList = ReOccurenceList.OrderBy(o=>o).ToList();
-
-    List<string> WeekDayList = new List<string>();
-    WeekDayList.Add("Sunday");
-    WeekDayList.Add("Monday");
-    WeekDayList.Add("Tuesday");
-    WeekDayList.Add("Wednesday");
-    WeekDayList.Add("Thursday");
-    WeekDayList.Add("Friday");
-    WeekDayList.Add("Saturday");
-
-
+    ViewData["Title"] = "Add Order";
 }
+@using Microsoft.Extensions.Options;
+@inject IOptions<Appsettings> Settings
+
+
 
 <div role="main" class="page-content container container-plus">
-    <form class="mt-lg-3" autocomplete="off" novalidate action="@Settings.Value.WebBaseURL/Order/Add" method="post">
-        <div class="card bcard mt-2 mt-lg-3">
-            @Html.HiddenFor(h => h.MaxReOccurenceEndDate)
-            @Html.HiddenFor(h => h.ReOccurenceStartDateSetBy)
-            @Html.HiddenFor(h => h.Tax)
+    <div class="card bcard mt-2 mt-lg-3">
+        <div class="card-header">
+            <h3 class="card-title text-125">
+                @ViewData["Title"]
+            </h3>
+        </div>
 
-            <div class="card-header">
-                <div class="card-title ">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <h3 class="text-125">
-                                <h3 class="card-title text-125">
-                                    @ViewData["Title"]
-                                </h3>
-                            </h3>
-                        </div>
-                        <div class="col-md-9 text-nowrap text-right">
-                            <button class="btn btn-info btn-bold px-4" onclick="return checkNonWorkingDay();" type="button">
-                                <i class="fa fa-check mr-1"></i>
-                                Submit
-                            </button>
+        <div ng-app="myApp" ng-controller="myCtrl" class="card-body px-3 pb-1">
+            <form>
 
-                            <a href="~/Order/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
-                                <i class="fa fa-undo mr-1"></i>
-                                Cancel
-                            </a>
-                        </div>
+                <div class="row form-group">
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Order No</label>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" ng-model="orderNo"
+                               readonly="readonly"
+                               class="form-control"
+                               placeholder="Order No" />
                     </div>
 
                 </div>
-            </div>
+                <hr />
 
-            <div class="card-body px-3 pb-1">
-
-                <div class="form-group row">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Order No
-                        </label>
+                <div class="row form-group">
+                    <div class="col-lg-1">
+                        <label class="col-form-label">  Contact No</label>
                     </div>
+                    <div class="col-md-2">
+                        <select id="customerContactNo"
+                                class="form-control chosen-select"
+                                name="customerContactNo">
+                        </select>
 
-                    <div class="col-sm-3">
-                        <div class="input-group date">
-                            @Html.TextBoxFor(m => m.OrderNo,
-                            new { @placeholder = "Order No", min = "1", type = "number", @class = "form-control" })
-                            <span asp-validation-for="OrderNo" class="text-danger"></span>
-                        </div>
-
-                    </div>
-                    @*<div class="col-sm-2 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Follow-up Order
-                            </label>
-                        </div>
-
-                        <div class="col-sm-3">
-                            @Html.DropDownListFor(model => model.ParentOrderId, new SelectList(Model.OrderList.Select(x => new { Value = x.OrderId, Text = x.CustomerName }), "Value", "Text"), "Select Follow-up Order", new { @class = "form-control", @placeholder = "Select Company" })
-                            <span asp-validation-for="ParentOrderId" class="text-danger"></span>
-                        </div>*@
-
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Order Date
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        <div class="input-group date">
-                            @Html.TextBoxFor(m => m.OrderDate,
-                            new { id = "OrderDate", @placeholder = "Order Date", @class = "form-control" })
-                            <div class="input-group-addon input-group-append">
-                                <div class="input-group-text">
-                                    <i class="far fa-calendar"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-                <div class="form-group row">
-
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Customer
-                        </label>
-                    </div>
-
-                    <div class="col-sm-2" style="min-width: 25%">
-                        @Html.DropDownListFor(model => model.CustomerId, new SelectList(Model.CustomerList.Select(x => new { Value = x.CustmoerId, Text = x.CompanyName }), "Value", "Text"), "Select Customer", new { @class = "form-control chosen-select", @placeholder = "Select Company" })
-                        <span asp-validation-for="CustomerId" class="text-danger"></span>
-                    </div>
-                    <div class="col-lg-1" style="max-width: 1%">
-                        <button data-toggle="modal" data-target="#newCustomerModel" type="button"
-                                class="btn btn-outline-light btn-h-light-orange
-                                btn-a-light-orange border-b-2 text-600 px-2 mb-1">
-
-                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                        </button>
-                    </div>
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0" style="max-width: 14.1%">
-                        <label for="id-form-field-1" class="mb-0">
-                            Ship Address
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.ShipId, new SelectList(Model.CustomerShipingAddressList.Select(x => new { Value = x.ShipId, Text = x.Address }), "Value", "Text"), "Select Ship Address", new { @class = "form-control chosen-select", @placeholder = "Select Ship Address" })
-                        <span asp-validation-for="ShipId" class="text-danger"></span>
-                    </div>
-                    <div class="col-sm-2" style="max-width: 13%">
-                        <button data-toggle="modal" data-target="#newCustomerShippingModel"
-                                type="button"
-                                class="btnAddShipping btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                            Address
-                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-group row" id="ApartmentIdPenal" style="display:none">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Apartment
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.ApartmentId, new SelectList(Model.ApartmentList.Select(x => new { Value = x.ApartmentId, Text = x.ApartmentNo }), "Value", "Text"),
-                       "Select Apartment", new { @class = "form-control chosen-select", @multiple = "", @placeholder = "Select Apartment" })
-                        <span asp-validation-for="ApartmentId" class="text-danger"></span>
                     </div>
                     <div class="col-lg-1">
-                        <button data-toggle="modal" data-target="#newApartmentModel" type="button"
-                                class="btn btn-outline-light btn-h-light-orange
-                                btn-a-light-orange border-b-2 text-600 px-2 mb-1">
-
-                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                        </button>
+                        <label class="col-form-label">Name</label>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" ng-model="customerName" class="form-control"
+                               placeholder="Contact Name" />
                     </div>
                 </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Ship Date
-                        </label>
-                    </div>
-
-                    <div class="col-sm-2" style="max-width:13%">
-                        <div class="input-group date">
-                            @Html.TextBoxFor(m => m.ShipStartDate,
-                            new { @placeholder = "Start Date", @class = "form-control" })
-
-                            <div class="input-group-addon input-group-append">
-                                <div class="input-group-text">
-                                    <i class="far fa-calendar"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-1" style="min-width:12%">
-                        <div class="input-group date" id="datetimepicker3">
-                            @Html.TextBoxFor(m => m.ShipStartTime,
-                            new { @placeholder = "Start Time", @class = "form-control" })
-
-                            <div class="input-group-addon input-group-append">
-                                <div class="input-group-text">
-                                    <i class="far fa-clock"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            End Time
-                        </label>
-                    </div>
-
-                    <div class="col-sm-2" style="max-width:13%">
-                        <div class="input-group date">
-                            @Html.TextBoxFor(m => m.ShipEndDate,
-                            new { @placeholder = "End Date", @class = "form-control" })
-
-                            <div class="input-group-addon input-group-append">
-                                <div class="input-group-text">
-                                    <i class="far fa-calendar"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-1" style="min-width:12%">
-                        <div class="input-group date" id="datetimepicker4">
-                            @Html.TextBoxFor(m => m.ShipEndTime,
-                            new { @placeholder = "End Time", @class = "form-control" })
-
-                            <div class="input-group-addon input-group-append">
-                                <div class="input-group-text">
-                                    <i class="far fa-clock"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <div class="form-group row">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Recurrence
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.ReOccurence, new SelectList(CheckboxSelectionList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select" })
-                        <span asp-validation-for="ReOccurence" class="text-danger"></span>
-                    </div>
-
-                </div>
-
-                <div id="reOccurencePanel" style="display:none">
-
-
-                    <div class="form-group row">
-                        <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Recurrence From
-                            </label>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="input-group date">
-                                @Html.TextBoxFor(m => m.ReOccurenceStartDate,
-                                new { id = "ReOccurenceStartDate", @placeholder = "Recurrence Date From", @class = "form-control" })
-                                <div class="input-group-addon input-group-append">
-                                    <div class="input-group-text">
-                                        <i class="far fa-calendar"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Recurrence To
-                            </label>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="input-group date">
-                                @Html.TextBoxFor(m => m.ReOccurenceEndDate,
-                                 new { id = "ReOccurenceEndDate", @placeholder = "Recurrence Date To", @class = "form-control" })
-                                <div class="input-group-addon input-group-append">
-                                    <div class="input-group-text">
-                                        <i class="far fa-calendar"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-
-                    <div class="form-group row">
-
-                        <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Recurrence In
-                            </label>
-                        </div>
-
-                        <div class="col-sm-3">
-                            @Html.TextBoxFor(m => m.ReOccurenceFrequency,
-                               new
-                                    {
-                                        @placeholder = "Re-Occurence In",
-                                        @class = "form-control",
-                                        type = "number",
-                                        min = "0"
-                                    })
-                            <span asp-validation-for="ReOccurenceFrequency" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-sm-2">
-                            @Html.DropDownListFor(model => model.ReOccurenceCycle, new SelectList(ReOccurenceList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select" })
-                            <span asp-validation-for="ReOccurenceCycle" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-sm-2" id="weekdayPanel" style="display:none">
-                            @Html.DropDownListFor(model => model.ReOccurenceWeekday, new SelectList(WeekDayList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select" })
-                            <span asp-validation-for="ReOccurenceWeekday" class="text-danger"></span>
-                        </div>
-
-
-                    </div>
-
-
-
-
-
-                </div>
-
-                <div class="form-group row">
-                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Assigned To
-                        </label>
-                    </div>
-
-                    <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.AssigneeId,
-                       new SelectList(Model.EmployeeList.Select(x => new { Value = x.EmployeeId, Text = x.FirstName + " " + x.LastName }), "Value", "Text"),
-                       "Select Employee", new { @class = "form-control", @placeholder = "Select Employee" })
-                        <span asp-validation-for="AssigneeId" class="text-danger"></span>
-                    </div>
-
-
-
-                </div>
-
-                <h3 class="card-title text-125">
-                    Item detail
-                </h3>
                 <hr />
-                <div id="itemPanel">
-                    @for (int i = 0; i < Model.OrderItemList.Count(); i++)
-                    {
-                        @if (i == 0)
-                        {
+                <div ng-repeat="item in itemArray" class="row form-group">
 
-                            <div class="form-group row" style="margin-bottom:0px">
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        @*<span>@(i + 1).</span>*@ Item
-                                    </label>
-                                </div>
-                                <div class="col-sm-3  col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Description
-                                    </label>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Price
-                                    </label>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Quantity
-                                    </label>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-left pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Total Price
-                                    </label>
-                                </div>
-
-
-
-                            </div>
-                        }
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                @Html.DropDownListFor(model => model.OrderItemList[i].ItemId, new SelectList(Model.ItemList.Select(x => new { Value = x.ItemId, Text = x.ItemCd }), "Value", "Text"), "Select Item", new { @class = "form-control chosen-select ItemId", @placeholder = "Select Item" })
-                                <span asp-validation-for="OrderItemList[i].ItemId" class="text-danger"></span>
-                            </div>
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.OrderItemList[i].Description,
-                                 new { @placeholder = "Description", @class = "form-control Description", @readonly = "@readonly" })
-                                <span asp-validation-for="OrderItemList[i].Description" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-sm-2">
-                                @Html.TextBoxFor(m => m.OrderItemList[i].PerUnitPrice,
-                                   new { @placeholder = "Price", @class = "form-control PerUnitPrice" })
-                                <span asp-validation-for="OrderItemList[i].PerUnitPrice" class="text-danger"></span>
-                            </div>
-
-
-                            <div class="col-sm-2">
-                                @Html.TextBoxFor(m => m.OrderItemList[i].Quantity,
-                                 new { @placeholder = "Quantity", @class = "form-control Quantity" })
-                                <span asp-validation-for="OrderItemList[i].Quantity" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-sm-2">
-                                @Html.TextBoxFor(m => m.OrderItemList[i].TotalPrice,
-                               new { @placeholder = "Total Price", @class = "form-control TotalPrice", @readonly = "@readonly" })
-                                <span asp-validation-for="OrderItemList[i].TotalPrice" class="text-danger"></span>
-                                @*<a href="#" class="btn btn-link text-primary-d1">Add More</a>*@
-                            </div>
-
-                            <div class="col-lg-1" style="width:30px">
-                                <button onclick="addItems('@i')" type="button"
-                                        class="btnAdd btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
-                                    <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                                </button>
-                            </div>
-                        </div>
-                    }
-                </div>
-
-
-
-
-                <div class="form-group row">
-                    <div class="col-sm-9 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Amount
-                        </label>
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Item</label>
                     </div>
 
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.TotalAmount,
-                       new { @placeholder = "Total Amount", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                    <div class="col-md-6">
+                        <select class="form-control"
+                                ng-options="option.ItemId as option.ItemName for option in itemList | orderBy : 'ItemName'"
+                                ng-model="item.ItemId">
+                        </select>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-9 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Tax Amount
-                        </label>
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Quantity</label>
                     </div>
 
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.TaxAmount,
-                       new { @placeholder = "Tax Amount Amount", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="TaxAmount" class="text-danger"></span>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" placeholder="Quanity"
+                               ng-change="setTotalAmount()"
+                               ng-model="item.Quantity" />
                     </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-9 col-form-label text-sm-right pr-0">
-                        <label for="id-form-field-1" class="mb-0">
-                            Gross Amount
-                        </label>
+                    <div class="col-md-2" style="display:none">
+                        <input type="number" class="form-control" placeholder="Quanity"
+                               ng-model="item.Amount" />
                     </div>
-
-                    <div class="col-sm-2">
-                        @Html.TextBoxFor(m => m.GrossAmount,
-                       new { @placeholder = "Gross Amount", @class = "form-control", @readonly = "@readonly" })
-                        <span asp-validation-for="GrossAmount" class="text-danger"></span>
-                    </div>
-                </div>
 
 
 
-                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
-                    <div class="offset-md-3 col-md-9 text-nowrap">
-                        <button class="btn btn-info btn-bold px-4" type="submit" style="display:none" id="mainSubmit">
-                            <i class="fa fa-check mr-1"></i>
-                            Submit
+                    <div class="col-md-1">
+                        <button ng-show="$index==itemArray.length-1" type="button" class="btn btn-sm btn-primary" ng-click="addItem(item,$index)">
+                            <i class="fa fa-plus"></i>
                         </button>
-                        <button class="btn btn-info btn-bold px-4" onclick="return checkNonWorkingDay();" type="button">
-                            <i class="fa fa-check mr-1"></i>
-                            Submit
+                        <button ng-show="$index==itemArray.length-1 && $index>0" type="button" class="btn btn-sm btn-primary" ng-click="deleteItem(item,$index)">
+                            <i class="fa fa-trash"></i>
                         </button>
+                    </div>
 
-                        <a href="~/Order/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
-                            <i class="fa fa-undo mr-1"></i>
-                            Cancel
-                        </a>
+
+                </div>
+
+                <hr />
+
+                <div class="row form-group" style="margin-top:5px;">
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Total Amount</label>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" ng-model="totalAmount"
+                               readonly="readonly"
+                               class="form-control"
+                               placeholder="Total Amount" />
+                    </div>
+
+                </div>
+
+                 <div class="row form-group" style="margin-top:5px;">
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Remarks</label>
+                    </div>
+                    <div class="col-md-4">
+                        <textarea ng-model="remarks"
+                               class="form-control" placeholder="Remarks"></textarea>
+                      
+                    </div>
+
+                </div>
+
+
+                <div class="hr-line-dashed"></div>
+                <div class="form-group row">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <a class="btn btn-white btn-sm" asp-action="OrderList">Cancel</a>
+                        <button class="btn btn-primary btn-sm" type="button" ng-click="saveForm()">Save</button>
                     </div>
                 </div>
 
-            </div>
-        </div>
-
-    </form>
-
-    <div class="modal fade modal-lg" id="newCustomerModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-primary-d3" id="exampleModalLabel">
-                        New Customer
-                    </h5>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-
-                    <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Order/AddNewCustomer" method="post">
-                        <div class="form-group row">
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Company Code
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.CustomerDetail.Code,
-                                new { @placeholder = "Code", @class = "form-control" })
-                                <span asp-validation-for="CustomerDetail.Code" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Company Name
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.CustomerDetail.CompanyName,
-                                new { @placeholder = "Company Name", @class = "form-control" })
-                                <span asp-validation-for="CustomerDetail.CompanyName" class="text-danger"></span>
-                            </div>
-
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Company Type
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.DropDownListFor(model => model.CustomerDetail.CompanyType, new SelectList(CompanyTypeList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select company type" })
-                            </div>
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    State
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.DropDownListFor(model => model.CustomerDetail.StateId, new SelectList(Model.CustomerDetail.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
-                                <span asp-validation-for="CustomerDetail.StateId" class="text-danger"></span>
-                            </div>
-
-                        </div>
-                        <div class="form-group row">
-
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    City
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.DropDownListFor(model => model.CustomerDetail.CityId, new SelectList(Model.CustomerDetail.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
-                                <span asp-validation-for="CustomerDetail.CityId" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Address
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.CustomerDetail.Address,
-                                new { @placeholder = "Address", @class = "form-control" })
-                                <span asp-validation-for="CustomerDetail.Address" class="text-danger"></span>
-                            </div>
-
-
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Zip 1
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.CustomerDetail.Zip1,
-                                new { @placeholder = "Zip 1", @class = "form-control" })
-                                <span asp-validation-for="CustomerDetail.Zip1" class="text-danger"></span>
-                            </div>
-
-
-                            <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                <label for="id-form-field-1" class="mb-0">
-                                    Zip 2
-                                </label>
-                            </div>
-
-                            <div class="col-sm-3">
-                                @Html.TextBoxFor(m => m.CustomerDetail.Zip2,
-                                new { @placeholder = "Zip 2", @class = "form-control" })
-                                <span asp-validation-for="CustomerDetail.Zip2" class="text-danger"></span>
-                            </div>
-
-
-                        </div>
-
-
-                        <h3 class="card-title text-125">
-                            Contact detail
-                        </h3>
-                        <hr />
-                        <div id="contactPanel">
-                            @for (int i = 0; i < Model.CustomerDetail.Contacts.Count(); i++)
-                            {
-
-                                <div class="form-group row">
-
-
-
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            First Name
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Contacts[i].FirstName,
-                                        new { @placeholder = "First Name", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Contacts[i].FirstName" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Middle Name
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Contacts[i].MiddleName,
-                                           new { @placeholder = "Middle Name", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Contacts[i].MiddleName" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Last Name
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Contacts[i].LastName,
-                                          new { @placeholder = "Last Name", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Contacts[i].MiddleName" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Email
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Contacts[i].Email,
-                                          new { @placeholder = "Email", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Contacts[i].Email" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Phone
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Contacts[i].Phone,
-                                          new { @placeholder = "Phone", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Contacts[i].Phone" class="text-danger"></span>
-                                    </div>
-                                    @*<div class="col-lg-2">
-                                            <button onclick="addContacts()" type="button"
-                                                    class="btnAddContact btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                                                Add
-                                                <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                                            </button>
-                                        </div>*@
-                                </div>
-
-                                <hr />
-                            }
-                        </div>
-
-
-
-
-                        <h3 class="card-title text-125">
-                            Shipping detail
-                        </h3>
-                        <hr />
-                        <div id="shippingPanel">
-
-                            @for (int i = 0; i < Model.CustomerDetail.Shippings.Count(); i++)
-                            {
-                                <div class="form-group row">
-
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            First Name
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Shippings[i].FirstName,
-                                        new { @placeholder = "First Name", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].FirstName" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Middle Name
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Shippings[i].MiddleName,
-                                           new { @placeholder = "Middle Name", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].MiddleName" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Last Name
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Shippings[i].LastName,
-                                          new { @placeholder = "Last Name", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].MiddleName" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Email
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Shippings[i].Email,
-                                          new { @placeholder = "Email", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].Email" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Phone
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Shippings[i].Phone,
-                                          new { @placeholder = "Phone", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].Phone" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            State
-                                        </label>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        @Html.DropDownListFor(model => model.CustomerDetail.Shippings[i].StateId, new SelectList(Model.CustomerDetail.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].StateId" class="text-danger"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="form-group row">
-
-
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            City
-                                        </label>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        @Html.DropDownListFor(model => model.CustomerDetail.Shippings[i].CityId, new SelectList(Model.CustomerDetail.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].CityId" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                        <label for="id-form-field-1" class="mb-0">
-                                            Address
-                                        </label>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        @Html.TextBoxFor(m => m.CustomerDetail.Shippings[i].Address,
-                                        new { @placeholder = "Address", @class = "form-control" })
-                                        <span asp-validation-for="CustomerDetail.Shippings[i].Address" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <hr />
-                            }
-
-                        </div>
-
-
-
-
-                        <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
-                            <div class="offset-md-3 col-md-9 text-nowrap">
-                                <button class="btn btn-info btn-bold px-4" type="submit">
-                                    <i class="fa fa-check mr-1"></i>
-                                    Submit
-                                </button>
-
-
-                                <a data-dismiss="modal" aria-label="Close" class="btn btn-outline-lightgrey btn-bold ml-2 px-4">
-                                    <i class="fa fa-undo mr-1"></i>
-                                    Cancel
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
-
-
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade modal-lg" id="newCustomerShippingModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-primary-d3" id="exampleModalLabel">
-                        New Shipping Address
-                    </h5>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-
-                    <form class="mt-lg-3" autocomplete="off" method="post">
-                        <div id="shippingPanel">
-
-
-                            <div class="form-group row">
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        First Name
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    @Html.TextBoxFor(m => m.CustomerShippingDetail.FirstName,
-                                    new { @placeholder = "First Name", @class = "form-control" })
-                                    <span asp-validation-for="CustomerShippingDetail.FirstName" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Middle Name
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    @Html.TextBoxFor(m => m.CustomerShippingDetail.MiddleName,
-                                       new { @placeholder = "Middle Name", @class = "form-control" })
-                                    <span asp-validation-for="CustomerShippingDetail.MiddleName" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Last Name
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    @Html.TextBoxFor(m => m.CustomerShippingDetail.LastName,
-                                      new { @placeholder = "Last Name", @class = "form-control" })
-                                    <span asp-validation-for="CustomerShippingDetail.MiddleName" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Email
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    @Html.TextBoxFor(m => m.CustomerShippingDetail.Email,
-                                      new { @placeholder = "Email", @class = "form-control" })
-                                    <span asp-validation-for="CustomerShippingDetail.Email" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Phone
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    @Html.TextBoxFor(m => m.CustomerShippingDetail.Phone,
-                                      new { @placeholder = "Phone", @class = "form-control" })
-                                    <span asp-validation-for="CustomerShippingDetail.Phone" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        State
-                                    </label>
-                                </div>
-
-                                <div class="col-sm-3">
-                                    @Html.DropDownListFor(model => model.CustomerShippingDetail.StateId, new SelectList(Model.CustomerDetail.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
-                                    <span asp-validation-for="CustomerShippingDetail.StateId" class="text-danger"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="form-group row">
-
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        City
-                                    </label>
-                                </div>
-
-                                <div class="col-sm-3">
-                                    @Html.DropDownListFor(model => model.CustomerShippingDetail.CityId, new SelectList(Model.CustomerDetail.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
-                                    <span asp-validation-for="CustomerShippingDetail.CityId" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Address
-                                    </label>
-                                </div>
-
-                                <div class="col-sm-3">
-                                    @Html.TextBoxFor(m => m.CustomerShippingDetail.Address,
-                                    new { @placeholder = "Address", @class = "form-control" })
-                                    <span asp-validation-for="CustomerShippingDetail.Address" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <hr />
-
-
-                        </div>
-
-
-
-
-                        <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
-                            <div class="offset-md-3 col-md-9 text-nowrap">
-                                <button class="btn btn-info btn-bold px-4" onclick="addNewShipping()" type="button">
-                                    <i class="fa fa-check mr-1"></i>
-                                    Submit
-                                </button>
-
-                                <a data-dismiss="modal" id="btnCloseShipping" aria-label="Close" class="btn btn-outline-lightgrey btn-bold ml-2 px-4">
-                                    <i class="fa fa-undo mr-1"></i>
-                                    Cancel
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade modal-lg" id="newApartmentModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-primary-d3" id="exampleModalLabelA">
-                        New Apartment
-                    </h5>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-
-                    <form class="mt-lg-3" autocomplete="off" method="post">
-                        <div id="apartmentPanel">
-
-                            <div class="form-group row">
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Apartment No
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <input type="text"
-                                           placeholder="Apartment No"
-                                           class="form-control" id="mApartmentNo" />
-                                </div>
-
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Apartment Name
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <input type="text" class="form-control"
-                                           id="mApartmentName" placeholder="Apartment Name" />
-                                </div>
-
-
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-sm-2 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Notes
-                                    </label>
-                                </div>
-                                <div class="col-sm-5">
-                                    <input type="text" class="form-control"
-                                           id="mNotes" placeholder="Notes" />
-                                </div>
-                            </div>
-
-                            <hr />
-
-
-                        </div>
-
-
-
-
-                        <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
-                            <div class="offset-md-3 col-md-9 text-nowrap">
-                                <button class="btn btn-info btn-bold px-4" onclick="addNewApartment()" type="button">
-                                    <i class="fa fa-check mr-1"></i>
-                                    Submit
-                                </button>
-
-                                <a data-dismiss="modal" id="btnCloseApartment" aria-label="Close" class="btn btn-outline-lightgrey btn-bold ml-2 px-4">
-                                    <i class="fa fa-undo mr-1"></i>
-                                    Cancel
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
-
-            </div>
+            </form>
         </div>
     </div>
 
 </div>
 
+
 @section Styles {
     <environment names="Development,Staging,Production">
-        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
-        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
-        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
         <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
     </environment>
-    <style>
-        hr {
-            /*margin-bottom: 2rem !important;*/
-        }
-    </style>
 }
 
-@section scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <environment names="Development,Staging,Production">
-        <script src="~/lib/moment/moment.js"></script>
-        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
-        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
-        @*<script src="~/pages/form-basic/@@page-script.js"></script>*@
-        <script src="~/lib/chosen-js/chosen.jquery.js"></script>
-    </environment>
-    <script type="text/javascript">
-        // Restricts input for each element in the set of matched elements to the given inputFilter.
-        (function ($) {
-            $.fn.inputFilter = function (inputFilter) {
-                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
-                    if (inputFilter(this.value)) {
-                        this.oldValue = this.value;
-                        this.oldSelectionStart = this.selectionStart;
-                        this.oldSelectionEnd = this.selectionEnd;
-                    } else if (this.hasOwnProperty("oldValue")) {
-                        this.value = this.oldValue;
-                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-                    } else {
-                        this.value = "";
-                    }
-                });
-            };
-        }(jQuery));
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-
-              var TinyDatePicker1 = DateRangePicker.TinyDatePicker;
-                          TinyDatePicker1('#ShipStartDate', {
-                             mode: 'dp-below',
-                              date: new Date(),
-
-                         })
-                          .on('statechange', function (ev) {
-                               var shipStartDate = new Date($("#ShipStartDate").val());
-                var shipEndDate = shipStartDate;
-                //shipEndDate.setMinutes(shipEndDate.getMinutes() + 30);
-                $("#ShipEndDate").val(new moment(shipEndDate).format("MM/DD/YYYY").toString());
-                window.reOccurenceStartDateSetBy = "System";
-                $('#ReOccurenceStartDate').val(new moment(shipStartDate).format("MM/DD/YYYY"));
-                var reOccurenceendDate = new moment($("#ReOccurenceStartDate").val()).add(12, 'M');
-                $('#ReOccurenceEndDate').val(new moment(reOccurenceendDate).format("MM/DD/YYYY"));
-              });
-
-
-             var TinyDatePicker2 = DateRangePicker.TinyDatePicker;
-                          TinyDatePicker2('#ShipEndDate', {
-                             mode: 'dp-below',
-                              date: new Date(),
-
-                         })
-                          .on('statechange', function (ev) {
-
-                          });
-
-             var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
-                           TinyDatePicker3('#ReOccurenceStartDate', {
-                            mode: 'dp-below',
-                               date: new Date(),
-
-                        })
-                               .on('statechange', function (ev) {
-                                   window.reOccurenceStartDateSetBy = "User";
-                                   //$('#ReOccurenceStartDate').val(new moment(shipStartDate).format("MM/DD/YYYY"));
-                                   if ($("#ReOccurenceStartDate").val()) {
-                                       var reOccurenceendDate = new moment($("#ReOccurenceStartDate").val()).add(12, 'M');
-                                       $('#ReOccurenceEndDate').val(new moment(reOccurenceendDate).format("MM/DD/YYYY"));
-                                   }
-
-                            });
-
-             var TinyDatePicker4 = DateRangePicker.TinyDatePicker;
-                          TinyDatePicker4('#ReOccurenceEndDate', {
-                             mode: 'dp-below',
-                             date: new Date()
-                         })
-                          .on('statechange', function (ev) {
-
-                          });
-
-            var TinyDatePicker5 = DateRangePicker.TinyDatePicker;
-                          TinyDatePicker5('#OrderDate', {
-                             mode: 'dp-below',
-                              date: new Date(),
-
-                         })
-                          .on('statechange', function (ev) {
-
-                          });
-
-
-            $('#datetimepicker3').datetimepicker({
-               icons: {
-            time: 'far fa-clock text-green-d1 text-120',
-            date: 'far fa-calendar text-blue-d1 text-120',
-
-            up: 'fa fa-chevron-up text-secondary',
-            down: 'fa fa-chevron-down text-secondary',
-            previous: 'fa fa-chevron-left text-secondary',
-            next: 'fa fa-chevron-right text-secondary',
-
-            today: 'far fa-calendar-check text-purple-d1 text-120',
-            clear: 'fa fa-trash-alt text-orange-d2 text-120',
-            close: 'fa fa-times text-danger text-120'
-        },
-               toolbarPlacement: "top",
-               allowInputToggle: true,
-               showTodayButton: true,
-               "format": "HH:mm:ss",
-                format: 'LT',
-                stepping: 5
-                 
-              });
-
-            $("#datetimepicker3").on('dp.change', function (event) {
-            if ($("#ShipStartTime").val()) {
-               // $("#ShipEndDateTime").val($("#ShipStartDateTime").val())
-                var shipStartDate = new Date("01/01/2001 "+ $("#ShipStartTime").val());
-                var shipEndDate = shipStartDate;
-                shipEndDate.setMinutes(shipEndDate.getMinutes() + 30);
-                 $("#ShipEndTime").val(new moment(shipEndDate).format("hh:mm a").toString().toUpperCase());
-            }
-        });
-
-            $('#datetimepicker4').datetimepicker({
-                 icons: {
-            time: 'far fa-clock text-green-d1 text-120',
-            date: 'far fa-calendar text-blue-d1 text-120',
-
-            up: 'fa fa-chevron-up text-secondary',
-            down: 'fa fa-chevron-down text-secondary',
-            previous: 'fa fa-chevron-left text-secondary',
-            next: 'fa fa-chevron-right text-secondary',
-
-            today: 'far fa-calendar-check text-purple-d1 text-120',
-            clear: 'fa fa-trash-alt text-orange-d2 text-120',
-            close: 'fa fa-times text-danger text-120'
-        },
-                 toolbarPlacement: "top",
-                 allowInputToggle: true,
-                 showTodayButton: true,
-                 "format": "HH:mm:ss",
-                format: 'LT',
-                   stepping: 5
-              });
-
-            $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
-
-            $("#CustomerId").trigger("change");
-
-             $("#OrderNo").inputFilter(function(value) {
-                 return /^-?\d*[.,]?\d*$/.test(value);
-             });
-
-            $(".btnAddShipping").hide();
-
-            if ($("#CustomerId").val()) {
-
-                $("#CustomerId").trigger("change");
-            }
-
-            setTimeout(function () {
-                $("input").each(function (index, element) {
-                    if ($(element).prop('id') !='OrderNo' && $(element).prop('id') !='MaxReOccurenceEndDate') {
-                        $(element).val('');
-                    }
-
-
-                });
-                $("#OrderDate").val(new moment().format("MM/DD/YYYY"));
-
-            //    try {
-            //        debugger;
-            //    $('#ReOccurenceEndDate').val(new moment($("#MaxReOccurenceEndDate").val()).format("MM/DD/YYYY"));
-            //} catch (e) {
-
-            //}
-
-            }, 0);
-            window.itemList = '@Json.Serialize(Model.ItemList)';
-            window.itemList = JSON.parse(itemList);
-            console.log(window.itemList);
-        var SuccessMessage = '@ViewBag.SuccessMessage';
-        var ErrorMessage = '@ViewBag.ErrorMessage';
-        if (SuccessMessage) {
-            swal(SuccessMessage, "", "success");
-           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Order/Add"; }, 500);
-
-        }
-        if (ErrorMessage) {
-            swal(ErrorMessage, "", "error");
-        }
-
-
-
-
-        });
-
-        $("#ShipStartDate").on("change", function () {
-
-
-              if ($(this).val()) {
-                 var shipStartDate = new Date($(this).val());
-                 var shipEndDate = new Date();
-                 shipEndDate.setMinutes(shipEndDate.getMinutes()+30);
-                  $("#ShipEndDate").val(shipEndDate);
-              }
-
-
-          });
-
-        $(".ItemId").on("change", function () {
-                console.log('event');
-                if ($(this).val()) {
-                    var price = getItemPrice($(this).val());
-                     var description = getItemDescription($(this).val());
-                    $(this).parent().parent().find(".PerUnitPrice").val(price);
-                    $(this).parent().parent().find(".Description").val(description);
-                    if ($(this).parent().parent().find(".Quantity").val()) {
-                        if ($(this).parent().parent().find(".Quantity").val().toString()=="0") {
-                             $(this).parent().parent().find(".TotalPrice").val('');
-                             $(this).parent().parent().find(".Quantity").val('1');
-                             $(this).parent().parent().find(".Quantity").trigger('change');
-
-                        }
-                        else {
-                            var quantity = Number($(this).parent().parent().find(".Quantity").val());
-                  var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
-                  $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
-                      if ($("#TotalAmount").val()) {
-                         // $("#TotalAmount").val(Number($("#TotalAmount").val())+ quantity * perUnitPrice);
-                      }
-                        }
-
-
-              }
-              else {
-                      $(this).parent().parent().find(".TotalPrice").val('');
-                      $(this).parent().parent().find(".Quantity").val('1');
-                      $(this).parent().parent().find(".Quantity").trigger('change');
-
-                 // $("#TotalAmount").val('');
-              }
-              }
-              else {
-                  $(this).parent().parent().find(".PerUnitPrice").val('');
-                    $(this).parent().parent().find(".Description").val('');
-                }
-
-                setTotalAmount();
-
-         });
-
-        $(".PerUnitPrice").on("change", function () {
-                console.log('event');
-                if ($(this).val()) {
-                    var price = $(this).val();
-                    if ($(this).parent().parent().find(".Quantity").val()) {
-                        if ($(this).parent().parent().find(".Quantity").val().toString()=="0") {
-                             $(this).parent().parent().find(".TotalPrice").val('');
-                             $(this).parent().parent().find(".Quantity").val('1');
-                             $(this).parent().parent().find(".Quantity").trigger('change');
-
-                        }
-                        else {
-                            var quantity = Number($(this).parent().parent().find(".Quantity").val());
-                            var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
-                             $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
-                             if ($("#TotalAmount").val()) {
-                         // $("#TotalAmount").val(Number($("#TotalAmount").val())+ quantity * perUnitPrice);
-                      }
-                        }
-
-
-              }
-              else {
-                      $(this).parent().parent().find(".TotalPrice").val('');
-                      $(this).parent().parent().find(".Quantity").val('1');
-                      $(this).parent().parent().find(".Quantity").trigger('change');
-
-                 // $("#TotalAmount").val('');
-              }
-              }
-              else {
-                  $(this).parent().parent().find(".PerUnitPrice").val('');
-                    $(this).parent().parent().find(".Description").val('');
-                }
-
-                setTotalAmount();
-
-         });
-
-        $(".Quantity").on("change", function () {
-              if ($(this).val()) {
-                  var quantity = Number($(this).val());
-                  var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
-                  $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
-                  //$("#TotalAmount").val(quantity * perUnitPrice);
-              }
-              else {
-                  $(this).parent().parent().find(".TotalPrice").val('');
-
-              }
-
-                setTotalAmount();
-          });
-
-        function setTotalAmount() {
-            // $("#TotalAmount").val('');
-            var total = 0;
-            $("#itemPanel .TotalPrice").each(function (index, item) {
-                if ($(item).val()) {
-                    total = total + Number($(item).val());
-                }
-
-            });
-            $("#TotalAmount").val(total);
-
-            if ($("#Tax").val()=='') {
-                $("#Tax").val('0');
-            }
-
-            var taxAmount = Number(((total) * Number($("#Tax").val())) / 100).toFixed(2);
-            var grossAmount = total + taxAmount;
-            $("#TaxAmount").val(taxAmount);
-            $("#GrossAmount").val(grossAmount);
-
-
-        }
-
-        function getItemPrice(itemId) {
-            var price = 0;
-              
-            for (var i = 0; i <  window.itemList.length; i++) {
-                //if (window.itemList[i]["ItemId"].toString()== itemId) {
-                //    price = window.itemList[i]["ItemPrice"];
-                //    i = window.itemList.length;
-                //    break;
-                //}
-               
-                if (parseInt(window.itemList[i]["ItemId"]) == itemId) {
-                    price = window.itemList[i]["ItemPrice"];
-                    i = window.itemList.length;
-                    break;
-                }
-            }
-            return price;
-        }
-
-        function getItemDescription(itemId) {
-            var description = "";
-            for (var i = 0; i <  window.itemList.length; i++) {
-                //if (window.itemList[i]["ItemId"].toString()== itemId) {
-                //    description = window.itemList[i]["ItemDescription"];
-                //    i = window.itemList.length;
-                //    break;
-                //}
-                if (parseInt(window.itemList[i]["ItemId"]) == itemId) {
-                    description = window.itemList[i]["ItemDescription"];
-                    i = window.itemList.length;
-                    break;
-                }
-            }
-            return description;
-        }
-
-
-        $("#CustomerId").on("change", function () {
-            $("#ShipId").html('');
-             $('#ApartmentId').empty(); //remove all child nodes
-            $('#ApartmentId').trigger("chosen:updated");
-            $("#ApartmentIdPenal").hide();
-
-             var data = {
-                'CustomerId':  $("#CustomerId").val(),
-            };
-
-            if ($("#CustomerId").val()) {
-                $(".btnAddShipping").show();
-            } else {
-                $(".btnAddShipping").hide();
-            }
-
-            console.log(data);
-            $.ajax({
-                url: "/Order/GetCustomerShippingAddress",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (response) {
-
-                    if (response.length > 0) {
-                        
-                $('#ShipId').html('');
-                       var options = '';
-
-                options += '<option value="">Select Ship Address</option>';
-                       for (var i = 0; i < response.length; i++) {
-                        options += '<option cust="' + response[i]['CustmoerId'] + '" value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
-                        }
-
-                        $("#Tax").val(response[0]['Tax']);
-
-                       $('#ShipId').append(options);
-                        $('#ShipId').trigger("chosen:updated");
-
-                       if (response.length==1) {
-                           $('#ShipId').val(response[0]['ShipId']);
-                           $('#ShipId').trigger("chosen:updated");
-                            $('#ShipId').trigger("change");
-                       }
-
-
-            }
-                }
-            })
-        });
-
-        $("#ShipId").on("change", function () {
-            $("#ApartmentId").html('');
-             var data = {
-                'ShipId':  $("#ShipId").val(),
-            };
-
-            if ($("#ShipId").val()) {
-                $("#ApartmentIdPenal").show();
-            } else {
-                $("#ApartmentIdPenal").hide();
-            }
-
-            console.log(data);
-            $.ajax({
-                url: "/Order/GetCustomerShippingApartment",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (response) {
-
-                 {
-                $('#ApartmentId').html('');
-                        var options = '';
-                        
-                        var tax = response.tax;
-                        response = response.aList;
-                        $("#Tax").val(tax);
-
-                //options += '<option value="">Select Apartment Address</option>';
-                for (var i = 0; i < response.length; i++) {
-                    options += '<option value="' + response[i]['ApartmentId'] + '">' + response[i]['ApartmentNo'] + '</option>';
-                }
-
-                        if ($("#ShipId option").length>1000) {
-                            var customerId = $($($("#ShipId option:selected"))[0]).attr("cust");
-
-                            $("#CustomerId").val(customerId);
-                            $('#CustomerId').trigger("chosen:updated");
-                       }
-
-                         $('#ApartmentId').empty(); //remove all child nodes
-                         $('#ApartmentId').append(options);
-                        $('#ApartmentId').trigger("chosen:updated");
-
-
-            }
-                }
-            })
-        });
-
-        $("#ParentOrderId").on("change", function () {
-             var data = {
-                'OrderId':  $("#ParentOrderId").val(),
-            };
-             console.log(data);
-
-            $.ajax({
-                url: "/Order/GetFollowUpOrderDetail",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (response) {
-                        if (response) {
-                            
-                            $("#ItemId").val(response.ItemId);
-                            $("#PerUnitPrice").val(response.PerUnitPrice);
-                            $("#Quantity").val(response.Quantity);
-                            $("#TotalPrice").val(response.TotalPrice);
-                            $("#Description").val(response.Description);
-                            $("#AssigneeId").val(response.AssigneeId);
-                            $("#TotalAmount").val(response.TotalAmount);
-                            $("#CustomerId").val(response.CustomerId);
-                             $('#ShipId').html('');
-                var options = '';
-                options += '<option value="">Select Ship Address</option>';
-                for (var i = 0; i < response.CustomerShipingAddressList.length; i++) {
-                    options += '<option value="' + response.CustomerShipingAddressList[i]['ShipId'] + '">' + response.CustomerShipingAddressList[i]['Address'] + '</option>';
-                }
-                            $('#ShipId').append(options);
-                            $("#ShipId").val(response.ShipId);
-                             if ($("#ShipId").val()) {
-                $("#ApartmentIdPenal").show();
-            } else {
-                $("#ApartmentIdPenal").hide();
-                            }
-
-                             if ($("#CustomerId").val()) {
-                $(".btnAddShipping").show();
-            } else {
-                $(".btnAddShipping").hide();
-            }
-
-                  $('#ApartmentId').html('');
-                var options = '';
-                //options += '<option value="">Select Apartment Address</option>';
-                for (var i = 0; i < response.ApartmentList.length; i++) {
-                    options += '<option value="' + response.ApartmentList[i]['ApartmentId'] + '">' + response.ApartmentList[i]['ApartmentNo'] + '</option>';
-                }
-
-
-                         $('#ApartmentId').empty(); //remove all child nodes
-                         $('#ApartmentId').append(options);
-                         $('#ApartmentId').trigger("chosen:updated");
-
-
-                }
-
-                }
-            })
-        });
-
-        $("#ReOccurence").on("change", function () {
-
-            if ($("#ReOccurence").val()=="Yes") {
-                $("#reOccurencePanel").show();
-            }
-            else {
-                $("#reOccurencePanel").hide();
-            }
-
-        });
-
-        $("#ReOccurenceCycle").on("change", function () {
-
-            if ($("#ReOccurenceCycle").val()=="WeekDay" || $("#ReOccurenceCycle").val()=="WeekDay(Weekly)") {
-                $("#weekdayPanel").show();
-            }
-            else {
-                 $("#weekdayPanel").hide();
-            }
-
-        });
-
-        function checkNonWorkingDay() {
-
-           //ReOccurenceStartDateSetBy
-
-            if (!$("#ShipId").val()) {
-                  swal("Please select ship address", "", "error");
-                return;
-            }
-
-            $("#ReOccurenceStartDateSetBy").val(window.reOccurenceStartDateSetBy);
-
-            var shipStartDate = $("#ShipStartDate").val();
-            var shipEndDate = $("#ShipEndDate").val();
-            var shipStartTime = $("#ShipStartTime").val();
-            var shipEndTime = $("#ShipEndTime").val();
-
-              if ((shipStartDate) && (shipEndDate)) {
-                     if (( new moment(shipStartDate)  > new moment(shipEndDate))) {
-                        swal("Order end date should be greater than start date", "", "error");
-                        return false;
-                  }
-
-                  if (new moment(shipStartDate).format("MM/DD/YYYY") == new moment(shipEndDate).format("MM/DD/YYYY")) {
-                 if (( new moment(shipStartDate+" "+shipStartTime)  > new moment(shipStartDate+" "+shipEndTime))) {
-                        swal("Order end time should be greater than start date", "", "error");
-                        return false;
-                    }
-            }
-            }
-
-
-
-
-            if ($("#ReOccurence").val() == "Yes") {
-               var reoccurrenceFromDate = $("#ReOccurenceStartDate").val();
-               var reoccurrenceDateTo = $("#ReOccurenceEndDate").val();
-               var reOccurrenceFrequency = $("#ReOccurenceFrequency").val();
-               var reOccurenceCycle = $("#ReOccurenceCycle").val();
-               var reOccurenceWeekday = $("#ReOccurenceWeekday").val();
-
-
-               if (((!reoccurrenceFromDate))) {
-                   swal("Please select recurrence start date", "", "error");
-                   return false;
-                }
-
-                if ((reoccurrenceFromDate) && (reoccurrenceDateTo)) {
-                     if (( new moment(reoccurrenceFromDate)  > new moment(reoccurrenceDateTo))) {
-                        swal("Recurrence From date should be less or equal to recurrence To date", "", "error");
-                        return false;
-                    }
-                }
-
-                if (( new moment(reoccurrenceDateTo)).diff((new moment(reoccurrenceFromDate)), 'months', true) > 12) {
-                    swal("Recurrence to date should be within 12 months from recurrence start date", "", "error");
-                        return false;
-                }
-
-                if (!reOccurrenceFrequency) {
-                      swal("Please enter in  recurrence In field", "", "error");
-                        return false;
-                }
-
-                 if (!reOccurenceCycle) {
-                         swal("Please select recurrence field", "", "error");
-                        return false;
-                }
-
-                if (reOccurenceCycle=="WeekDay" || reOccurenceCycle=="WeekDay(Weekly)") {
-                     if (!reOccurenceWeekday) {
-                         swal("Please select weekday", "", "error");
-                        return false;
-                   }
-                }
-            }
-
-              var count = 0;
-             $("#itemPanel .ItemId").each(function (index, item) {
-
-                 if (!$(this).val()) {
-                     count++;
-                 }
-             });
-
-            if (count>0) {
-                 swal("Please select item in item detail", "", "error");
-                   return false;
-            }
-
-             $("#itemPanel .Quantity").each(function (index, item) {
-
-                 if (!$(this).val()) {
-                     count++;
-                 }
-                 else if ($(this).val().toString()=="0") {
-                     count++;
-                 }
-             });
-
-            if (count>0) {
-                 swal("Please select quantity in item detail", "", "error");
-                   return false;
-            }
-
-            if (!$("#ShipStartDate").val()) {
-                $("#mainSubmit").trigger('click');
-                return;
-            }
-
-
-
-             var data = {
-                'date': $("#ShipStartDate").val(),
-
-            };
-
-            $.ajax({
-                url: "/Order/CheckNonworkingDay",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (response) {
-                    console.log(response);
-                    if (response.Status=="1") {
-                        $("#mainSubmit").trigger('click');
-                    }
-                    else {
-                          swal({
-                title: "Ship Date is a non working day. Do you want to continue?",
-                type: "warning",
-                showCancelButton: true,
-                cancelButtonText: "No",
-                confirmButtonClass: "btn-danger",
-                confirmButtonText: "Yes",
-                closeOnConfirm: false
-            },
-                function (isConfirm) {
-                    if (!isConfirm)
-                        return;
-
-                 $("#mainSubmit").trigger('click');
-
-                });
-                    }
-                }
-            })
-        }
-
-
-    </script>
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="~/lib/chosen-js/chosen.jquery.js"></script>
 
     <script type="text/javascript">
 
-        $("#CompanyName").on("change", function () {
-            if ($("#CompanyName").val()) {
-                $("#CompanyType").val("Business");
-                $("#CompanyType").attr("readonly", "readonly");
-            }
-            else {
-                $("#CompanyType").removeAttr("readonly");
-            }
+        window.mOrderno  = @Model.OrderNo;
+        window.itemList = @Html.Raw(Json.Serialize(Model.ItemList));
+        window.contactList = @Html.Raw(Json.Serialize(Model.ContactList));
+
+        window.contactList.push({ 'ContactNo': '8233252120' });
+
+        $("#customerContactNo").prepend("<option value='' >No contact</option>");
+        $.each(window.contactList, function (key, value) {
+            $("#customerContactNo").append($("<option></option>").val(value.ContactNo).html(value.ContactNo));
         });
 
+        $("#customerContactNo").chosen({ allow_single_deselect: true, width: '100%' });
 
-
-        function addNewApartment() {
-
-            if (!$("#ShipId").val()) {
-                swal("Please select ship address ", "", "error")
-                return;
-            }
-
-            if ((!$("#mApartmentNo").val()) && (!$("#mApartmentName").val())) {
-                swal("Please select apartment no or name", "", "error")
-                return;
-            }
-
-            var data = {
-                'ShipId': $("#ShipId").val(),
-                ApartmentNo: $("#mApartmentNo").val(),
-                ApartmentName: $("#mApartmentName").val(),
-                Notes: $("#mNotes").val(),
-                ApartmentId: ($("#ApartmentId").val() ? $("#ApartmentId").val().toString() : ""),
-
-
-            };
-
-            $.ajax({
-                url: "/Order/AddApartment",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (response) {
-                    
-                    console.log(response);
-                    $("#mApartmentNo").val('');
-                    $("#mApartmentName").val('');
-                    $("#mNotes").val('');
-                    if (true) {
-                        $("#btnCloseApartment").trigger('click');
-                        $('#ApartmentId').html('');
-                        var options = '';
-                        var selectedApartments = "";
-                        //options += '<option value="">Select Apartment Address</option>';
-                        for (var i = 0; i < response.length; i++) {
-                            options += '<option value="' + response[i]['ApartmentId'] + '">' + response[i]['ApartmentNo'] + '</option>';
-                            selectedApartments = response[i]['ApartmentName'];
-                        }
-
-                        selectedApartments = selectedApartments == "" ? [] : selectedApartments.split(',');
-
-                        $('#ApartmentId').empty(); //remove all child nodes
-                        $('#ApartmentId').append(options);
-                        $('#ApartmentId').val(selectedApartments);
-                        $('#ApartmentId').trigger("chosen:updated");
-
-
-                    }
-
-                }
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope) {
+            $scope.orderNo = window.mOrderno;
+            $scope.itemArray = [];
+            $scope.itemArray.push({
+                ItemId: '',
+                Quantity: '',
             });
 
-        }
+            $scope.itemList = window.itemList;
+            $scope.contactList = window.contactList;
 
-        function addNewShipping() {
+            $scope.addItem = function (item, index) {
 
-            var data = {
-                'CustomerId': $("#CustomerId").val(),
-                FirstName: $("#CustomerShippingDetail_FirstName").val(),
-                MiddleName: $("#CustomerShippingDetail_MiddleName").val(),
-                LastName: $("#CustomerShippingDetail_LastName").val(),
-                Email: $("#CustomerShippingDetail_Email").val(),
-                Phone: $("#CustomerShippingDetail_Phone").val(),
-                StateId: $("#CustomerShippingDetail_StateId").val(),
-                CityId: $("#CustomerShippingDetail_CityId").val(),
-                Address: $("#CustomerShippingDetail_Address").val(),
+                if (!item.ItemId) {
+                    swal("Please select item", "", "error");
+                    return;
+                }
+                if (!item.Quantity) {
+                    swal("Please enter item quantity", "", "error");
+                    return;
+                }
+
+
+                $scope.itemArray.push({
+                    ItemId: '',
+                    Quantity: '',
+                });
+
+
+
             };
 
-            $.ajax({
-                url: "/Order/AddShipping",
-                type: "POST",
-                dataType: "json",
-                data: data,
-                success: function (response) {
-                    console.log(response);
-                    if (response.Status) {
-                        $("#CustomerId").trigger("change");
-                        setTimeout(function () { $("#ShipId").val(response.Status); }, 500);
-                        $("#btnCloseShipping").trigger('click');
-                    }
-                }
-            })
-        }
+            $scope.deleteItem = function (item, index) {
 
-    </script>
+                $scope.itemArray.splice(index, 1);
 
-    <script type="text/javascript">
+            }
 
-        function addItems(i) {
             
-            var index = $(".btnAdd").length;
+            $scope.setTotalAmount = function () {
+                var totalAmount = 0;
 
-            $.ajax({
-                url: "/Order/GetOrderDetail/" + index,
-
-                type: "POST",
-                contentType: "application/json; charset=utf-8",
-                dataType: "html",
-                success: function (response) {
-                    $("#itemPanel").append(response);
-                    $(".btnAdd").each(function (ind, ele) {
-                        if (ind != index) {
-                            $(ele).hide();
-                        }
-                    });
-
-                    $(".btnDelete").each(function (ind, ele) {
-                        if (ind != (index - 1)) {
-                            $(ele).hide();
-                        }
-                    });
-
-
-                    $("#itemPanel .form-control").each(function (ind, ele) {
-                        if ($(ele).attr('name1')) {
-                            $(ele).attr('name', $(ele).attr('name1'));
-                        }
-
-                    });
-
-                    bindEvent();
-
-                }
-            })
-        };
-
-
-        function bindEvent() {
-
-            $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
-
-            $(".ItemId").on("change", function () {
-                if ($(this).val()) {
-                    var price = getItemPrice($(this).val());
-                    var description = getItemDescription($(this).val());
-
-                    $(this).parent().parent().find(".PerUnitPrice").val(price);
-                    $(this).parent().parent().find(".Description").val(description);
-                    if ($(this).parent().parent().find(".Quantity").val()) {
-                        if ($(this).parent().parent().find(".Quantity").val().toString() == "0") {
-                            $(this).parent().parent().find(".TotalPrice").val('');
-                            $(this).parent().parent().find(".Quantity").val('1');
-                            $(this).parent().parent().find(".Quantity").trigger('change');
-
-                        }
-                        else {
-                            var quantity = Number($(this).parent().parent().find(".Quantity").val());
-                            var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
-                            $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
-                            if ($("#TotalAmount").val()) {
-                                // $("#TotalAmount").val(Number($("#TotalAmount").val())+ quantity * perUnitPrice);
-                            }
-                        }
-
-
-                    }
-                    else {
-                        $(this).parent().parent().find(".TotalPrice").val('');
-                        $(this).parent().parent().find(".Quantity").val('1');
-                        $(this).parent().parent().find(".Quantity").trigger('change');
-                        // $("#TotalAmount").val('');
+                for (var i = 0; i < $scope.itemArray.length; i++) {
+                    var itemAmount = getItemPrice($scope.itemArray[i]['ItemId']);
+                    $scope.itemArray[i]['Amount'] = itemAmount; 
+                    $scope.itemArray[i]['IsCombo'] = getItemIsCombo($scope.itemArray[i]['ItemId']); 
+                    if (itemAmount && $scope.itemArray[i]['Quantity']) {
+                        totalAmount = totalAmount + ((itemAmount) * $scope.itemArray[i]['Quantity'])
                     }
                 }
-                else {
-                    $(this).parent().parent().find(".PerUnitPrice").val('');
-                    $(this).parent().parent().find(".Description").val('');
+                $scope.totalAmount = totalAmount;
+            };
+
+            function getItemPrice(id) {
+               var price = 0;
+                for (var i = 0; i < window.itemList.length; i++){
+                    if (window.itemList[i]['ItemId'] == id) {
+                             price = window.itemList[i]['ItemPrice'];
+                         }
                 }
-
-                setTotalAmount();
-
-            });
-
-            $(".PerUnitPrice").on("change", function () {
-                console.log('event');
-                if ($(this).val()) {
-                    var price = $(this).val();
-                    if ($(this).parent().parent().find(".Quantity").val()) {
-                        if ($(this).parent().parent().find(".Quantity").val().toString() == "0") {
-                            $(this).parent().parent().find(".TotalPrice").val('');
-                            $(this).parent().parent().find(".Quantity").val('1');
-                            $(this).parent().parent().find(".Quantity").trigger('change');
-
-                        }
-                        else {
-                            var quantity = Number($(this).parent().parent().find(".Quantity").val());
-                            var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
-                            $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
-                            if ($("#TotalAmount").val()) {
-                                // $("#TotalAmount").val(Number($("#TotalAmount").val())+ quantity * perUnitPrice);
-                            }
-                        }
-
-
-                    }
-                    else {
-                        $(this).parent().parent().find(".TotalPrice").val('');
-                        $(this).parent().parent().find(".Quantity").val('1');
-                        $(this).parent().parent().find(".Quantity").trigger('change');
-
-                        // $("#TotalAmount").val('');
-                    }
-                }
-                else {
-                    $(this).parent().parent().find(".PerUnitPrice").val('');
-                    $(this).parent().parent().find(".Description").val('');
-                }
-
-                setTotalAmount();
-
-            });
-
-            $(".Quantity").on("change", function () {
-                console.log('event');
-                if ($(this).val()) {
-                    var quantity = Number($(this).val());
-                    var perUnitPrice = Number($(this).parent().parent().find(".PerUnitPrice").val());
-                    $(this).parent().parent().find(".TotalPrice").val(quantity * perUnitPrice);
-                    //$("#TotalAmount").val(quantity * perUnitPrice);
-                }
-                else {
-                    $(this).parent().parent().find(".TotalPrice").val('');
-
-                }
-
-                setTotalAmount();
-            });
-        }
-
-        function deleteItem(index) {
-           
-            $(event.currentTarget).parent().parent().parent().remove();
-            $(".btnAdd").each(function (ind, ele) {
-                if (ind == (index - 1)) {
-                    $(ele).show();
-                }
-            });
-            if (index > 1) {
-                $(".btnDelete").each(function (ind, ele) {
-                    if (ind == (index - 2)) {
-                        $(ele).show();
-                    }
-                });
+               return price;
 
             }
+
+             function getItemIsCombo(id) {
+               var IsCombo = "";
+                for (var i = 0; i < window.itemList.length; i++){
+                    if (window.itemList[i]['ItemId'] == id) {
+                             IsCombo = window.itemList[i]['IsCombo'];
+                         }
+                }
+               return IsCombo;
+
+            }
+
+        //addColumnValue  deleteColumnValue
+
+
+        $scope.saveForm = function () {
+            //comboOfferName comboOfferPrice comboOfferType
+            if (!$scope.totalAmount) {
+                swal("Please add items/combo", "", "error");
+                return;
+            }
+
+            
+            var model = {
+                TotalAmount: $scope.totalAmount,
+                ContactNo: $("#customerContactNo").val(),
+                Name: $scope.customerName,
+                OrderNo: $scope.orderNo,
+                OrderItems: $scope.itemArray,
+                Remarks : $scope.remarks
+            }
+
+            $.ajax({
+                url: "/Order/AddOrder",
+                type: "POST",
+                dataType: "json",
+                data: { model: angular.toJson(model) },
+                success: function (data) {
+                    if (data.Status == "1") {
+                        swal(data.Message, "", "success")
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+                    }
+                    else {
+                        swal(data.Message, "", "error")
+                    }
+                }
+            })
+
         }
 
+
+                        });
+
+
+
+
+
+    </script>
+
+    <script type="text/javascript">
+        var select, chosen;
+
+        // cache the select element as we'll be using it a few times
+        select = $(".chosen-select");
+
+        // init the chosen plugin
+        select.chosen({ no_results_text: 'Press Enter to add new entry:' });
+
+        // get the chosen object
+        chosen = select.data('chosen');
+
+        // Bind the keyup event to the search box input
+        chosen.dropdown.find('input').on('keyup', function (e) {
+            // if we hit Enter and the results list is empty (no matches) add the option
+            if (e.which == 13 && chosen.dropdown.find('li.no-results').length > 0) {
+                var option = $("<option>").val(this.value).text(this.value);
+
+                // add the new option
+                select.prepend(option);
+                // automatically select it
+                select.find(option).prop('selected', true);
+                // trigger the update
+                select.trigger("chosen:updated");
+            }
+        });
     </script>
 
 }

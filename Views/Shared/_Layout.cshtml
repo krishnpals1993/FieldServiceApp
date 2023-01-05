@@ -14,7 +14,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Field Service Application</title>
+    <title>@ViewData["Title"] - La Cafelogy</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- Add local styles, mostly for plugins css file -->
@@ -69,8 +69,7 @@
                                 <!-- shown when sidebar is full-width -->
                                 <div class="py-2 text-center mx-3" id="sidebar-header-brand2">
                                     <a class="navbar-brand ml-n2 text-140 text-white" href="#">
-                                        <i class="fa fa-leaf mr-1 text-success-l1"></i>
-                                        Field Service <span>App</span>
+                                        La Cafelogy
                                     </a>
                                 </div>
                             </div>
@@ -83,7 +82,8 @@
 
                             <div class="fadeable hideable">
                                 <div class="py-2 d-flex flex-column align-items-center">
-                                    <img alt="Natalie's avatar" src="~/assets/image/avatar/profile_small.png" class="p-2px border-2 brc-primary-m2 radius-round" />
+                                    <img alt="La Cafelogy" style="height:100px;width:100px;"
+                                        src="~/images/logo.png" class="p-2px border-2 brc-primary-m2 radius-round" />
 
                                     <div class="text-center mt-1" id="id-user-info">
                                         <a href="#id-user-menu" class="d-style pos-rel collapsed text-orange-l2 accordion-toggle no-underline bgc-h-white-tp9 radius-1 px-1 py-2px" data-toggle="collapse" aria-expanded="false">
@@ -104,7 +104,7 @@
                         <nav aria-label="Main">
                             <ul class="nav flex-column mt-2 has-active-border active-on-top">
 
-                                <li class="nav-item @(routeControl=="Home" ?"active":"" )">
+                                <li class="nav-item @(routeControl == "Home" ? "active" : "" )">
 
                                     <a href="~/Home/Dashboard" class="nav-link">
                                         <i class="nav-icon fa fa-tachometer-alt"></i>
@@ -118,7 +118,7 @@
                                 </li>
                                 @if (RoleName != "Admin")
                                 {
-                                    <li class="nav-item @(routeControl=="Service" ?"active":"" )">
+                                    <li class="nav-item @(routeControl == "Service" ? "active" : "" )">
 
                                         <a href="~/Service/List" class="nav-link">
                                             <i class="nav-icon fa fa-user-tie"></i>
@@ -130,13 +130,25 @@
                                         <b class="sub-arrow"></b>
 
                                     </li>
+                                    <li class="nav-item @(routeControl == "Order" ? "active" : "" )">
+
+                                        <a href="~/Notes/List" class="nav-link">
+                                            <i class="nav-icon fa fa-sticky-note"></i>
+                                            <span class="nav-text fadeable">
+                                                <span> Note(s)</span>
+                                            </span>
+                                        </a>
+
+
+                                    </li>
+                                   
 
                                 }
 
                                 @if (RoleName == "Admin")
                                 {
 
-                                    <li class="nav-item @(routeControl=="Customer" ?"active":"" )">
+                                    <li class="nav-item @(routeControl == "Customer" ? "active" : "" )">
 
                                         <a href="~/Customer/List" class="nav-link">
                                             <i class="nav-icon fa fa-user-tie"></i>
@@ -150,9 +162,9 @@
                                     </li>
 
 
-                                    <li class="nav-item @(routeControl=="Inventory" ?"active open":"" )">
+                                    <li class="nav-item @(routeControl == "Inventory" ? "active open" : "" )">
 
-                                        <a href="#" class="nav-link dropdown-toggle  @(routeControl!="Inventory" ?"collapsed":"" )">
+                                        <a href="#" class="nav-link dropdown-toggle  @(routeControl != "Inventory" ? "collapsed" : "" )">
                                             <i class="nav-icon fa fa-box-open"></i>
                                             <span class="nav-text fadeable">
                                                 <span>Inventory</span>
@@ -161,11 +173,11 @@
                                             <b class="caret fa fa-angle-left rt-n90"></b>
                                         </a>
 
-                                        <div class="hideable submenu  @(routeControl!="Inventory" ?"collapse":"" )">
+                                        <div class="hideable submenu  @(routeControl != "Inventory" ? "collapse" : "" )">
                                             <ul class="submenu-inner">
 
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="ItemCategoryList" || routeAction=="AddItemCategory" || routeAction=="EditItemCategory" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "ItemCategoryList" || routeAction == "AddItemCategory" || routeAction == "EditItemCategory")) ? "active" : "" )">
 
                                                     <a href="~/Inventory/ItemCategoryList" class="nav-link">
 
@@ -176,8 +188,8 @@
 
 
                                                 </li>
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="ItemList" || routeAction=="AddItem" || routeAction=="EditItem" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "ItemList" || routeAction == "AddItem" || routeAction == "EditItem")) ? "active" : "" )">
 
                                                     <a href="~/Inventory/ItemList" class="nav-link">
 
@@ -189,8 +201,8 @@
 
                                                 </li>
 
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="ItemPriceList" || routeAction=="ItemPrice" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "ItemPriceList" || routeAction == "ItemPrice")) ? "active" : "" )">
                                                     <a href="~/Inventory/ItemPriceList" class="nav-link">
 
                                                         <span class="nav-text">
@@ -198,23 +210,13 @@
                                                         </span>
                                                     </a>
                                                 </li>
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="UnitList" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "UnitList")) ? "active" : "" )">
 
                                                     <a href="~/Inventory/UnitList" class="nav-link">
 
                                                         <span class="nav-text">
                                                             <span>Unit</span>
-                                                        </span>
-                                                    </a>
-
-
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a href="#" class="nav-link">
-
-                                                        <span class="nav-text">
-                                                            <span>Vendor</span>
                                                         </span>
                                                     </a>
                                                 </li>
@@ -224,9 +226,9 @@
 
                                     </li>
 
-                                    <li class="nav-item @((routeControl=="Order")  ?"active open":"" )">
+                                    <li class="nav-item @((routeControl == "Order" || routeControl =="JobImages")  ?"active open":"" )">
 
-                                        <a class="nav-link dropdown-toggle @(routeControl!="Order" ?"collapsed":"" )">
+                                        <a class="nav-link dropdown-toggle @((routeControl!="Order" && routeControl!="JobImages" ) ?"collapsed":"" )">
                                             <i class="nav-icon fab fa-first-order-alt"></i>
                                             <span class="nav-text fadeable">
                                                 <span>Order</span>
@@ -237,33 +239,11 @@
 
                                         <div class="hideable submenu @(routeControl!="Order" ?"collapse":"" )">
                                             <ul class="submenu-inner">
-
-                                                <li class="nav-item">
-
-                                                    <a href="#" class="nav-link">
-
-                                                        <span class="nav-text">
-                                                            <span>PO</span>
-                                                        </span>
-                                                    </a>
-                                                </li>
-
                                                 <li class="nav-item @((routeControl=="Order" &&
                                         (routeAction=="Add" || routeAction=="Edit" || routeAction=="List" ))  ?"active":"" )">
-                                                    <a href="~/Order/List" class="nav-link">
-
+                                                    <a href="~/Order/OrderList" class="nav-link">
                                                         <span class="nav-text">
                                                             <span>Orders</span>
-                                                        </span>
-                                                    </a>
-                                                </li>
-
-                                                <li class="nav-item @((routeControl=="Invoice" &&
-                                        (routeAction=="Add" || routeAction=="Edit" || routeAction=="List" ))  ?"active":"" )">
-
-                                                    <a href="~/Invoice/List" class="nav-link">
-                                                        <span class="nav-text">
-                                                            <span>Invoice</span>
                                                         </span>
                                                     </a>
                                                 </li>
@@ -316,47 +296,6 @@
 
                                     </li>
 
-                                    <li class="nav-item @((routeControl=="Master")  ?"active open":"" )">
-
-                                        <a href="#" class="nav-link dropdown-toggle @(routeControl!="Master" ?"collapsed":"" )">
-                                            <i class="nav-icon fa fa-cogs"></i>
-                                            <span class="nav-text fadeable">
-                                                <span>Master</span>
-                                            </span>
-
-                                            <b class="caret fa fa-angle-left rt-n90"></b>
-                                        </a>
-
-                                        <div class="hideable submenu @(routeControl!="Master" ?"collapse":"" )">
-                                            <ul class="submenu-inner">
-
-                                                <li class="nav-item @((routeControl=="Master" &&
-                                        (routeAction=="StateList" || routeAction=="AddState" || routeAction=="EditState"))  ?"active":"" )">
-
-                                                    <a href="~/Master/StateList" class="nav-link">
-
-                                                        <span class="nav-text">
-                                                            <span>States</span>
-                                                        </span>
-                                                    </a>
-
-
-                                                </li>
-                                                <li class="nav-item @((routeControl=="Master" &&
-                                        (routeAction=="CityList") || (routeAction=="AddCity")|| (routeAction=="EditCity"))  ?"active":"" )">
-                                                    <a href="~/Master/CityList" class="nav-link">
-
-                                                        <span class="nav-text">
-                                                            <span>City</span>
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-
-                                        <b class="sub-arrow"></b>
-
-                                    </li>
 
                                     <li class="nav-item @((routeControl=="Employee" &&
                                         (routeAction=="Add") || (routeAction=="Edit"))  ?"active":"" )">
@@ -371,60 +310,20 @@
                                         <b class="sub-arrow"></b>
 
                                     </li>
-                                    <li class="nav-item @((routeControl=="CalenderHour")  ?"active open":"" )">
 
-                                        <a href="#" class="nav-link dropdown-toggle @(routeControl!="CalenderHour" ?"collapsed":"" )">
-                                            <i class="nav-icon fa fa-cogs"></i>
+                                    <li class="nav-item @((routeControl=="ComboOffer"  ))">
+
+                                        <a href="~/ComboOffer/List" class="nav-link">
+                                            <i class="nav-icon fa fa-users"></i>
                                             <span class="nav-text fadeable">
-                                                <span>Calender Days</span>
+                                                <span>Combo/Offer</span>
                                             </span>
-
-                                            <b class="caret fa fa-angle-left rt-n90"></b>
                                         </a>
-
-                                        <div class="hideable submenu @(routeControl!="CalenderHour" ?"collapse":"" )">
-                                            <ul class="submenu-inner">
-
-                                                <li class="nav-item @((routeControl=="CalenderHour" &&
-                                        (routeAction=="Index" || routeAction=="Add" || routeAction=="Edit"))  ?"active":"" )">
-
-                                                    <a href="~/CalenderHour/Index" class="nav-link">
-
-                                                        <span class="nav-text">
-                                                            <span>Calender Hour</span>
-                                                        </span>
-                                                    </a>
-
-
-                                                </li>
-                                                <li class="nav-item @((routeControl=="CalenderHour" &&
-                                        (routeAction=="AddWorkingDay"))  ?"active":"" )">
-
-                                                    <a href="~/CalenderHour/NonWorkingDayList" class="nav-link">
-
-                                                        <span class="nav-text">
-                                                            <span>Working Day</span>
-                                                        </span>
-                                                    </a>
-
-
-                                                </li>
-
-                                            </ul>
-                                        </div>
-
-                                        <b class="sub-arrow"></b>
-
-                                    </li>
-
-
-
-
+                                            <b class="sub-arrow"></b>
+                                        </li>
                                 }
-
                             </ul>
                         </nav>
-
                     </div><!-- /.ace-scroll -->
                 </div>
             </div>
@@ -476,7 +375,7 @@
                                         </li>
 
                                         <li class="nav-item mx-2">
-                                            <a href="~/Order/List" class=" @(routeControl=="Order" ?"active":"" ) btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
+                                            <a href="~/Order/Add" class=" @(routeControl=="Order" ?"active":"" ) btn bgc-h-primary-l4 btn-brc-tp btn-outline-secondary btn-h-lighter-secondary btn-a-outline-primary btn-a-bgc-tp btn-a-bold px-4 px-lg-2">
                                                 Orders
                                             </a>
                                         </li>
@@ -632,8 +531,8 @@
                 <footer class="footer d-none d-sm-block">
                     <div class="footer-inner">
                         <div class="h-100 pt-3 border-t-1 brc-secondary-l2 bgc-white-tp1 shadow">
-                            <span class="text-primary-m1 font-bolder text-120">Field Service</span>
-                            <span class="text-secondary-d2">Application &copy; 2020</span>
+                            <span class="text-primary-m1 font-bolder text-120">La Cafelogy</span>
+                            <span class="text-secondary-d2">Application &copy; 2022 - @DateTime.Now.Year.ToString()</span>
                         </div>
                     </div><!-- .footer-inner -->
                 </footer>
@@ -689,7 +588,6 @@
         <script src="~/js/bootstrap.js"></script>
         <script src="~/js/ace.js"></script>
         <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
-       
         <!-- Only for demo purpose -->
     </environment>
     <environment names="Staging,Production">
@@ -698,10 +596,10 @@
         <script src="~/js/bootstrap.js"></script>
         <script src="~/js/ace.js"></script>
         <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
-      
+
     </environment>
 
     @RenderSection("scripts", required: false)
-
+   
 </body>
 </html>

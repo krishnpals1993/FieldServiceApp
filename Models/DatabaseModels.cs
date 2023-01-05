@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FieldServiceApp.Models
+namespace LaCafelogy.Models
 {
     public class DBContext : DbContext
     {
@@ -23,19 +23,24 @@ namespace FieldServiceApp.Models
         public DbSet<ItemPrice> tbl_ItemPrice { get; set; }
         public DbSet<OrderMaster> tbl_OrderMaster { get; set; }
         public DbSet<OrderDetail> tbl_OrderDetail { get; set; }
+        public DbSet<Order> tbl_Order { get; set; }
+        public DbSet<OrderItem> tbl_OrderItem { get; set; }
         public DbSet<OrderAssignment> tbl_OrderAssignment { get; set; }
         public DbSet<State> tbl_States { get; set; }
         public DbSet<City> tbl_Cities { get; set; }
         public DbSet<Unit> tbl_Units { get; set; }
         public DbSet<EmployeeMaster> tbl_EmployeeMaster { get; set; }
         public DbSet<ItemCategory> tbl_ItemCategory { get; set; }
-        public DbSet<ServiceFormLog> tbl_ServiceFormLogs { get; set; }
-        public DbSet<CalenderWorkingHour> tbl_CalenderWorkingHours { get; set; }
-        public DbSet<CalenderWorkingDay> tbl_CalenderWorkingDays { get; set; }
         public DbSet<BilHeader> tbl_BilHeaders { get; set; }
         public DbSet<BilDetail> tbl_BilDetail { get; set; }
         public DbSet<GlobalSetting> tbl_GlobalSetting { get; set; }
-
+        public DbSet<OrderNote> tbl_OrderNotes { get; set; }
+        public DbSet<OrderImage> tbl_OrderImages { get; set; }
+        public DbSet<OrderImageShareDetail> tbl_OrderImageShareDetail { get; set; }
+        public DbSet<EmailAddressDetail> tbl_EmailAddressDetail { get; set; }
+        public DbSet<ComboOfferMaster> tbl_ComboOfferMasters { get; set; }
+        public DbSet<ComboOfferDetail> tbl_ComboOfferDetails { get; set; }
+      
     }
 
     [Table("Users")]
@@ -276,7 +281,6 @@ namespace FieldServiceApp.Models
         public string Color { get; set; }
     }
 
-
     [Table("ItemCategories")]
     public class ItemCategory
     {
@@ -287,58 +291,6 @@ namespace FieldServiceApp.Models
         public string CategoryName { get; set; }
         public string RoleIds { get; set; }
 
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-    }
-
-    [Table("ServiceFormLogs")]
-    public class ServiceFormLog
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ServiceFormLogId { get; set; }
-        public int OrderId { get; set; }
-        public DateTime DateOfService { get; set; }
-        public int ItemCategoryId { get; set; }
-        public int ItemId { get; set; }
-        public decimal Qty { get; set; }
-        public string Locations { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public int? ApartmentId { get; set; }
-    }
-
-    [Table("CalenderWorkingHour")]
-    public class CalenderWorkingHour
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public Int16 Day { get; set; }
-        public string DayName { get; set; }
-    }
-
-    [Table("CalenderWorkingDay")]
-    public class CalenderWorkingDay
-    {
-
-        public int Id { get; set; }
-        public string Type { get; set; }
-        public string DayName { get; set; }
-        public DateTime? HolidayDate { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
@@ -445,7 +397,7 @@ namespace FieldServiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CustomerContactId { get; set; }
-        public int CustomerShipId { get; set; } 
+        public int CustomerShipId { get; set; }
         public int CustomerId { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
@@ -526,4 +478,140 @@ namespace FieldServiceApp.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+
+    [Table("OrderNotes")]
+    public class OrderNote
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderNoteId { get; set; }
+
+        public int OrderId { get; set; }
+
+        public string Note { get; set; }
+
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("OrderImages")]
+    public class OrderImage
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderImageId { get; set; }
+
+        public int OrderId { get; set; }
+
+        public string Image { get; set; }
+        public string Description { get; set; }
+        public Byte[] Base64 { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("OrderImageShareDetail")]
+    public class OrderImageShareDetail
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderImageShareDetailId { get; set; }
+        public int OrderId { get; set; }
+        public int OrderImageId { get; set; }
+        public string Type { get; set; }
+        public string ToEmail { get; set; }
+        public string Subject { get; set; }
+        public string Body { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("EmailAddressDetail")]
+    public class EmailAddressDetail
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int EmailAddressDetailId { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+
+    [Table("ComboOfferMaster")]
+    public class ComboOfferMaster
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ComboOfferMasterId { get; set; }
+        public string ComboOfferName { get; set; }
+        public decimal Price { get; set; }
+        public string Type { get; set; }
+        public Int16 IsActive { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("ComboOfferDetail")]
+    public class ComboOfferDetail
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ComboOfferDetailId { get; set; }
+        public int ComboOfferMasterId { get; set; }
+        public int ItemId { get; set; }
+        public int Quantity { get; set; }
+        public Int16 IsActive { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("Orders")]
+    public class Order
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderId { get; set; }
+        public string OrderNo { get; set; }
+        public string ContactNo { get; set; }
+        public string Name { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string Remarks { get; set; }
+        public Int16 IsActive { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("OrderItems")]
+    public class OrderItem
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderItemId { get; set; }
+        public int OrderId { get; set; }
+        public int ItemId { get; set; }
+        public int ComboOfferId { get; set; }
+        public int Quantity { get; set; }
+        public int Amount { get; set; }
+        public Int16 IsActive { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+
 }

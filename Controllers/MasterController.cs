@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using FieldServiceApp.Models;
-using FieldServiceApp.Utility;
+using LaCafelogy.Models;
+using LaCafelogy.Utility;
 using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
-using FieldServiceApp.Filters;
+using LaCafelogy.Filters;
 
-namespace FieldServiceApp.Controllers
+namespace LaCafelogy.Controllers
 {
     [Authentication]
     public class MasterController : Controller
@@ -348,7 +348,14 @@ namespace FieldServiceApp.Controllers
             return Json(response);
         }
 
-
+         
+         
+ 
+  
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
 
     }
 }

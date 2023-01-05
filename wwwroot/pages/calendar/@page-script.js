@@ -1,4 +1,4 @@
- 
+
 
 jQuery(function ($) {
     if (!window.Intl) {
@@ -68,6 +68,7 @@ jQuery(function ($) {
     // initialize the calendar
 
     if (window.calenderHourId == '0') {
+        
         window.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             themeSystem: 'bootstrap',
@@ -138,7 +139,7 @@ jQuery(function ($) {
                                 end: data['ShipEndDate'] == null ? null : new Date(data['ShipEndDate']),
                                 allDay: false,
                                 extendedProps: data,
-                              //  className: 'bgc-info text-white text-75'
+                                //  className: 'bgc-info text-white text-75'
                                 className: 'text-75 ',
                                 color: data['Color'],   // a non-ajax option
                                 textColor: 'white'
@@ -157,10 +158,39 @@ jQuery(function ($) {
                 }
 
             },
-            slotDuration: '00:15:00',
+            slotDuration: '00:30:00',
+            snapDuration: '00:30:00',
             eventResize: function (info) {
-                updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
-                });
+                if (info.event._def.extendedProps.ReOccurenceParentOrderId.toString() == "1") {
+
+                    swal({
+                        title: "Do you want to change all future",
+                        type: "warning",
+                        showCancelButton: true,
+                        cancelButtonText: "No",
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: false
+                    },
+                        function (isConfirm) {
+                            if (!isConfirm) {
+                                updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
+                                });
+                            }
+                            else {
+
+                                updateOrderDateAllFuture(info.event.id, info.event.start, info.event.end, function (data) {
+                                });
+                                return;
+                            }
+
+                        });
+                }
+                else {
+                    updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
+                    });
+                }
+
             },
             eventDragStop: function (info) {
                 var event = info.event;
@@ -241,12 +271,12 @@ jQuery(function ($) {
         });
     }
     else {
-        
+        debugger;
         window.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
             themeSystem: 'bootstrap',
             height: 1100,
-            initialView: (window.roleName === 'Admin' ? 'resourceTimeGridDay' : 'timeGridDay' ),
+            initialView: (window.roleName === 'Admin' ? 'resourceTimeGridDay' : 'timeGridDay'),
             //resourceGroupField: 'groupdId',
             resources: getResource(),
             headerToolbar: {
@@ -256,20 +286,20 @@ jQuery(function ($) {
             },
             events: getEvents(),
             eventDidMount: function (info, element, view) {
-                
+
                 //ReOccurenceParentOrderId
                 try {
 
-                     
+
                     if (info.event._def.extendedProps.ReOccurenceParentOrderId.toString() != "0") {
                         $(info.el).find('.fc-daygrid-event-dot').html('').html("<i class='fa fa-asterisk'></i>");
                     }
                 } catch (e) {
 
                 }
-                
 
-               
+
+
 
                 if (info.event._def.extendedProps.Color) {
                     // debugger;
@@ -277,9 +307,10 @@ jQuery(function ($) {
                         $(info.el).css('background-color', info.event._def.extendedProps.Color);
                     }
                     else {
-                        
-                        $(info.el).find('.fc-event-time').prepend(" <i style='margin-right:5px;font-size:10px;margin-top:1px;' class='fa fa-asterisk'></i>");
-                        //
+                        if (info.event._def.extendedProps.ReOccurenceParentOrderId.toString() != "0") {
+
+                            $(info.el).find('.fc-event-time').prepend(" <i style='margin-right:5px;font-size:10px;margin-top:1px;' class='fa fa-asterisk'></i>");
+                        }//
                     }
                     //  $(info.el).css('background-color', info.event._def.extendedProps.Color);
                 }
@@ -343,7 +374,7 @@ jQuery(function ($) {
                                 className: 'text-75',
                                 color: data['Color'],   // a non-ajax option
                                 textColor: 'white'
-                                
+
                             });
 
                         });
@@ -359,10 +390,39 @@ jQuery(function ($) {
                 }
 
             },
-            slotDuration: '00:15:00',
+            slotDuration: '00:30:00',
+            snapDuration: '00:30:00',
             eventResize: function (info) {
-                updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
-                });
+                if (info.event._def.extendedProps.ReOccurenceParentOrderId.toString() == "1") {
+
+                    swal({
+                        title: "Do you want to change all future",
+                        type: "warning",
+                        showCancelButton: true,
+                        cancelButtonText: "No",
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "Yes",
+                        closeOnConfirm: true
+                    },
+                        function (isConfirm) {
+                            if (!isConfirm) {
+                                updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
+                                });
+                            }
+                            else {
+
+                                updateOrderDateAllFuture(info.event.id, info.event.start, info.event.end, function (data) {
+                                });
+                                return;
+                            }
+
+                        });
+                }
+                else {
+                    updateOrderDate(info.event.id, info.event.start, info.event.end, function (data) {
+                    });
+                }
+
             },
             eventDragStop: function (info) {
                 var event = info.event;
@@ -413,12 +473,12 @@ jQuery(function ($) {
                             if (inf) {
                                 inf.event.remove();
                             }
-                            
+
                             var props = {};
                             Object.assign(props, inf.event._def.extendedProps);
                             props.Color = window.assingEmployeeColor;
                             window.calendar.addEvent({
-                               
+
                                 id: inf.event._def.extendedProps['OrderId'],
                                 resourceId: $("#EmployeeId").val(),
                                 title: inf.event._def.extendedProps.CustomerName + '<br/>' + inf.event._def.extendedProps.ItemName,
@@ -446,15 +506,15 @@ jQuery(function ($) {
             },
             scrollTime: window.startTime,
             viewDidMount: function (args) {
-               
-                if (args.view.type == "resourceTimeGridDay" || args.view.type=="timeGridDay") {
-                   
+
+                if (args.view.type == "resourceTimeGridDay" || args.view.type == "timeGridDay") {
+
                     $("#goToDateCalendar").show();
-                    if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length>0) {
+                    if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length > 0) {
                         $($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().eq(0).remove();
                     }
                     $($($(".fc-toolbar-chunk")[1]).children().eq(0)).append('<span> (' + new moment(window.calendar.getDate()).format('dddd') + ')</span>');
-                    
+
                 }
                 else {
                     if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length > 0) {
@@ -468,7 +528,7 @@ jQuery(function ($) {
                 });
             },
             eventRender: function (event, element, view) {
-                
+
                 $(info.el).find('.fc-daygrid-event-dot').html('').html("<i class='fa fa-asterisk'></i>");
                 //element.find(".fc-title").prepend("<i class='fa fa-asterisk'></i>");
                 //if (info.event._def.extendedProps.Color) {
@@ -487,8 +547,8 @@ jQuery(function ($) {
 
 
     window.calendar.render();
-   
-     
+
+
     $($(".fc-toolbar-chunk")[1]).append('<input type="text" id="goToDateCalendar" placeholder="MM/DD/YYYY" style="display:none;margin-top: 8px;margin-left: 25%;width: 50%;" class="form-control"  />');
 
     setTimeout(function () {
@@ -502,28 +562,28 @@ jQuery(function ($) {
         })
             .on('statechange', function (ev) {
                 if ($("#goToDateCalendar").val()) {
-                   // console.log('f');
-                   // window.calendar.gotoDate('2020-01-12');
+                    // console.log('f');
+                    // window.calendar.gotoDate('2020-01-12');
                     if (new moment($("#goToDateCalendar").val())._d.toString() != "Invalid Date") {
-                        
+
                         /*if ($("#goToDateCalendar").val().toString().length == "10" || $("#goToDateCalendar").val().toString().length == "9") {*/
                         window.calendar.gotoDate(new moment($("#goToDateCalendar").val()).format("YYYY-MM-DD"));
-                        
-                    /*}*/
-                        $("#calendar .fc-toolbar-title span").text("("+new moment($("#goToDateCalendar").val()).format("dddd")+")");
+
+                        /*}*/
+                        $("#calendar .fc-toolbar-title span").text("(" + new moment($("#goToDateCalendar").val()).format("dddd") + ")");
                     }
                 }
             });
 
         $("#goToDateCalendar").show();
-       
+
 
     }, 500);
 
     $('.fc-prev-button').click(function () {
 
-        
-        if (window.calendar.view.type =="resourceTimeGridDay") {
+
+        if (window.calendar.view.type == "resourceTimeGridDay") {
             if ($($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().length > 0) {
                 $($($(".fc-toolbar-chunk")[1]).children().eq(0)).children().eq(0).remove();
             }

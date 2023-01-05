@@ -1,0 +1,209 @@
+﻿@model LaCafelogy.Models.ComboOfferMasterViewModel
+
+@{
+    ViewData["Title"] = "Add Combo/Offers";
+}
+@using Microsoft.Extensions.Options;
+@inject IOptions<Appsettings> Settings
+
+
+
+<div role="main" class="page-content container container-plus">
+    <div class="card bcard mt-2 mt-lg-3">
+        <div class="card-header">
+            <h3 class="card-title text-125">
+                @ViewData["Title"]
+            </h3>
+        </div>
+
+        <div ng-app="myApp" ng-controller="myCtrl" class="card-body px-3 pb-1">
+            <form>
+
+                <div class="row form-group">
+                    <div class="col-lg-1">
+                        <label class="col-form-label"> Name</label>
+                    </div>
+                    <div class="col-md-">
+                        <input type="text" ng-model="comboOfferName" class="form-control"
+                               placeholder="Combo/Offer name" />
+                    </div>
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Price</label>
+                    </div>
+                    <div class="col-md-">
+                        <input type="text" ng-model="comboOfferPrice" class="form-control"
+                               placeholder="Combo/Offer Price" />
+                    </div>
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Type</label>
+                    </div>
+                    <div class="col-md-">
+                        <select class="form-control"
+                                ng-model="comboOfferType">
+                            <option value="Offer">Offer</option>
+                            <option value="Combo">Combo</option>
+                        </select>
+                    </div>
+                </div>
+                <hr />
+                <div ng-repeat="item in itemArray" class="row form-group">
+
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Item</label>
+                    </div>
+
+                    <div class="col-md-2">
+                        <select class="form-control"
+                                ng-options="option.ItemId as option.ItemName for option in itemList | orderBy : 'ItemName'"
+                                ng-model="item.ItemId">
+                        </select>
+                    </div>
+                    <div class="col-lg-1">
+                        <label class="col-form-label">Quantity</label>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" placeholder="Quanity"
+                               ng-model="item.Quantity" />
+                    </div>
+
+
+
+                    <div class="col-md-1">
+                        <button ng-show="$index==itemArray.length-1" type="button" class="btn btn-sm btn-primary" ng-click="addItem(item,$index)">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                        <button ng-show="$index==itemArray.length-1 && $index>0" type="button" class="btn btn-sm btn-primary" ng-click="deleteItem(item,$index)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+
+
+                </div>
+
+
+                <div class="hr-line-dashed"></div>
+                <div class="form-group row">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <a class="btn btn-white btn-sm" asp-action="ItemClassList">Cancel</a>
+                        <button class="btn btn-primary btn-sm" type="button" ng-click="saveForm()">Save</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
+    </environment>
+}
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="text/javascript">
+
+        window.itemList = @Html.Raw(Json.Serialize(Model.ItemList));
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function ($scope) {
+
+            $scope.itemArray = [];
+            $scope.itemArray.push({
+                ItemId: '',
+                Quantity: '',
+            });
+
+            $scope.itemList = window.itemList;
+
+
+
+            $scope.addItem = function (item, index) {
+
+                if (!item.ItemId) {
+                    swal("Please select item", "", "error");
+                    return;
+                }
+                if (!item.Quantity) {
+                    swal("Please enter item quantity", "", "error");
+                    return;
+                }
+
+
+                $scope.itemArray.push({
+                    ItemId: '',
+                    Quantity: '',
+                });
+
+            };
+
+            $scope.deleteItem = function (item, index) {
+
+                $scope.itemArray.splice(index, 1);
+
+            }
+
+            //addColumnValue  deleteColumnValue
+
+
+            $scope.saveForm = function () {
+                //comboOfferName comboOfferPrice comboOfferType
+                if (!$scope.comboOfferName) {
+                    swal("Please enter combo/offer name", "", "error");
+                    return;
+                }
+
+                if (!$scope.comboOfferPrice) {
+                    swal("Please enter combo/offer price", "", "error");
+                    return;
+                }
+
+                if (!$scope.comboOfferType) {
+                    swal("Please enter combo/offer type", "", "error");
+                    return;
+                }
+
+                var model = {
+                    ComboOfferName: $scope.comboOfferName,
+                    Price: $scope.comboOfferPrice,
+                    Type: $scope.comboOfferType,
+                    ItemList: $scope.itemArray
+                }
+
+                $.ajax({
+                    url: "/ComboOffer/AddComboOffer",
+                    type: "POST",
+                    dataType: "json",
+                    data: { model: angular.toJson(model) },
+                    success: function (data) {
+
+                        if (data.Status == "1") {
+                            swal(data.Message, "", "success")
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 250);
+                        }
+                        else {
+                            swal(data.Message, "", "error")
+                        }
+                    }
+                })
+
+            }
+
+
+        });
+
+
+
+
+
+    </script>
+}

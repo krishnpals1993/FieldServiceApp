@@ -1,6 +1,6 @@
 ﻿@using Microsoft.Extensions.Options;
 @using Newtonsoft.Json;
-@model FieldServiceApp.Models.CityViewModel
+@model LaCafelogy.Models.CityViewModel
 @inject IOptions<Appsettings> Settings
 @{
     ViewData["Title"] = "Add City";
@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="col-sm-3">
-                        @Html.DropDownListFor(model => model.StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select unit", new { @class = "form-control", @placeholder = "Select unit" })
+                        @Html.DropDownListFor(model => model.StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select unit" })
                         <span asp-validation-for="StateId" class="text-danger"></span>
                     </div>
                 </div>

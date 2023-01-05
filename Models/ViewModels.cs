@@ -2,13 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FieldServiceApp.Models
+namespace LaCafelogy.Models
 {
     public class ResponseModel
     {
         public string Status { get; set; }
         public string Message { get; set; }
+
+        public object AdditionalData { get; set; }
     }
     public class LoginViewModel
     {
@@ -193,9 +196,11 @@ namespace FieldServiceApp.Models
             CityList = new List<CityViewModel>();
             Contacts = new List<CustmoerContactViewModel>();
             Shippings = new List<CustmoerShippingViewModel>();
-            Billings = new List<CustomerBillingViewModel>();
+
         }
         public int ShipId { get; set; }
+
+        public int BillingId { get; set; }
         public int CustomerBillingId { get; set; }
         public string Notes { get; set; }
         public int CustmoerId { get; set; }
@@ -225,17 +230,64 @@ namespace FieldServiceApp.Models
         public List<CustmoerContactViewModel> Contacts { get; set; }
         public CustmoerShippingViewModel Shipping { get; set; }
         public List<CustmoerShippingViewModel> Shippings { get; set; }
-        public List<CustomerBillingViewModel> Billings { get; set; }
         public List<StateViewModel> StateList { get; set; }
         public List<CityViewModel> CityList { get; set; }
+
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Mobile { get; set; }
+        public string AltPhone { get; set; }
+        public string Fax { get; set; }
+        public string MiddleName { get; set; }
+
+    }
+    public class CustomerDetailViewModel
+    {
+        public CustomerDetailViewModel()
+        {
+            Shipping = new CustmoerShippingViewModel();
+
+        }
+        public int ShipId { get; set; }
+        public int CustomerBillingId { get; set; }
+        public string Notes { get; set; }
+        public int CustmoerId { get; set; }
+        public string CompanyName { get; set; }
+
+        //[Required(ErrorMessage = "Please enter code")]
+        public string Code { get; set; }
+        public string Address { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string CompanyType { get; set; }
+        public int? CityId { get; set; }
+        public int? StateId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string CityName { get; set; }
+        public string StateName { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string ShipAddress { get; set; }
+        public CustmoerShippingViewModel Shipping { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Mobile { get; set; }
+        public string AltPhone { get; set; }
+        public string Fax { get; set; }
+
     }
     public class CustomerMasterViewModel_datatable
     {
 
-        public CustomerMasterViewModel_datatable()
-        {
-            BillingDetail = new List<CustomerBillingViewModel_Datatable>();
-        }
+
         public int CustmoerId { get; set; }
 
         [Sortable]
@@ -254,7 +306,7 @@ namespace FieldServiceApp.Models
 
         public string Action { get; set; }
 
-        public List<CustomerBillingViewModel_Datatable> BillingDetail { get; set; }
+
 
     }
     public class CustmoerContactViewModel
@@ -334,6 +386,7 @@ namespace FieldServiceApp.Models
 
         [Required(ErrorMessage = "Please enter item code")]
         public string ItemCd { get; set; }
+        public string ItemName { get; set; }
         public string ItemDescription { get; set; }
 
         public string ItemUnitId { get; set; }
@@ -360,6 +413,9 @@ namespace FieldServiceApp.Models
 
         public List<ItemCategoryViewModel> ItemCategoryList { get; set; }
         public string CategoryName { get; set; }
+        public string Type { get; set; }
+
+        public string IsCombo { get; set; }
     }
 
     public class OrderItemViewModel
@@ -368,6 +424,9 @@ namespace FieldServiceApp.Models
         public string ItemCd { get; set; }
         public decimal? ItemPrice { get; set; }
         public string ItemDescription { get; set; }
+        public string IsCombo { get; set; }
+        public int Quantity { get; set; }
+        public int OrderId { get; set; }
     }
     public class ItemPriceViewModel
     {
@@ -463,6 +522,7 @@ namespace FieldServiceApp.Models
         public DateTime? MaxReOccurenceEndDate { get; set; }
         public int? ReOccurenceParentOrderId { get; set; }
         public int ReOccurenceOrderCount { get; set; }
+        public int RemainingReOccurenceOrderCount { get; set; }
         public CustomerMasterViewModel CustomerDetail { get; set; }
         public CustmoerShippingViewModel CustomerShippingDetail { get; set; }
         public List<OrderItemViewModel> ItemList { get; set; }
@@ -481,6 +541,7 @@ namespace FieldServiceApp.Models
         public decimal? Tax { get; set; }
         public decimal? TaxAmount { get; set; }
         public decimal? GrossAmount { get; set; }
+        public string Notes { get; set; }
     }
 
     public class OrderMasterViewModel_Datatable
@@ -702,13 +763,8 @@ namespace FieldServiceApp.Models
     {
         public List<OrderMasterViewModel> OrderList { get; set; }
         public List<EmployeeMasterViewModel> EmployeeList { get; set; }
-        public CalenderWorkingHourViewModel CalenderWorkingHour { get; set; }
-        public DashboardViewModel()
-        {
-            OrderList = new List<OrderMasterViewModel>();
-            EmployeeList = new List<EmployeeMasterViewModel>();
-            CalenderWorkingHour = new CalenderWorkingHourViewModel();
-        }
+
+
 
     }
     public class DashboardOrderViewModel
@@ -716,6 +772,7 @@ namespace FieldServiceApp.Models
         public DashboardOrderViewModel()
         {
             EmployeeList = new List<EmployeeMasterViewModel>();
+            OrderImageList = new List<OrderImageViewModel>();
         }
         public int OrderId { get; set; }
         public DateTime? ShipStartDate { get; set; }
@@ -732,6 +789,9 @@ namespace FieldServiceApp.Models
         public string Color { get; set; }
         public string Apartments { get; set; }
         public int ReOccurenceParentOrderId { get; set; }
+        public string Description { get; set; }
+
+        public List<OrderImageViewModel> OrderImageList { get; set; }
     }
     public class ServiceFormViewModel
     {
@@ -828,133 +888,6 @@ namespace FieldServiceApp.Models
 
 
     }
-    public class CalenderWorkingHourViewModel
-    {
-
-        public int Id { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public Int16 Day { get; set; }
-        public string DayName { get; set; }
-        public string StartTimeFormatted { get; set; }
-        public string EndTimeFormatted { get; set; }
-    }
-    public class CalenderWorkingDayViewModel
-    {
-
-        public int Id { get; set; }
-        public string Type { get; set; }
-        public string DayName { get; set; }
-        public DateTime? HolidayDate { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-    }
-
-    public class BilHeaderViewModel
-    {
-        public BilHeaderViewModel()
-        {
-            Shipping = new CustmoerShippingViewModel();
-            ItemList = new List<ItemMasterViewModel>();
-        }
-        public int BilligCustomerId { get; set; }
-        public string BilligCompanyName { get; set; }
-        public string BilligCompanyCode { get; set; }
-        public string BilligAddress { get; set; }
-        public string BilligZip1 { get; set; }
-        public string BilligZip2 { get; set; }
-        public string BilligFirstName { get; set; }
-        public string BilligLastName { get; set; }
-        public string BilligCityName { get; set; }
-        public string BilligStateName { get; set; }
-        public string BilligAddress2 { get; set; }
-        public string BilligAddress3 { get; set; }
-        public int OrderId { get; set; }
-        public int OrderNo { get; set; }
-        public DateTime OrderDate { get; set; }
-        public decimal TotalAmount { get; set; }
-        public int ShipId { get; set; }
-        public DateTime? ShipStartDate { get; set; }
-        public int ItemId { get; set; }
-        public string Description { get; set; }
-        public int UnitId { get; set; }
-        public int Quantity { get; set; }
-        public decimal PerUnitPrice { get; set; }
-        public decimal TotalPrice { get; set; }
-        public string AssigneeId { get; set; }
-        public string CustomerName { get; set; }
-        public string EmployeeName { get; set; }
-        public string CustomerShipAddress { get; set; }
-        public string Status { get; set; }
-        public List<ItemMasterViewModel> ItemList { get; set; }
-        public CustmoerShippingViewModel Shipping { get; set; }
-        public int BillId { get; set; }
-        public int BillNo { get; set; }
-        public DateTime BillInvoiceDate { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-
-
-    }
-
-    public class CustomerBillingViewModel
-    {
-        public CustomerBillingViewModel()
-        {
-            Shippings = new List<CustmoerShippingViewModel>();
-        }
-
-        public int CustomerBillingId { get; set; }
-        public int CustomerId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public int? CityId { get; set; }
-        public int? StateId { get; set; }
-        public string Zip1 { get; set; }
-        public string Zip2 { get; set; }
-        public string Address1 { get; set; }
-        public string Address2 { get; set; }
-        public string Address3 { get; set; }
-        public string Notes { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public List<CustmoerShippingViewModel> Shippings { get; set; }
-
-    }
-
-    public class CustomerBillingViewModel_Datatable
-    {
-        public CustomerBillingViewModel_Datatable()
-        {
-            Shippings = new List<CustmoerShippingViewModel_Datatable>();
-        }
-
-        public int CustomerBillingId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Zip1 { get; set; }
-        public string Zip2 { get; set; }
-        public string Address1 { get; set; }
-        public string Address2 { get; set; }
-        public string Address3 { get; set; }
-        public List<CustmoerShippingViewModel_Datatable> Shippings { get; set; }
-
-    }
-
     public class MaxValueAttribute : ValidationAttribute
     {
         private readonly int _maxValue;
@@ -976,6 +909,122 @@ namespace FieldServiceApp.Models
             }
 
         }
+    }
+
+    public class OrderNoteViewModel : DashboardOrderViewModel
+    {
+        public OrderNoteViewModel()
+        {
+            OrderNoteList = new List<OrderNoteDetailViewModel>();
+        }
+        public int OrderNoteId { get; set; }
+
+        [Required(ErrorMessage = "Please enter notes")]
+        public string Note { get; set; }
+
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public List<OrderNoteDetailViewModel> OrderNoteList { get; set; }
+    }
+
+    public class OrderNoteDetailViewModel
+    {
+        public string Note { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+    }
+
+    public class OrderImageViewModel
+    {
+        public OrderImageViewModel()
+        {
+
+            CustomerShipingAddressList = new List<CustmoerShippingViewModel>();
+            OrderList = new List<ServiceFormOrderViewModel>();
+        }
+        public int JobImageId { get; set; }
+
+        [Required(ErrorMessage = "Please select order")]
+        public int OrderId { get; set; }
+        public int ShipId { get; set; }
+        public string ShipAddress { get; set; }
+        public string Image { get; set; }
+        public string Description { get; set; }
+        public Byte[] Base64 { get; set; }
+        public string IsFollowUp { get; set; }
+        public Int16 IsActive { get; set; }
+        public string CustomerName { get; set; }
+        public string EmployeeName { get; set; }
+        public List<CustmoerShippingViewModel> CustomerShipingAddressList { get; set; }
+        public List<ServiceFormOrderViewModel> OrderList { get; set; }
+    }
+
+
+    public class ComboOfferMasterViewModel
+    {
+        public ComboOfferMasterViewModel()
+        {
+            ItemList = new List<ComboOfferDetailViewModel>();
+        }
+        public int ComboOfferMasterId { get; set; }
+        public string ComboOfferName { get; set; }
+        public decimal Price { get; set; }
+        public string Type { get; set; }
+        public string Description { get; set; }
+        public List<ComboOfferDetailViewModel> ItemList { get; set; }
+
+    }
+
+    public class ComboOfferDetailViewModel
+    {
+        public int ComboOfferDetailId { get; set; }
+        public int ComboOfferMasterId { get; set; }
+        public int ItemId { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+        public string ItemName { get; set; }
+    }
+
+
+    public class OrderViewModel
+    {
+        public OrderViewModel() {
+            ItemList = new List<ItemMasterViewModel>();
+            OrderItems = new List<OrderItemsViewModel>();
+            ContactList = new List<OrderCustomerDetailViewModel>();
+        }
+        public int OrderId { get; set; }
+        public string OrderNo { get; set; }
+        public string ContactNo { get; set; }
+        public string Name { get; set; }
+        public decimal TotalAmount { get; set; }
+        public  string Remarks { get; set; }
+        public List<ItemMasterViewModel> ItemList { get; set; }
+        public List<OrderItemsViewModel> OrderItems { get; set; }
+        public List<OrderCustomerDetailViewModel> ContactList { get; set; }
+    }
+
+    public class OrderItemsViewModel
+    {
+        public int OrderItemId { get; set; }
+        public int OrderId { get; set; }
+        public int ItemId { get; set; }
+        public string ItemName { get; set; }
+        public int ComboOfferId { get; set; }
+        public int Quantity { get; set; }
+        public int Amount { get; set; }
+        public string IsCombo { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class OrderCustomerDetailViewModel
+    {
+        public string ContactNo { get; set; }
+        public string Name { get; set; }
+
     }
 
 

@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using FieldServiceApp.Models;
-using FieldServiceApp.Utility;
+using LaCafelogy.Models;
+using LaCafelogy.Utility;
 using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Linq;
 
-namespace FieldServiceApp.Controllers
+namespace LaCafelogy.Controllers
 {
     public class AccountController : Controller
     {
@@ -45,7 +45,7 @@ namespace FieldServiceApp.Controllers
                 if (ModelState.IsValid)
                 {
 
-                    var checkUser = _dbContext.tbl_Roles.ToList();
+                    //var checkUser = _dbContext.tbl_Roles.ToList();
 
                     DbfunctionUtility dbfunction = new DbfunctionUtility(_appSettings);
                     DataSet ds = dbfunction.GetDataset(@"select * from ""Users"" u join ""Roles"" r on u.""RoleId"" = r.""RoleId""
@@ -133,7 +133,7 @@ namespace FieldServiceApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                EmailUtility _emaUtility = new EmailUtility(_appSettings, _emailSettings);
+                EmailUtility _emaUtility = new EmailUtility(_appSettings, _emailSettings,_dbContext);
                 CommanUtility _commanUtility = new CommanUtility(_appSettings);
                 var encEmail = _commanUtility.EncryptString(model.Email);
                 string emailBody = @"<p>Please click on  following link to reset password</p>
@@ -196,9 +196,9 @@ namespace FieldServiceApp.Controllers
             return View(model);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+            }
     }
 }

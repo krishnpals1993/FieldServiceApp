@@ -53,9 +53,11 @@
             }
         },
         "drawCallback": function (settings) {
-            if ($("#datatable_filter input[type='search']").val()) {
-                $_table.rows(':not(.parent)').nodes().to$().find('td:first-child').trigger('click');
-            }
+            //if ($("#datatable_filter input[type='search']").val()) {
+            //    $_table.rows(':not(.parent)').nodes().to$().find('td:first-child').trigger('click');
+            //}
+
+            $_table.rows(':not(.parent)').nodes().to$().find('td:first-child').trigger('click');
             
         },
         columns: [
@@ -71,6 +73,7 @@
                 data: "CompanyName",
                 name: "co",
                 render: function (data, type, row) {
+                   
                     if ($("input[type='search']").val()) {
                         if (row.CompanyName) {
                             if (row.CompanyName.toString().indexOf($("input[type='search']").val()) > -1) {
@@ -133,7 +136,7 @@
                 data: "UserId",
                 searchable: false,
                 render: function (data, type, row) {
-                    return '<span><a href="/Customer/Edit/' + row.CustmoerId + '">Edit</a>|</span >' +
+                    return '<span><a href="/Customer/EditV2/' + row.CustmoerId + '">Edit</a>|</span >' +
                         '<a href="#" onclick="deleteFun(' + row.CustmoerId + ')">Delete</a>';
                 }
             }
@@ -326,10 +329,12 @@
         
         
 
-          $('.dataTables_filter').appendTo('.page-tools').find('input').addClass('pl-45 radius-round').removeClass('form-control-sm')
+        $('.dataTables_filter').appendTo('.page-tools').find('input').addClass('pl-45 radius-round').removeClass('form-control-sm')
             // and add a "+" button
             .end().append('<button data-rel="tooltip" id="btnAdd" onclick="add()" type="button" class="btn radius-round btn-outline-primary border-2 btn-sm ml-2" title="Add New"><i class="fa fa-plus"></i></button>')
 
+
+        
 
     }, 10);
 

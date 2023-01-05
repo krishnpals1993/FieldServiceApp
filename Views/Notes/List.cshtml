@@ -1,9 +1,9 @@
-﻿@model IEnumerable<FieldServiceApp.Models.ServiceFormViewModel>
+﻿@model IEnumerable<LaCafelogy.Models.OrderMasterViewModel>
 @using Microsoft.Extensions.Options;
 @inject IOptions<Appsettings> Settings
 @{
 
-    ViewData["Title"] = " Service Form Log(s)";
+    ViewData["Title"] = " Note(s)";
 }
 <div role="main" class="page-content container container-plus">
     <div class="page-header mb-2 pb-2 flex-column flex-sm-row align-items-start align-items-sm-center py-25 px-1">
@@ -11,9 +11,6 @@
             @ViewData["Title"]
         </h1>
 
-        <div class="page-tools mt-3 mt-sm-0 mb-sm-n1">
-            <!-- dataTables search box will be inserted here dynamically -->
-        </div>
     </div>
 
     <div class="card bcard h-auto">
@@ -24,41 +21,27 @@
                 <!-- thead with .sticky-nav -->
                 <thead class="sticky-nav text-secondary-m1 text-uppercase text-85">
                     <tr>
-                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Customer
-                        </th>
+                        
 
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                             Order
                         </th>
 
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Apartment
+                            Customer
                         </th>
 
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Date Of Service
+                            Ship Date
                         </th>
 
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Item Category
+                            Note
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Item
+                            Note Date
                         </th>
-                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Quantity
-                        </th>
-                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Locations
-                        </th>
-
-                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Status
-                        </th>
-                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Action
-                        </th>
+                        
                     </tr>
                 </thead>
 
@@ -67,61 +50,27 @@
                     {
                     <tr class="d-style bgc-h-default-l4">
                         <td>
-                            @item.CustomerName
+                            @item.OrderNo
                         </td>
 
                         <td class="text-grey">
-                            #@item.OrderId
+                            #@item.CustomerName
                         </td>
 
                         <td class="text-grey">
-                            @item.ApartmentName
-                        </td>
-
-                        <td class="text-grey">
-                            @item.DateOfService?.ToString("MM/dd/yyyy")
-                        </td>
-
-                        <td class="text-grey">
-                            @item.CategoryName
-                        </td>
-
-                        <td class="text-grey">
-                            @item.ItemCd
-                        </td>
-
-                        <td class="text-grey">
-                            @item.Quantity
-                        </td>
-
-                        <td class="text-grey">
-                            @item.Locations
-                        </td>
-                        <td>
-                            @if (item.IsActive == 1)
+                            @if (item.ShipStartDate != null)
                             {
-                                <span class="badge badge-success mr-1">
-                                    Active
-                                </span>
+                                <span>@item.ShipStartDate?.DayOfWeek , </span>
                             }
-                            else
-                            {
-                                <span class="badge badge-danger mr-1">
-                                    In Active
-                                </span>
-
-                            }
+                            @item.ShipStartDate?.ToString("MM/dd/yyyy hh:mm tt")
                         </td>
 
                         <td class="text-grey">
-                            @if (item.IsActive == 1)
-                            {
-                                @Html.ActionLink("Edit", "Edit", "Service", new { id = item.ServiceFormLogId })
-                                <span>|</span>
-                                <a href="#" onclick="deleteFun('@item.ServiceFormLogId')">Delete</a>
-                            }
+                            @item.Notes
+                        </td>
 
-
+                        <td class="text-grey">
+                            @item.CreatedDate?.ToString("MM/dd/yyyy hh:mm tt")
                         </td>
 
                     </tr>

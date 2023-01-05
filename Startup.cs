@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using FieldServiceApp.Contracts;
 using FieldServiceApp.Services;
-using FieldServiceApp.Models;
+using LaCafelogy.Models;
 using AutoMapper;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
@@ -46,6 +46,10 @@ namespace FieldServiceApp
             });
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddControllersWithViews();
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+            });
             services.AddDbContext<DBContext>(options =>
               options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddAutoMapper(typeof(Startup));
@@ -72,7 +76,7 @@ namespace FieldServiceApp
             app.UseSession();
             app.UseRouting();
             app.UseAuthorization();
-
+            app.UseCors(options => options.AllowAnyOrigin());
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

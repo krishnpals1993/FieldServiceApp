@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using FieldServiceApp.Models;
-using FieldServiceApp.Utility;
+using LaCafelogy.Models;
+using LaCafelogy.Utility;
 using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
-using FieldServiceApp.Filters;
+using LaCafelogy.Filters;
 
-namespace FieldServiceApp.Controllers
+namespace LaCafelogy.Controllers
 {
     [Authentication]
     public class InventoryController : Controller
@@ -29,6 +29,8 @@ namespace FieldServiceApp.Controllers
         {
             List<ItemMasterViewModel> items = (from item in _dbContext.tbl_ItemMaster
                                                join unit in _dbContext.tbl_Units on item.ItemUnitId equals unit.UnitId
+                                               into unit
+                                               from unit1 in unit.DefaultIfEmpty()
                                                join category in _dbContext.tbl_ItemCategory on item.CategoryId equals category.CategoryId
                                                into category
                                                from category1 in category.DefaultIfEmpty()
@@ -38,7 +40,7 @@ namespace FieldServiceApp.Controllers
                                                    ItemCd = item.ItemCd,
                                                    ItemPrice = item.ItemPrice,
                                                    ItemDescription = item.ItemDescription,
-                                                   UnitName = unit.UnitName,
+                                                   UnitName = unit1.UnitName,
                                                    Sellable = item.Sellable,
                                                    Service = item.Service,
                                                    Taxable = item.Taxable,

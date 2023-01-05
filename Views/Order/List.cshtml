@@ -1,4 +1,4 @@
-﻿@model FieldServiceApp.Models.OrderMasterViewModel_Datatable
+﻿@model LaCafelogy.Models.OrderMasterViewModel_Datatable
 @using Microsoft.Extensions.Options;
 @inject IOptions<Appsettings> Settings
 @{
@@ -12,13 +12,86 @@
         </h1>
 
         <div class="page-tools mt-3 mt-sm-0 mb-sm-n1">
+
             <!-- dataTables search box will be inserted here dynamically -->
         </div>
     </div>
 
     <div class="card bcard h-auto">
 
+        <form class="mt-lg-3" autocomplete="off">
+            <div class="form-group row">
+                <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                    <label for="id-form-field-1" class="mb-0">
+                        Ship Date
+                    </label>
+                </div>
+                <div class="col-sm-2">
+                    <div class="input-group date">
+                        <input type="text" id="id-date-1" placeholder="Ship Date From" class="form-control" />
 
+                        <div class="input-group-addon input-group-append">
+                            <div class="input-group-text">
+                                <i class="far fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-1 col-form-label text-sm-right pr-0" style="margin-left:-5%">
+                    <label for="id-form-field-1" class="mb-0">
+                        To
+                    </label>
+                </div>
+                <div class="col-sm-2">
+                    <div class="input-group date">
+                        <input type="text" id="id-date-2" placeholder="Ship Date To" class="form-control" />
+                        <div class="input-group-addon input-group-append">
+                            <div class="input-group-text">
+                                <i class="far fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-sm-1 col-form-label text-sm-right pr-0">
+                    <label for="id-form-field-1" class="mb-0">
+                        Order Date
+                    </label>
+                </div>
+                <div class="col-sm-2">
+                    <div class="input-group date">
+                        <input type="text" id="id-date-3" placeholder="Order Date From" class="form-control" />
+                        <div class="input-group-addon input-group-append">
+                            <div class="input-group-text">
+                                <i class="far fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-1 col-form-label text-sm-right pr-0" style="margin-left:-5%">
+                    <label for="id-form-field-1" class="mb-0">
+                        To
+                    </label>
+                </div>
+                <div class="col-sm-2">
+                    <div class="input-group date">
+                        <input type="text" id="id-date-4" placeholder="Order Date To" class="form-control" />
+                        <div class="input-group-addon input-group-append">
+                            <div class="input-group-text">
+                                <i class="far fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </form>
 
         <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Order/List" method="post">
 
@@ -67,9 +140,11 @@
 
         @@media (min-width: 1368px) {
             .datatable {
-                 width:  98% !important;
+                width: 98% !important;
             }
         }
+
+         
     </style>
 
 }
@@ -88,7 +163,7 @@
         <script src="~/lib//datatable/buttons.colVis.js"></script>
         <script src="~/lib/moment/moment.js"></script>
         <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
-        <script src="~/js/order_list.js"></script>
+        <script src="~/js/order_list.js?v=1"></script>
 
 
         <script type="text/javascript">
@@ -102,44 +177,44 @@
 
             window.baseUrl = '@Settings.Value.WebBaseURL';
 
-    //        $(document).ready(function () {
+            $(document).ready(function () {
 
-    // var TinyDatePicker = DateRangePicker.TinyDatePicker;
-    //                      TinyDatePicker('#id-date-1', {
-    //                    mode: 'dp-below',
-    //                    date : new Date()
-    //                })
-    //                      .on('statechange', function (ev) {
+     var TinyDatePicker = DateRangePicker.TinyDatePicker;
+                          TinyDatePicker('#id-date-1', {
+                        mode: 'dp-below',
+                        date : new Date()
+                    })
+                          .on('statechange', function (ev) {
+                              checkDate();
+                        });
+    var TinyDatePicker2 = DateRangePicker.TinyDatePicker;
+                          TinyDatePicker2('#id-date-2', {
+                        mode: 'dp-below',
+                        date : new Date()
+                    })
+                          .on('statechange', function (ev) {
+                              checkDate();
+                        });
 
-    //                    });
-    //var TinyDatePicker2 = DateRangePicker.TinyDatePicker;
-    //                      TinyDatePicker2('#id-date-2', {
-    //                    mode: 'dp-below',
-    //                    date : new Date()
-    //                })
-    //                      .on('statechange', function (ev) {
+     var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
+                           TinyDatePicker3('#id-date-3', {
+                            mode: 'dp-below',
+                            date : new Date()
+                        })
+                           .on('statechange', function (ev) {
+                               checkDate();
+                            });
 
-    //                    });
+    var TinyDatePicker4 = DateRangePicker.TinyDatePicker;
+                          TinyDatePicker4('#id-date-4', {
+                             mode: 'dp-below',
+                             date : new Date()
+                         })
+                          .on('statechange', function (ev) {
+                              checkDate();
+                             });
 
-    // var TinyDatePicker3 = DateRangePicker.TinyDatePicker;
-    //                       TinyDatePicker3('#id-date-3', {
-    //                        mode: 'dp-below',
-    //                        date : new Date()
-    //                    })
-    //                       .on('statechange', function (ev) {
-
-    //                        });
-
-    //var TinyDatePicker4 = DateRangePicker.TinyDatePicker;
-    //                      TinyDatePicker4('#id-date-4', {
-    //                         mode: 'dp-below',
-    //                         date : new Date()
-    //                     })
-    //                      .on('statechange', function (ev) {
-
-    //                         });
-
-    //        });
+            });
 
 
             function add() {
@@ -184,18 +259,18 @@
             }
 
             function checkDate() {
-               
-                var shipFromDate = $("#id-date-1").val();
-                var shipDateTo = $("#id-date-2").val();
-                var orderDateFrom = $("#id-date-3").val();
-                var orderDateTo = $("#id-date-4").val();
+
+                var shipFromDate =$("#id-date-1").val() ?  new moment($("#id-date-1").val()) : '';
+                var shipDateTo = $("#id-date-2").val() ?  new moment($("#id-date-2").val()) : '';
+                var orderDateFrom = $("#id-date-3").val() ?  new moment($("#id-date-3").val()) : '';
+                var orderDateTo = $("#id-date-4").val() ?  new moment($("#id-date-4").val()) : '';
 
 
 
-                if (((shipFromDate) && (!shipDateTo)) || ((!shipFromDate) && (shipDateTo))) {
-                swal("Please select both ship dates", "", "error");
-                return false;
-            }
+            //    if (((shipFromDate) && (!shipDateTo)) || ((!shipFromDate) && (shipDateTo))) {
+            //    swal("Please select both ship dates", "", "error");
+            //    return false;
+            //}
                 if ((shipFromDate) && (shipDateTo)) {
                      if (shipFromDate > shipDateTo) {
                 swal("Ship From date should be less or equal to ship To date", "", "error");
@@ -203,10 +278,10 @@
             }
                 }
 
-                if (((orderDateFrom) && (!orderDateTo)) || ((!orderDateFrom) && (orderDateTo))) {
-                swal("Please select both order dates", "", "error");
-                return false;
-            }
+            //    if (((orderDateFrom) && (!orderDateTo)) || ((!orderDateFrom) && (orderDateTo))) {
+            //    swal("Please select both order dates", "", "error");
+            //    return false;
+            //}
                 if ((orderDateFrom) && (orderDateTo)) {
                      if (orderDateFrom > orderDateTo) {
                 swal("Order From date should be less or equal to Order To date", "", "error");
@@ -214,10 +289,68 @@
             }
                 }
 
+                if (((shipFromDate) && (shipDateTo)) || ((orderDateFrom) && (orderDateTo))) {
+                    window.$_table.draw();
+                }
 
-                return true;
+
 
             }
+
+
+            function saveOrder(id) {
+
+                if (!$("#Note").val()) {
+                    swal("Please enter note", "", "error");
+                    return;
+                }
+
+                 $.ajax({
+                    url: "/Order/AddNote",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: id , note :$("#Note").val() },
+                    success: function (data) {
+                        if (data.Status=="1") {
+                            swal(data.Message, "", "success")
+                            setTimeout(function () {
+                                $("#dshbrdClose").trigger('click');
+                            }, 50);
+
+                        }
+                        else {
+                              swal(data.Message, "", "error")
+                        }
+                    }
+                })
+
+            }
+
+
+            function openOrderNotePopup(id) {
+    $.ajax({
+        url: "/Order/GetOrderNotePopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+            modal.find('form').on('submit', function (ev) {
+                ev.preventDefault();
+                //info.event.setProp('title', info.event._def.extendedProps.CustomerName + '<br />' + $("#EmployeeId option:selected").text());
+                window.location.reload();
+                modal.modal("hide");
+            });
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+}
 
 
 
