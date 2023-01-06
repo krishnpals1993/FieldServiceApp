@@ -550,6 +550,12 @@ Create TABLE public."CustomerShippingApartment"
 
 
 
+ ------------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------------
 
 
 
@@ -561,6 +567,520 @@ Create TABLE public."CustomerShippingApartment"
 
 
 
+ -- Table: public.BilDetail
+CREATE TABLE public."BilDetail"
+(
+    "BilDetailId" serial,
+    "Bill2No" integer,
+    "Bill2Seq" integer,
+    "Bill2ItemId" integer,
+    "Bill2Description" character varying(500) COLLATE pg_catalog."default",
+    "Bill2Price" numeric(10,2),
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+
+	
+	
+ 
+CREATE TABLE public."BilHeader"
+(
+    "BillId" serial,
+    "BillNo" integer,
+    "OrderId" integer,
+    "BillInvoiceDate" timestamp without time zone,
+    "TotalAmount" numeric(10,2),
+    "CustomerId" integer,
+    "ShipId" integer,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+ 
+CREATE TABLE public."CalenderWorkingDay"
+(
+    "Id" serial,
+    "Type" character varying(15) COLLATE pg_catalog."default",
+    "DayName" character varying(15) COLLATE pg_catalog."default",
+    "HolidayDate" timestamp without time zone,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+	
+ 
+CREATE TABLE public."CalenderWorkingHour"
+(
+    "Id" serial,
+    "StartTime" timestamp without time zone,
+    "EndTime" timestamp without time zone,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "DayName" character varying(100) COLLATE pg_catalog."default",
+    "Day" smallint
+)
+ 
+	
+ 
+CREATE TABLE public."Cities"
+(
+    "CityId" serial,
+    "CityName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "StateId" integer,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "Tax" numeric(10,3)
+)
+ 
+CREATE TABLE public."ComboOfferDetail"
+(
+    "ComboOfferDetailId" serial,
+    "ComboOfferMasterId" integer,
+    "ItemId" integer,
+    "Quantity" integer,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+ 
+CREATE TABLE public."ComboOfferMaster"
+(
+    "ComboOfferMasterId" serial,
+    "ComboOfferName" character varying COLLATE pg_catalog."default",
+    "Price" numeric(18,2),
+    "Type" character varying COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+
+ 
+CREATE TABLE public."Cust1"
+(
+    first_name character varying(100) COLLATE pg_catalog."default",
+    last_name character varying(100) COLLATE pg_catalog."default",
+    dob character varying(100) COLLATE pg_catalog."default",
+    email character varying(100) COLLATE pg_catalog."default"
+)
+
+  
+CREATE TABLE public."CustomerBilling"
+(
+    "CustomerBillingId" serial,
+    "CustomerId" integer NOT NULL,
+    "FirstName" character varying(300) COLLATE pg_catalog."default",
+    "LastName" character varying(300) COLLATE pg_catalog."default",
+    "CityId" integer,
+    "StateId" integer,
+    "Zip1" character varying(500) COLLATE pg_catalog."default",
+    "Zip2" character varying(5) COLLATE pg_catalog."default",
+    "Address1" character varying(300) COLLATE pg_catalog."default",
+    "Address2" character varying(40) COLLATE pg_catalog."default",
+    "Address3" character varying(40) COLLATE pg_catalog."default",
+    "Notes" character varying(500) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "Name" character varying(500) COLLATE pg_catalog."default",
+    "City" character varying(500) COLLATE pg_catalog."default",
+    "State" character varying(500) COLLATE pg_catalog."default",
+    "Country" character varying(500) COLLATE pg_catalog."default",
+    "Address4" character varying(500) COLLATE pg_catalog."default",
+    "Address5" character varying(500) COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."CustomerContact"
+(
+    "CustomerContactId" serial,
+    "CustomerShipId" integer,
+    "CustomerId" integer,
+    "FirstName" character varying(300) COLLATE pg_catalog."default",
+    "MiddleName" character varying(300) COLLATE pg_catalog."default",
+    "LastName" character varying(300) COLLATE pg_catalog."default",
+    "Email" character varying(150) COLLATE pg_catalog."default",
+    "Phone" character varying(15) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."CustomerMaster"
+(
+    "CustomerId" serial,
+    "CompanyName" character varying(300) COLLATE pg_catalog."default",
+    "CompanyType" character varying(100) COLLATE pg_catalog."default",
+    "CompanyCode" character varying(100) COLLATE pg_catalog."default",
+    "Notes" character varying(500) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "FullName" character varying(500) COLLATE pg_catalog."default",
+    "FirstName" character varying(500) COLLATE pg_catalog."default",
+    "MiddleName" character varying(500) COLLATE pg_catalog."default",
+    "LastName" character varying(500) COLLATE pg_catalog."default",
+    "Phone" character varying(500) COLLATE pg_catalog."default",
+    "Mobile" character varying(500) COLLATE pg_catalog."default",
+    "ID" character varying(500) COLLATE pg_catalog."default",
+    "Email" character varying(500) COLLATE pg_catalog."default",
+    "AltPhone" character varying(500) COLLATE pg_catalog."default",
+    "Fax" character varying(500) COLLATE pg_catalog."default",
+    "CompanyName1" character varying(500) COLLATE pg_catalog."default",
+    "JobName" character varying(500) COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."CustomerShipping"
+(
+    "CustomerShipId" serial,
+    "CustomerId" integer,
+    "CustomerBillingId" integer,
+    "FirstName" character varying(300) COLLATE pg_catalog."default",
+    "MiddleName" character varying(300) COLLATE pg_catalog."default",
+    "LastName" character varying(300) COLLATE pg_catalog."default",
+    "Email" character varying(150) COLLATE pg_catalog."default",
+    "Phone" character varying(150) COLLATE pg_catalog."default",
+    "Address" character varying(300) COLLATE pg_catalog."default",
+    "CityId" integer,
+    "StateId" integer,
+    "Notes" character varying(500) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "Zip1" character varying(500) COLLATE pg_catalog."default",
+    "Zip2" character varying(500) COLLATE pg_catalog."default",
+    "Address2" character varying(500) COLLATE pg_catalog."default",
+    "Address3" character varying(500) COLLATE pg_catalog."default",
+    "City" character varying(500) COLLATE pg_catalog."default",
+    "State" character varying(500) COLLATE pg_catalog."default",
+    "Country" character varying(500) COLLATE pg_catalog."default",
+    "Name" character varying(500) COLLATE pg_catalog."default",
+    "Address4" character varying(500) COLLATE pg_catalog."default",
+    "Address5" character varying(500) COLLATE pg_catalog."default",
+    "QBID" character varying(250) COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."CustomerShippingApartment"
+(
+    "ApartmentId" serial,
+    "CustomerShipId" integer,
+    "ApartmentNo" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "ApartmentName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "Notes" character varying(500) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+
+ 	
+	 
+CREATE TABLE public."EmailAddressDetail"
+(
+    "EmailAddressDetailId" serial,
+    "Email" character varying(100) COLLATE pg_catalog."default",
+    "Password" character varying(100) COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."EmployeeMaster"
+(
+    "EmployeeId" serial,
+    "FirstName" character varying(300) COLLATE pg_catalog."default",
+    "MiddleName" character varying(300) COLLATE pg_catalog."default",
+    "LastName" character varying(300) COLLATE pg_catalog."default",
+    "Email" character varying(150) COLLATE pg_catalog."default",
+    "Phone" character varying(15) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "UserId" integer,
+    "Color" character varying(100) COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."GlobalSetting"
+(
+    "Id" serial,
+    "Name" character varying(500) COLLATE pg_catalog."default",
+    "Value" character varying(100) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."ItemCategories"
+(
+    "CategoryId" serial,
+    "CategoryName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "RoleIds" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."ItemMaster"
+(
+    "ItemId" serial,
+    "ItemCd" character varying(50) COLLATE pg_catalog."default",
+    "ItemDescription" character varying(500) COLLATE pg_catalog."default",
+    "ItemUnitId" integer,
+    "ItemQOH" integer,
+    "ItemCost" numeric(10,2),
+    "ItemPrice" numeric(10,2),
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "Taxable" character varying(1) COLLATE pg_catalog."default",
+    "Sellable" character varying(1) COLLATE pg_catalog."default",
+    "Service" character varying(1) COLLATE pg_catalog."default",
+    "CategoryId" integer,
+    "QBDesc" character varying COLLATE pg_catalog."default",
+    "QBID" character varying COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."ItemPrice"
+(
+    "ItemPriceId" serial,
+    "PricCustId" integer,
+    "PricItemId" integer,
+    "PricPrice" numeric(10,2)
+)
+ 
+CREATE TABLE public."Menus"
+(
+    "MenuId" serial,
+    "Name" character varying(300) COLLATE pg_catalog."default",
+    "Parent" character varying(300) COLLATE pg_catalog."default",
+    "Action" character varying(300) COLLATE pg_catalog."default",
+    "Controller" character varying(300) COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."OrderAssignment"
+(
+    "OrderAssignmentId" serial,
+    "OrderId" integer,
+    "EmployeeId" integer,
+    "AssignmentDate" timestamp without time zone,
+    "Status" character varying(50) COLLATE pg_catalog."default",
+    "CompletedDate" timestamp without time zone,
+    "CompletedBy" integer,
+    "Notes" character varying(500) COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."OrderDetail"
+(
+    "OrderDetailId" serial,
+    "OrderId" integer,
+    "ItemId" integer,
+    "Description" character varying(500) COLLATE pg_catalog."default",
+    "UnitId" integer,
+    "Quantity" integer,
+    "PerUnitPrice" numeric(10,2),
+    "TotalPrice" numeric(10,2),
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."OrderImageShareDetail"
+(
+    "OrderImageShareDetailId" serial,
+    "OrderId" integer,
+    "OrderImageId" integer,
+    "Type" character varying(250) COLLATE pg_catalog."default",
+    "ToEmail" character varying(500) COLLATE pg_catalog."default",
+    "Subject" character varying(500) COLLATE pg_catalog."default",
+    "Body" text COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."OrderImages"
+(
+    "OrderImageId" serial,
+    "OrderId" integer,
+    "Image" character varying(250) COLLATE pg_catalog."default",
+    "Description" character varying(500) COLLATE pg_catalog."default",
+    "Base64" bytea,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."OrderItems"
+(
+    "OrderItemId" serial,
+    "OrderId" integer,
+    "ItemId" integer,
+    "ComboOfferId" integer,
+    "Quantity" integer,
+    "Amount" numeric(18,2),
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+
+CREATE TABLE public."OrderMaster"
+(
+    "OrderId" serial,
+    "OrderDate" timestamp without time zone,
+    "TotalAmount" numeric(10,2),
+    "CustomerId" integer,
+    "ShipId" integer,
+    "CancelDate" timestamp without time zone,
+    "CancelReason" character varying(500) COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "ShipStartDate" timestamp without time zone,
+    "ShipEndDate" timestamp without time zone,
+    "ShipDate" timestamp without time zone,
+    "OrderNo" integer,
+    "ApartmentIds" character varying(250) COLLATE pg_catalog."default",
+    "IsFollowUp" smallint,
+    "ParentOrderId" integer,
+    "ReOccurence" smallint,
+    "ReOccurenceFrequency" integer,
+    "ReOccurenceCycle" character varying(50) COLLATE pg_catalog."default",
+    "ReOccurenceWeekday" character varying(50) COLLATE pg_catalog."default",
+    "ReOccurenceStartDate" timestamp without time zone,
+    "ReOccurenceEndDate" timestamp without time zone,
+    "ReOccurenceParentOrderId" integer,
+    "TaxAmount" numeric(10,2)
+)
+ 
+CREATE TABLE public."OrderNotes"
+(
+    "OrderNoteId" serial,
+    "OrderId" integer,
+    "Note" character varying COLLATE pg_catalog."default",
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."Orders"
+(
+    "OrderId" serial,
+    "OrderNo" character varying COLLATE pg_catalog."default",
+    "ContactNo" character varying COLLATE pg_catalog."default",
+    "Name" character varying COLLATE pg_catalog."default",
+    "TotalAmount" numeric(18,2),
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone,
+    "Remarks" character varying COLLATE pg_catalog."default"
+)
+ 
+CREATE TABLE public."Roles"
+(
+    "RoleId" serial,
+    "RoleName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."States"
+(
+    "StateId" serial,
+    "StateName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."Units"
+(
+    "UnitId" serial,
+    "UnitName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+CREATE TABLE public."UserClaims"
+(
+    "ClaimId" serial,
+    "MenuId" integer,
+    "RoleId" integer,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
+ 
+	
+ 
+CREATE TABLE public."Users"
+(
+    "UserId" serial,
+    "Email" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "UserName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "Password" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "RoleId" integer,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
 
 
 
