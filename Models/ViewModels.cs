@@ -856,6 +856,18 @@ namespace LaCafelogy.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+    public class ItemGroupViewModel 
+    {
+        public int GroupId { get; set; }
+
+        [Required(ErrorMessage = "Please enter category name")]
+        public string GroupName { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
     public class CustomerShippingApartmentViewModel
     {
         public string Notes { get; set; }

@@ -1085,10 +1085,13 @@ CREATE TABLE public."Users"
 
 
 
+INSERT INTO public."Roles"(
+	  "RoleName", "IsActive", "CreatedBy", "CreatedDate"  )
+	VALUES ('Admin', '1', 1, now());
 
 
-
-
-
-
-
+INSERT INTO public."Users"(
+	"Email", "UserName", "Password", "RoleId", "IsActive",
+	"CreatedBy", "CreatedDate")
+	VALUES ('krishnpalsingh1993@gmail.com', 'krishnpalsingh1993@gmail.com',
+			'Pass@word1', 1, '1', 1, now());

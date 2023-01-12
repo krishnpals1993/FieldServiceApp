@@ -1,0 +1,17 @@
+﻿@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@model LaCafelogy.Models.ItemGroupViewModel
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = "Add Item Group";
+}
+<div role="main" class="page-content container container-plus">
+    <div class="card bcard mt-2 mt-lg-3">
+        <div class="card-header">
+            <h3 class="card-title text-125">
+                @ViewData["Title"]
+            </h3>
+        </div>
+    </div>
+</div> 

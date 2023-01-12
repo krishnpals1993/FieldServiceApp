@@ -189,6 +189,16 @@
 
                                                 </li>
                                                 <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "ItemGroupList" || routeAction == "AddItemGroup")) ? "active" : "" )">
+
+                                                    <a href="~/Inventory/ItemGroupList" class="nav-link">
+
+                                                        <span class="nav-text">
+                                                            <span>Item Group</span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item @((routeControl == "Inventory" &&
 (routeAction == "ItemList" || routeAction == "AddItem" || routeAction == "EditItem")) ? "active" : "" )">
 
                                                     <a href="~/Inventory/ItemList" class="nav-link">

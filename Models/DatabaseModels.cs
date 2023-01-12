@@ -31,6 +31,7 @@ namespace LaCafelogy.Models
         public DbSet<Unit> tbl_Units { get; set; }
         public DbSet<EmployeeMaster> tbl_EmployeeMaster { get; set; }
         public DbSet<ItemCategory> tbl_ItemCategory { get; set; }
+        public DbSet<ItemGroup> tbl_ItemGroup { get; set; }
         public DbSet<BilHeader> tbl_BilHeaders { get; set; }
         public DbSet<BilDetail> tbl_BilDetail { get; set; }
         public DbSet<GlobalSetting> tbl_GlobalSetting { get; set; }
@@ -291,6 +292,20 @@ namespace LaCafelogy.Models
         public string CategoryName { get; set; }
         public string RoleIds { get; set; }
 
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("ItemGroup")]
+    public class ItemGroup
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int GroupId { get; set; }
+        public string GroupName { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }

@@ -9,6 +9,8 @@ using System.Data;
 using System.Linq;
 using System.Collections.Generic;
 using LaCafelogy.Filters;
+using Microsoft.Owin.Security.Provider;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace LaCafelogy.Controllers
 {
@@ -483,7 +485,28 @@ namespace LaCafelogy.Controllers
             return View(model);
         }
 
+        public IActionResult ItemGroupList()
+        {
+            var group = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel
+            {
+                GroupId = s.GroupId,
+                GroupName = s.GroupName,
+                IsActive = s.IsActive
+            })
+            .ToList();
 
+            return View(group);
+        }
+        public IActionResult AddItemGroup()
+        {
+            ItemGroupViewModel model = new ItemGroupViewModel();
+            return View(model);
+        }
 
+        [HttpPost]
+        public ActionResult AddItemGroup(ItemGroupViewModel model)
+        {
+            return View(model);
+        }
     }
 }
