@@ -860,7 +860,7 @@ namespace LaCafelogy.Models
     {
         public int GroupId { get; set; }
 
-        [Required(ErrorMessage = "Please enter category name")]
+        [Required(ErrorMessage = "Please enter Group name")]
         public string GroupName { get; set; }
         public Int16 IsActive { get; set; }
         public int? CreatedBy { get; set; }

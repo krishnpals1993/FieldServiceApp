@@ -31,40 +31,45 @@
                             GroupName
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            IsActive
+                            Status
                         </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Action
+                        </th>
+
                     </tr>
                 </thead>
 
                 <tbody class="pos-rel">
                     @foreach (var item in Model)
                     {
-                    <tr class="d-style bgc-h-default-l4">
-                        <td>
+                        <tr class="d-style bgc-h-default-l4">
+                            <td>
                                 @item.GroupId
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                                 @item.GroupName
-                        </td>
-                        <td>
-                            @if (item.IsActive == 1)
-                            {
-                                <span class="badge badge-success mr-1">
-                                    Active
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-danger mr-1">
-                                    In Active
-                                </span>
+                            </td>
+                            <td>
+                                @if (item.IsActive == 1)
+                                {
+                                    <span class="badge badge-success mr-1">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger mr-1">
+                                        In Active
+                                    </span>
 
-                            }
-                        </td>
-
-
-
-                    </tr>
+                                }
+                            </td>
+                            <td class="text-grey">
+                                @Html.ActionLink("Edit", "EditItemGroup", "Inventory", new { id = item.GroupId }) |
+                                <a href="#" onclick="deleteFun('@item.GroupId')">Delete</a>
+                            </td>
+                        </tr>
                     }
 
                 </tbody>
@@ -99,11 +104,11 @@
         <script src="~/pages/datatable/@@page-script.js"></script>
     </environment>
     <script type="text/javascript">
-            window.baseUrl = '@Settings.Value.WebBaseURL';
+        window.baseUrl = '@Settings.Value.WebBaseURL';
 
-            function add() {
-                window.location = window.baseUrl + "/Inventory/AddItemGroup";
-            }
+        function add() {
+            window.location = window.baseUrl + "/Inventory/AddItemGroup";
+        }
 
     </script>
 }

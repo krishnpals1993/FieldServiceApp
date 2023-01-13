@@ -1083,6 +1083,16 @@ CREATE TABLE public."Users"
 )
 
 
+create table public."ItemGroup"
+(
+	"GroupId" serial,
+	"GroupName" character varying(150) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    "IsActive" smallint,
+    "CreatedBy" integer,
+    "CreatedDate" timestamp without time zone,
+    "ModifiedBy" integer,
+    "ModifiedDate" timestamp without time zone
+)
 
 
 INSERT INTO public."Roles"(

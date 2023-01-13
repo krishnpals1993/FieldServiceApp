@@ -47,7 +47,7 @@ namespace LaCafelogy.Controllers
                                                    Service = item.Service,
                                                    Taxable = item.Taxable,
                                                    IsActive = item.IsActive,
-                                                   CategoryName= category1.CategoryName
+                                                   CategoryName = category1.CategoryName
                                                })
                                                 .ToList();
             return View(items);
@@ -57,7 +57,7 @@ namespace LaCafelogy.Controllers
         public IActionResult AddItem()
         {
             ItemMasterViewModel model = new ItemMasterViewModel();
-            model.UnitList = _dbContext.tbl_Units.Where(w=>w.IsActive==1).Select(s => new UnitViewModel
+            model.UnitList = _dbContext.tbl_Units.Where(w => w.IsActive == 1).Select(s => new UnitViewModel
             {
                 UnitId = s.UnitId,
                 UnitName = s.UnitName
@@ -104,7 +104,7 @@ namespace LaCafelogy.Controllers
                             Sellable = model.Sellable,
                             Taxable = model.Taxable,
                             Service = model.Service,
-                            CategoryId= model.CategoryId,
+                            CategoryId = model.CategoryId,
                             IsActive = 1,
                             CreatedBy = 1,
                             CreatedDate = DateTime.Now
@@ -169,14 +169,14 @@ namespace LaCafelogy.Controllers
                 model.Sellable = checkItem.Sellable;
                 model.Taxable = checkItem.Taxable;
                 model.Service = checkItem.Service;
-                model.CategoryId = checkItem.CategoryId??0;
+                model.CategoryId = checkItem.CategoryId ?? 0;
             }
             catch (Exception ex)
             {
 
                 var a = "";
             }
-            
+
 
             return View(model);
         }
@@ -430,12 +430,12 @@ namespace LaCafelogy.Controllers
         public IActionResult ItemCategoryList()
         {
             List<ItemCategoryViewModel> units = (from category in _dbContext.tbl_ItemCategory
-                                         select new ItemCategoryViewModel
-                                         {
-                                             CategoryId = category.CategoryId,
-                                             CategoryName = category.CategoryName,
-                                             IsActive = category.IsActive
-                                         })
+                                                 select new ItemCategoryViewModel
+                                                 {
+                                                     CategoryId = category.CategoryId,
+                                                     CategoryName = category.CategoryName,
+                                                     IsActive = category.IsActive
+                                                 })
                                         .ToList();
             return View(units);
         }
@@ -487,7 +487,7 @@ namespace LaCafelogy.Controllers
 
         public IActionResult ItemGroupList()
         {
-            var group = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel
+            List<ItemGroupViewModel> group = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel
             {
                 GroupId = s.GroupId,
                 GroupName = s.GroupName,
@@ -506,7 +506,90 @@ namespace LaCafelogy.Controllers
         [HttpPost]
         public ActionResult AddItemGroup(ItemGroupViewModel model)
         {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupName == model.GroupName).FirstOrDefault();
+                    if (checkgroup != null)
+                    {
+                        ViewBag.ErrorMessage = "Group already exists with this name"; ;
+                    }
+                    else
+                    {
+                        ItemGroup groups = new ItemGroup()
+                        {
+
+                            GroupName = model.GroupName,
+                            IsActive = 1,
+                            CreatedBy = 1,
+                            CreatedDate = DateTime.Now
+                        };
+
+                        _dbContext.tbl_ItemGroup.Add(groups);
+                        _dbContext.SaveChanges();
+                        ViewBag.SuccessMessage = "Group added successfully";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var a = " ";
+            }
             return View(model);
         }
+
+        public IActionResult EditItemGroup(string id)
+        {
+            ItemGroupViewModel model = new ItemGroupViewModel();
+            try
+            {
+                int GroupId = 0;
+                int.TryParse(id, out GroupId);
+                var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == GroupId).FirstOrDefault();
+                model.GroupId = GroupId;
+                model.GroupId = checkgroup.GroupId;
+                model.GroupName = checkgroup.GroupName;
+            }
+            catch (Exception ex)
+            {
+                var a = " ";
+            }
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult EditItemGroup(ItemGroupViewModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == model.GroupId).FirstOrDefault();
+                    if (checkgroup != null)
+                    {
+                        ViewBag.ErrorMessage = "Group already exists with this name"; ;
+                    }
+                    else
+                    {
+                        checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == model.GroupId).FirstOrDefault();
+                        checkgroup.GroupId = model.GroupId;
+                        checkgroup.GroupName = model.GroupName;
+                        checkgroup.ModifiedBy = 1;
+                        checkgroup.ModifiedDate = DateTime.Now;
+                        _dbContext.SaveChanges();
+                        ViewBag.SuccessMessage = "Group update successfully";
+
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var a = " ";
+            }
+            return View(model);
+        }
+
     }
+
 }
