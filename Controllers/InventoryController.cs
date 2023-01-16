@@ -36,6 +36,9 @@ namespace LaCafelogy.Controllers
                                                join category in _dbContext.tbl_ItemCategory on item.CategoryId equals category.CategoryId
                                                into category
                                                from category1 in category.DefaultIfEmpty()
+                                               join Group in _dbContext.tbl_ItemGroup on item.GroupId equals Group.GroupId
+                                               into Group
+                                               from Group1 in Group.DefaultIfEmpty()
                                                select new ItemMasterViewModel
                                                {
                                                    ItemId = item.ItemId,
@@ -47,6 +50,7 @@ namespace LaCafelogy.Controllers
                                                    Service = item.Service,
                                                    Taxable = item.Taxable,
                                                    IsActive = item.IsActive,
+                                                   GroupName = Group1.GroupName,
                                                    CategoryName = category1.CategoryName
                                                })
                                                 .ToList();
@@ -68,6 +72,11 @@ namespace LaCafelogy.Controllers
                 CategoryId = s.CategoryId,
                 CategoryName = s.CategoryName
 
+            }).ToList();
+            model.ItemGroupList = _dbContext.tbl_ItemGroup.Where(w => w.IsActive == 1).Select(s => new ItemGroupViewModel
+            {
+                GroupId = s.GroupId,
+                GroupName = s.GroupName
             }).ToList();
             return View(model);
         }
@@ -105,6 +114,7 @@ namespace LaCafelogy.Controllers
                             Taxable = model.Taxable,
                             Service = model.Service,
                             CategoryId = model.CategoryId,
+                            GroupId = model.GroupId,
                             IsActive = 1,
                             CreatedBy = 1,
                             CreatedDate = DateTime.Now
@@ -134,6 +144,11 @@ namespace LaCafelogy.Controllers
                 CategoryName = s.CategoryName
 
             }).ToList();
+            model.ItemGroupList = _dbContext.tbl_ItemGroup.Where(w => w.IsActive == 1).Select(s => new ItemGroupViewModel
+            {
+                GroupId = s.GroupId,
+                GroupName = s.GroupName
+            }).ToList();
             return View(model);
         }
 
@@ -155,6 +170,12 @@ namespace LaCafelogy.Controllers
                     CategoryName = s.CategoryName
 
                 }).ToList();
+                model.ItemGroupList = _dbContext.tbl_ItemGroup.Where(w => w.IsActive == 1).Select(s => new ItemGroupViewModel
+                {
+                    GroupId = s.GroupId,
+                    GroupName = s.GroupName
+                      
+                }).ToList();
                 int itemId = 0;
                 int.TryParse(id, out itemId);
                 var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemId == itemId).FirstOrDefault();
@@ -170,6 +191,7 @@ namespace LaCafelogy.Controllers
                 model.Taxable = checkItem.Taxable;
                 model.Service = checkItem.Service;
                 model.CategoryId = checkItem.CategoryId ?? 0;
+                model.GroupId = checkItem.GroupId;
             }
             catch (Exception ex)
             {
@@ -213,6 +235,7 @@ namespace LaCafelogy.Controllers
                         checkItem.Taxable = model.Taxable;
                         checkItem.Service = model.Service;
                         checkItem.CategoryId = model.CategoryId;
+                        checkItem.GroupId = model.GroupId;
                         checkItem.ModifiedBy = 1;
                         checkItem.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();
@@ -237,6 +260,11 @@ namespace LaCafelogy.Controllers
                 CategoryId = s.CategoryId,
                 CategoryName = s.CategoryName
 
+            }).ToList();
+            model.ItemGroupList = _dbContext.tbl_ItemGroup.Where(w => w.IsActive == 1).Select(s => new ItemGroupViewModel
+            {
+                GroupId = s.GroupId,
+                GroupName = s.GroupName
             }).ToList();
             return View(model);
         }
@@ -513,7 +541,7 @@ namespace LaCafelogy.Controllers
                     var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupName == model.GroupName).FirstOrDefault();
                     if (checkgroup != null)
                     {
-                        ViewBag.ErrorMessage = "Group already exists with this name"; ;
+                        ViewBag.ErrorMessage = "Group already exists with this name";
                     }
                     else
                     {
@@ -548,7 +576,6 @@ namespace LaCafelogy.Controllers
                 int.TryParse(id, out GroupId);
                 var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == GroupId).FirstOrDefault();
                 model.GroupId = GroupId;
-                model.GroupId = checkgroup.GroupId;
                 model.GroupName = checkgroup.GroupName;
             }
             catch (Exception ex)
@@ -564,10 +591,10 @@ namespace LaCafelogy.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == model.GroupId).FirstOrDefault();
+                    var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupName == model.GroupName).FirstOrDefault();
                     if (checkgroup != null)
                     {
-                        ViewBag.ErrorMessage = "Group already exists with this name"; ;
+                        ViewBag.ErrorMessage = "This GroupName is already exists"; 
                     }
                     else
                     {
@@ -577,9 +604,7 @@ namespace LaCafelogy.Controllers
                         checkgroup.ModifiedBy = 1;
                         checkgroup.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();
-                        ViewBag.SuccessMessage = "Group update successfully";
-
-
+                        ViewBag.SuccessMessage = "GroupName update successfully";
                     }
                 }
             }
@@ -588,6 +613,33 @@ namespace LaCafelogy.Controllers
                 var a = " ";
             }
             return View(model);
+        }
+
+        [HttpPost]
+        public JsonResult DeleteItemGroup(int id)
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                var checkItem = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == id).FirstOrDefault();
+                if (checkItem != null)
+                {
+                    checkItem.IsActive = 0;
+                    checkItem.ModifiedBy = 1;
+                    checkItem.ModifiedDate = DateTime.Now;
+                    _dbContext.SaveChanges();
+
+                    response.Status = "1";
+                    response.Message = "ItemGroup deleted successfully";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Status = "0";
+                response.Message = "Error occurred";
+            }
+
+            return Json(response);
         }
 
     }

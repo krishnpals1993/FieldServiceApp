@@ -29,12 +29,11 @@
                         new { @placeholder = "Group Name ", @class = "form-control" })
                         <span asp-validation-for="GroupName" class="text-danger"></span>
                     </div>
-
-
+                    <p class="text-danger">
+                        @ViewBag.ErrorMessage
+                    </p>
                 </div>
-                <p class="text-danger">
-                    @ViewBag.ErrorMessage
-                </p>
+                
 
                 <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
                     <div class="offset-md-2 col-md-9 text-nowrap">

@@ -32,7 +32,7 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.ItemCd,
-                           new { @placeholder = "Item Code", @class = "form-control", maxlength = "200" })
+                        new { @placeholder = "Item Code", @class = "form-control", maxlength = "200" })
                         <span asp-validation-for="ItemCd" class="text-danger"></span>
                     </div>
 
@@ -63,17 +63,15 @@
                     </div>
 
 
-
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
                         <label for="id-form-field-1" class="mb-0">
-                            QOH
+                            Group
                         </label>
                     </div>
 
                     <div class="col-sm-3">
-                        @Html.TextBoxFor(m => m.ItemQOH,
-                           new { @placeholder = "QOH", @class = "form-control", maxlength = "5" })
-                        <span asp-validation-for="ItemQOH" class="text-danger"></span>
+                        @Html.DropDownListFor(model => model.GroupId, new SelectList(Model.ItemGroupList.Select(x => new { Value = x.GroupId, Text = x.GroupName }), "Value", "Text"), "Select item category", new { @class = "form-control", @placeholder = "Select unit" })
+                        <span asp-validation-for="GroupId" class="text-danger"></span>
                     </div>
 
                 </div>
@@ -86,7 +84,7 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.ItemCost,
-                           new { @placeholder = "Cost", @class = "form-control", maxlength = "20" })
+                        new { @placeholder = "Cost", @class = "form-control", maxlength = "20" })
                         <span asp-validation-for="ItemCost" class="text-danger"></span>
                     </div>
 
@@ -99,7 +97,7 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.ItemPrice,
-                           new { @placeholder = "Price", @class = "form-control", maxlength = "5" })
+                        new { @placeholder = "Price", @class = "form-control", maxlength = "5" })
                         <span asp-validation-for="ItemPrice" class="text-danger"></span>
                     </div>
 
@@ -149,11 +147,23 @@
 
                     <div class="col-sm-3">
                         @Html.TextBoxFor(m => m.ItemDescription,
-                           new { @placeholder = "Description", @class = "form-control", maxlength = "250" })
+                        new { @placeholder = "Description", @class = "form-control", maxlength = "250" })
                         <span asp-validation-for="ItemDescription" class="text-danger"></span>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            QOH
+                        </label>
+                    </div>
 
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.ItemQOH,
+                        new { @placeholder = "QOH", @class = "form-control", maxlength = "5" })
+                        <span asp-validation-for="ItemQOH" class="text-danger"></span>
+                    </div>
+                </div>
                 <p class="text-danger">
                     @ViewBag.ErrorMessage
                 </p>
@@ -194,7 +204,9 @@
 }
 
 @section scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <environment names="Development,Staging,Production">
         <script src="~/lib/moment/moment.js"></script>
         <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
@@ -205,32 +217,32 @@
 
         $(document).ready(function () {
 
-         if ($("#Service").val()=="Y") {
+            if ($("#Service").val() == "Y") {
                 $("#ItemQOH").val('0');
-                $("#ItemQOH").attr("readonly","readonly");
+                $("#ItemQOH").attr("readonly", "readonly");
             }
             else {
                 $("#ItemQOH").removeAttr("readonly");
             }
 
 
-        var SuccessMessage = '@ViewBag.SuccessMessage';
-        var ErrorMessage = '@ViewBag.ErrorMessage';
-        if (SuccessMessage) {
-            swal(SuccessMessage, "", "success");
-           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Inventory/ItemList"; }, 750);
+            var SuccessMessage = '@ViewBag.SuccessMessage';
+            var ErrorMessage = '@ViewBag.ErrorMessage';
+            if (SuccessMessage) {
+                swal(SuccessMessage, "", "success");
+                setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Inventory/ItemList"; }, 750);
 
-        }
-        if (ErrorMessage) {
-            swal(ErrorMessage, "", "error");
+            }
+            if (ErrorMessage) {
+                swal(ErrorMessage, "", "error");
             }
 
         })
 
         $("#Service").on("change", function () {
-            if ($("#Service").val()=="Y") {
+            if ($("#Service").val() == "Y") {
                 $("#ItemQOH").val('0');
-                $("#ItemQOH").attr("readonly","readonly");
+                $("#ItemQOH").attr("readonly", "readonly");
             }
             else {
                 $("#ItemQOH").removeAttr("readonly");

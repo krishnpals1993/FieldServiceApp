@@ -39,18 +39,19 @@
                         @ViewBag.ErrorMessage
                     </p>
 
-                    <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
-                        <div class="offset-md-3 col-md-9 text-nowrap">
-                            <button class="btn btn-info btn-bold px-4" type="submit">
-                                <i class="fa fa-check mr-1"></i>
-                                Submit
-                            </button>
+                </div>
+                
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-3 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
 
-                            <a href="~/Inventory/ItemGroupList" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
-                                <i class="fa fa-undo mr-1"></i>
-                                Cancel
-                            </a>
-                        </div>
+                        <a href="~/Inventory/ItemGroupList" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
                     </div>
                 </div>
             </form>
@@ -101,11 +102,7 @@
                 swal(ErrorMessage, "", "error");
             }
 
-            setTimeout(function () {
-                $("input").each(function (index, element) {
-                    $(element).val('');
-                });
-            }, 200);
+            
 
         })
     </script>

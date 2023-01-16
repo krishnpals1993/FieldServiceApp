@@ -109,6 +109,43 @@
         function add() {
             window.location = window.baseUrl + "/Inventory/AddItemGroup";
         }
+        function deleteFun(id) {
+
+            swal({
+                title: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "No",
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            },
+                function (isConfirm) {
+                    if (!isConfirm)
+                        return;
+
+                    $.ajax({
+                        url: "/Inventory/DeleteItemGroup",
+                        type: "POST",
+                        dataType: "json",
+                        data: { id: id },
+                        success: function (data) {
+                            if (data.Status == "1") {
+                                swal(data.Message, "", "success")
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 750);
+
+                            }
+                            else {
+                                swal(data.Message, "", "error")
+                            }
+                        }
+                    })
+
+                });
+
+        }
 
     </script>
 }

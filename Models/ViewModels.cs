@@ -378,6 +378,7 @@ namespace LaCafelogy.Models
         {
             UnitList = new List<UnitViewModel>();
             ItemCategoryList = new List<ItemCategoryViewModel>();
+            ItemGroupList= new List<ItemGroupViewModel>();
         }
         public int ItemId { get; set; }
 
@@ -412,10 +413,14 @@ namespace LaCafelogy.Models
         public List<UnitViewModel> UnitList { get; set; }
 
         public List<ItemCategoryViewModel> ItemCategoryList { get; set; }
+        public List<ItemGroupViewModel> ItemGroupList { get; set; }
         public string CategoryName { get; set; }
         public string Type { get; set; }
 
         public string IsCombo { get; set; }
+
+        public int GroupId { get; set; }
+        public string GroupName { get; set; }
     }
 
     public class OrderItemViewModel
