@@ -66,8 +66,13 @@
                                 }
                             </td>
                             <td class="text-grey">
-                                @Html.ActionLink("Edit", "EditItemGroup", "Inventory", new { id = item.GroupId }) |
-                                <a href="#" onclick="deleteFun('@item.GroupId')">Delete</a>
+                                @if (item.IsActive == 1)
+                                {
+                                    <span class="action-buttons">
+                                        @Html.ActionLink("Edit", "EditItemGroup", "Inventory", new { id = item.GroupId }) |
+                                        <a href="#" onclick="deleteFun('@item.GroupId')">Delete</a>
+                                    </span>
+                                }
                             </td>
                         </tr>
                     }

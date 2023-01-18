@@ -174,11 +174,11 @@ namespace LaCafelogy.Controllers
                 {
                     GroupId = s.GroupId,
                     GroupName = s.GroupName
-                      
+
                 }).ToList();
                 int itemId = 0;
                 int.TryParse(id, out itemId);
-                var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemId == itemId).FirstOrDefault();
+                var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd == model.ItemCd && w.ItemId != model.ItemId).FirstOrDefault();
 
                 model.ItemId = itemId;
                 model.ItemCd = checkItem.ItemCd;
@@ -538,7 +538,8 @@ namespace LaCafelogy.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupName == model.GroupName).FirstOrDefault();
+                    var list = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel { GroupName = s.GroupName }).ToList();
+                    var checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
                     if (checkgroup != null)
                     {
                         ViewBag.ErrorMessage = "Group already exists with this name";
@@ -591,14 +592,15 @@ namespace LaCafelogy.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupName == model.GroupName).FirstOrDefault();
+                    var list = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel { GroupName = s.GroupName }).ToList();
+                    var checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
                     if (checkgroup != null)
                     {
-                        ViewBag.ErrorMessage = "This GroupName is already exists"; 
+                        ViewBag.ErrorMessage = "This GroupName is already exists";
                     }
                     else
                     {
-                        checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == model.GroupId).FirstOrDefault();
+                        checkgroup = checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
                         checkgroup.GroupId = model.GroupId;
                         checkgroup.GroupName = model.GroupName;
                         checkgroup.ModifiedBy = 1;
