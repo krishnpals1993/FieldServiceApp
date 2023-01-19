@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using LaCafelogy.Filters;
 using Microsoft.Owin.Security.Provider;
 using DocumentFormat.OpenXml.EMMA;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace LaCafelogy.Controllers
 {
@@ -20,12 +22,14 @@ namespace LaCafelogy.Controllers
         private readonly IOptions<Appsettings> _appSettings;
         private readonly IOptions<EmailSettings> _emailSettings;
         private readonly DBContext _dbContext;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public InventoryController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext)
+        public InventoryController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext, IWebHostEnvironment webHostEnvironment)
         {
             _appSettings = appSettings;
             _emailSettings = emailSettings;
             _dbContext = dbContext;
+            this.webHostEnvironment = webHostEnvironment;
         }
         public IActionResult ItemList()
         {
@@ -519,6 +523,7 @@ namespace LaCafelogy.Controllers
             {
                 GroupId = s.GroupId,
                 GroupName = s.GroupName,
+                //GroupImage = s.GroupImage,
                 IsActive = s.IsActive
             })
             .ToList();
@@ -540,6 +545,7 @@ namespace LaCafelogy.Controllers
                 {
                     var list = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel { GroupName = s.GroupName }).ToList();
                     var checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
+                    string uniqueFileName = UploadedFile(model);
                     if (checkgroup != null)
                     {
                         ViewBag.ErrorMessage = "Group already exists with this name";
@@ -550,6 +556,7 @@ namespace LaCafelogy.Controllers
                         {
 
                             GroupName = model.GroupName,
+                            GroupImage = uniqueFileName,
                             IsActive = 1,
                             CreatedBy = 1,
                             CreatedDate = DateTime.Now
@@ -567,7 +574,22 @@ namespace LaCafelogy.Controllers
             }
             return View(model);
         }
+        private string UploadedFile(ItemGroupViewModel model)
+        {
+            string uniqueFileName = null;
 
+            if (model.GroupImage != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.GroupImage.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.GroupImage.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
+        }
         public IActionResult EditItemGroup(string id)
         {
             ItemGroupViewModel model = new ItemGroupViewModel();
@@ -576,12 +598,14 @@ namespace LaCafelogy.Controllers
                 int GroupId = 0;
                 int.TryParse(id, out GroupId);
                 var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == GroupId).FirstOrDefault();
+                string uniqueFileName = UploadedFile(model);
                 model.GroupId = GroupId;
                 model.GroupName = checkgroup.GroupName;
+                //model.GroupImage = checkgroup.GroupImage;
             }
             catch (Exception ex)
             {
-                var a = " ";
+                var a = " "; 
             }
             return View(model);
         }
@@ -594,6 +618,7 @@ namespace LaCafelogy.Controllers
                 {
                     var list = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel { GroupName = s.GroupName }).ToList();
                     var checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
+                    string uniqueFileName = UploadedFile(model);
                     if (checkgroup != null)
                     {
                         ViewBag.ErrorMessage = "This GroupName is already exists";
@@ -603,6 +628,7 @@ namespace LaCafelogy.Controllers
                         checkgroup = checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
                         checkgroup.GroupId = model.GroupId;
                         checkgroup.GroupName = model.GroupName;
+                        checkgroup.GroupImage = model.GroupImage;
                         checkgroup.ModifiedBy = 1;
                         checkgroup.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();

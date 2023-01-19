@@ -30,6 +30,9 @@
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                             GroupName
                         </th>
+                        <th>
+                            Group Image
+                        </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                             Status
                         </th>
@@ -49,6 +52,9 @@
                             </td>
                             <td>
                                 @item.GroupName
+                            </td>
+                            <td>
+                                <img src="~/images/@item.GroupImage" height="50px" width="50px" asp-append-version="true" />
                             </td>
                             <td>
                                 @if (item.IsActive == 1)

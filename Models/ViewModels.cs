@@ -1,4 +1,5 @@
 ﻿using JqueryDataTables.ServerSide.AspNetCoreWeb.Attributes;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -872,6 +873,10 @@ namespace LaCafelogy.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+
+        [Required(ErrorMessage = "Please choose Group image")]
+        [Display(Name = "Group Image")]
+        public IFormFile GroupImage { get; set; }
     }
     public class CustomerShippingApartmentViewModel
     {

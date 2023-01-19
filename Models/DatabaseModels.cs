@@ -312,6 +312,9 @@ namespace LaCafelogy.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
+
+        [Required(ErrorMessage = "Please choose Group image")]
+        public string GroupImage { get; set; }
     }
 
     [Table("BilHeader")]

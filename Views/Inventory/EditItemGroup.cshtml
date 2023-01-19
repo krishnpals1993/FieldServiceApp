@@ -18,7 +18,7 @@
         </div>
 
         <div class="card-body px-3 pb-1">
-            <form class="mt-lg-3" autocomplete="off" novalidate
+            <form class="mt-lg-3" enctype="multipart/form-data" autocomplete="off" novalidate
                   action="@Settings.Value.WebBaseURL/Inventory/EditItemGroup" method="post">
 
                 @Html.HiddenFor(h=>h.GroupId)
@@ -35,12 +35,25 @@
                         new { @placeholder = "Enter new GroupName", @class = "form-control", maxlength = "200" })
                         <span asp-validation-for="GroupName" class="text-danger"></span>
                     </div>
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Group Image
+                        </label>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="custom-file">
+                            <input asp-for="GroupImage" class="custom-file-input" id="customFile">
+                            <label class="custom-file-label" for="customFile">Choose file</label>
+                        </div>
+                        <span asp-validation-for="GroupImage" class="text-danger"></span>
+                    </div>
                     <p class="text-danger">
                         @ViewBag.ErrorMessage
                     </p>
 
                 </div>
-                
+
                 <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
                     <div class="offset-md-3 col-md-9 text-nowrap">
                         <button class="btn btn-info btn-bold px-4" type="submit">
@@ -102,7 +115,10 @@
                 swal(ErrorMessage, "", "error");
             }
 
-            
+            $(".custom-file-input").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
 
         })
     </script>
