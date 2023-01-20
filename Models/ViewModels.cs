@@ -876,7 +876,8 @@ namespace LaCafelogy.Models
 
         [Required(ErrorMessage = "Please choose Group image")]
         [Display(Name = "Group Image")]
-        public IFormFile GroupImage { get; set; }
+        public IFormFile GroupImageName { get; set; }
+        public string ImageName { get; set; }
     }
     public class CustomerShippingApartmentViewModel
     {

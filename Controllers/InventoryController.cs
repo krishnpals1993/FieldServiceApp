@@ -523,7 +523,7 @@ namespace LaCafelogy.Controllers
             {
                 GroupId = s.GroupId,
                 GroupName = s.GroupName,
-                //GroupImage = s.GroupImage,
+                ImageName = s.GroupImage == null?"": s.GroupImage,
                 IsActive = s.IsActive
             })
             .ToList();
@@ -578,14 +578,14 @@ namespace LaCafelogy.Controllers
         {
             string uniqueFileName = null;
 
-            if (model.GroupImage != null)
+            if (model.GroupImageName != null)
             {
                 string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.GroupImage.FileName;
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.GroupImageName.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    model.GroupImage.CopyTo(fileStream);
+                    model.GroupImageName.CopyTo(fileStream);
                 }
             }
             return uniqueFileName;
@@ -601,7 +601,7 @@ namespace LaCafelogy.Controllers
                 string uniqueFileName = UploadedFile(model);
                 model.GroupId = GroupId;
                 model.GroupName = checkgroup.GroupName;
-                //model.GroupImage = checkgroup.GroupImage;
+                model.ImageName = checkgroup.GroupImage == null ? "" : checkgroup.GroupImage;
             }
             catch (Exception ex)
             {
@@ -616,19 +616,20 @@ namespace LaCafelogy.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var list = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel { GroupName = s.GroupName }).ToList();
-                    var checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
+                    var list = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel { GroupName = s.GroupName, GroupId = s.GroupId }).ToList();
+                    var checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper() &&
+                            w.GroupId != model.GroupId).FirstOrDefault();
                     string uniqueFileName = UploadedFile(model);
                     if (checkgroup != null)
                     {
-                        ViewBag.ErrorMessage = "This GroupName is already exists";
+                        ViewBag.ErrorMessage = "Group already exists with this name";
                     }
                     else
                     {
-                        checkgroup = checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
+                        checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
                         checkgroup.GroupId = model.GroupId;
                         checkgroup.GroupName = model.GroupName;
-                        checkgroup.GroupImage = model.GroupImage;
+                        checkgroup.ImageName = model.ImageName;
                         checkgroup.ModifiedBy = 1;
                         checkgroup.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();
@@ -642,6 +643,7 @@ namespace LaCafelogy.Controllers
             }
             return View(model);
         }
+
 
         [HttpPost]
         public JsonResult DeleteItemGroup(int id)
