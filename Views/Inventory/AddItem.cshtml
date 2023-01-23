@@ -18,7 +18,7 @@
         </div>
 
         <div class="card-body px-3 pb-1">
-            <form class="mt-lg-3" autocomplete="off" novalidate
+            <form class="mt-lg-3" enctype="multipart/form-data" autocomplete="off" novalidate
                   action="@Settings.Value.WebBaseURL/Inventory/AddItem" method="post">
                 <div class="form-group row">
                     <div class="col-sm-2 col-form-label text-sm-right pr-0">
@@ -164,6 +164,20 @@
                         new { @placeholder = "QOH", @class = "form-control", maxlength = "5" })
                         <span asp-validation-for="ItemQOH" class="text-danger"></span>
                     </div>
+                    
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Item Image
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="custom-file">
+                            <input asp-for="ItemImageName" class="custom-file-input" id="customFile" accept="image/*">
+                            <label class="custom-file-label" for="customFile">Choose file</label>
+                        </div>
+                        <span asp-validation-for="ItemImageName" class="text-danger"></span>
+                    </div>
                 </div>
 
                 <p class="text-danger">
@@ -218,38 +232,40 @@
         $(document).ready(function () {
 
 
-        var SuccessMessage = '@ViewBag.SuccessMessage';
-        var ErrorMessage = '@ViewBag.ErrorMessage';
-        if (SuccessMessage) {
-            swal(SuccessMessage, "", "success");
-           setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Inventory/AddItem"; }, 500);
-
-        }
-        if (ErrorMessage) {
-            swal(ErrorMessage, "", "error");
+            var SuccessMessage = '@ViewBag.SuccessMessage';
+            var ErrorMessage = '@ViewBag.ErrorMessage';
+            if (SuccessMessage) {
+                swal(SuccessMessage, "", "success");
+                setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Inventory/AddItem"; }, 500);
+            }
+            if (ErrorMessage) {
+                swal(ErrorMessage, "", "error");
             }
 
-          setTimeout(function () {
+            setTimeout(function () {
                 $("input").each(function (index, element) {
                     $(element).val('');
-                 //   $("#ShipDate").val(new Date());
-            });
+                    //   $("#ShipDate").val(new Date());
+                });
+
             }, 200);
 
+            $(".custom-file-input").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+
+            $("#Service").on("change", function () {
+                if ($("#Service").val() == "Y") {
+                    $("#ItemQOH").val('0');
+                    $("#ItemQOH").attr("readonly", "readonly");
+                }
+                else {
+                    $("#ItemQOH").removeAttr("readonly");
+                }
+
+            });
         })
-
-        $("#Service").on("change", function () {
-            if ($("#Service").val()=="Y") {
-                $("#ItemQOH").val('0');
-                $("#ItemQOH").attr("readonly","readonly");
-            }
-            else {
-                $("#ItemQOH").removeAttr("readonly");
-            }
-
-        });
-
-
 
     </script>
 }

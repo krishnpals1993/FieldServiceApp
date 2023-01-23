@@ -40,8 +40,11 @@
                         <label for="id-form-field-1" class="mb-0">
                             Group Image
                         </label>
+                       
                     </div>
                     <div class="col-sm-3">
+                        <img src="~/images/@Model.ImageName" height="50px" width="50px" asp-append-version="true" />
+
                         <div class="custom-file">
                             <input asp-for="GroupImageName" class="custom-file-input" id="customFile">
                             <label class="custom-file-label" for="customFile">Choose file</label>
@@ -108,7 +111,7 @@
             var ErrorMessage = '@ViewBag.ErrorMessage';
             if (SuccessMessage) {
                 swal(SuccessMessage, "", "success");
-                setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Inventory/EditItemGroup"; }, 750);
+                setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Inventory/ItemGroupList"; }, 750);
 
             }
             if (ErrorMessage) {

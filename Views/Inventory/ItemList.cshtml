@@ -28,10 +28,10 @@
                             Item Code
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
-                            Category 
+                            Category
                         </th>
-                        
-                        <th class ="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                             Group
                         </th>
 
@@ -56,6 +56,9 @@
                             Sellable
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
+                            Item Image
+                        </th>
+                        <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
                             Status
                         </th>
                         <th class="border-0 bgc-white bgc-h-yellow-l3 shadow-sm">
@@ -67,65 +70,69 @@
                 <tbody class="pos-rel">
                     @foreach (var item in Model)
                     {
-                    <tr class="d-style bgc-h-default-l4">
-                        <td>
-                            @item.ItemCd
-                        </td>
-                        <td>
-                            @item.CategoryName
-                        </td>
-                        <td>
-                            @item.GroupName
-                        </td>
-                        <td class="text-grey">
-                            @item.ItemPrice
-                        </td>
+                        <tr class="d-style bgc-h-default-l4">
+                            <td>
+                                @item.ItemCd
+                            </td>
+                            <td>
+                                @item.CategoryName
+                            </td>
+                            <td>
+                                @item.GroupName
+                            </td>
+                            <td class="text-grey">
+                                @item.ItemPrice
+                            </td>
 
-                        <td class="text-600 text-grey-d1">
-                            @item.UnitName
-                        </td>
+                            <td class="text-600 text-grey-d1">
+                                @item.UnitName
+                            </td>
 
-                        <td class="text-grey">
-                            @item.ItemDescription
-                        </td>
-                        <td class="text-grey">
-                            @(item.Service == "Y" ? "Yes" : "No")
+                            <td class="text-grey">
+                                @item.ItemDescription
+                            </td>
+                            <td class="text-grey">
+                                @(item.Service == "Y" ? "Yes" : "No")
 
-                        </td>
-                        <td class="text-grey">
-                            @(item.Taxable == "Y" ? "Yes" : "No")
+                            </td>
+                            <td class="text-grey">
+                                @(item.Taxable == "Y" ? "Yes" : "No")
 
-                        </td>
-                        <td class="text-grey">
-                            @(item.Sellable == "Y" ? "Yes" : "No")
+                            </td>
+                            <td class="text-grey">
+                                @(item.Sellable == "Y" ? "Yes" : "No")
 
-                        </td>
-                        <td>
-                            @if (item.IsActive == 1)
-                            {
-                                <span class="badge badge-success mr-1">
-                                    Active
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-danger mr-1">
-                                    In Active
-                                </span>
+                            </td>
+                            <td>
+                                @*@item.ImageName*@
+                                <img src="~/images/@item.ImageName" height="50px" width="50px" asp-append-version="true" />
+                            </td>
+                            <td>
+                                @if (item.IsActive == 1)
+                                {
+                                    <span class="badge badge-success mr-1">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger mr-1">
+                                        In Active
+                                    </span>
 
-                            }
-                        </td>
+                                }
+                            </td>
                             <td class="text-grey">
                                 @if (item.IsActive == 1)
                                 {
                                     <span class="action-buttons">
-                                        @Html.ActionLink("Edit", "EditItem", "Inventory", new { id = item.GroupId }) |
-                                        <a href="#" onclick="deleteFun('@item.GroupId')">Delete</a>
+                                        @Html.ActionLink("Edit", "EditItem", "Inventory", new { id = @item.ItemId }) |
+                                        <a href="#" onclick="deleteFun('@item.ItemId')">Delete</a>
                                     </span>
                                 }
-                        </td>
+                            </td>
 
-                    </tr>
+                        </tr>
                     }
 
                 </tbody>
@@ -161,13 +168,13 @@
     </environment>
     <script type="text/javascript">
 
-            window.baseUrl = '@Settings.Value.WebBaseURL';
+        window.baseUrl = '@Settings.Value.WebBaseURL';
 
-            function add() {
-                window.location = window.baseUrl + "/Inventory/AddItem";
+        function add() {
+            window.location = window.baseUrl + "/Inventory/AddItem";
         }
 
-            function deleteFun(id) {
+        function deleteFun(id) {
 
             swal({
                 title: "Are you sure?",
@@ -182,24 +189,24 @@
                     if (!isConfirm)
                         return;
 
-                  $.ajax({
-                    url: "/Inventory/DeleteItem",
-                    type: "POST",
-                    dataType: "json",
-                    data: { id: id },
-                    success: function (data) {
-                        if (data.Status=="1") {
-                            swal(data.Message, "", "success")
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 750);
+                    $.ajax({
+                        url: "/Inventory/DeleteItem",
+                        type: "POST",
+                        dataType: "json",
+                        data: { id: id },
+                        success: function (data) {
+                            if (data.Status == "1") {
+                                swal(data.Message, "", "success")
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 750);
 
+                            }
+                            else {
+                                swal(data.Message, "", "error")
+                            }
                         }
-                        else {
-                              swal(data.Message, "", "error")
-                        }
-                    }
-                })
+                    })
 
                 });
 

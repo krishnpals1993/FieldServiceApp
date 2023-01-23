@@ -422,6 +422,12 @@ namespace LaCafelogy.Models
 
         public int GroupId { get; set; }
         public string GroupName { get; set; }
+        [Required(ErrorMessage = "Please choose Item image")]
+        [Display(Name = "Item Image")]
+        public IFormFile ItemImageName { get; set; }
+        public string ImageName { get; set; }
+
+
     }
 
     public class OrderItemViewModel

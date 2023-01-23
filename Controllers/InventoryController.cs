@@ -55,6 +55,7 @@ namespace LaCafelogy.Controllers
                                                    Taxable = item.Taxable,
                                                    IsActive = item.IsActive,
                                                    GroupName = Group1.GroupName,
+                                                   ImageName = item.ItemImage == null ? "" : item.ItemImage,
                                                    CategoryName = category1.CategoryName
                                                })
                                                 .ToList();
@@ -96,6 +97,7 @@ namespace LaCafelogy.Controllers
                 {
 
                     var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd == model.ItemCd).FirstOrDefault();
+                    string uniqueItemImageName = UploadedImage(model);
                     if (checkItem != null)
                     {
                         ViewBag.ErrorMessage = "Item already exists with this code";
@@ -119,6 +121,7 @@ namespace LaCafelogy.Controllers
                             Service = model.Service,
                             CategoryId = model.CategoryId,
                             GroupId = model.GroupId,
+                            ItemImage = uniqueItemImageName,
                             IsActive = 1,
                             CreatedBy = 1,
                             CreatedDate = DateTime.Now
@@ -156,6 +159,22 @@ namespace LaCafelogy.Controllers
             return View(model);
         }
 
+        private string UploadedImage(ItemMasterViewModel model)
+        {
+            string uniqueItemImageName = null;
+
+            if (model.ItemImageName != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                uniqueItemImageName = Guid.NewGuid().ToString() + "_" + model.ItemImageName.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueItemImageName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.ItemImageName.CopyTo(fileStream);
+                }
+            }
+            return uniqueItemImageName;
+        }
 
         public IActionResult EditItem(string id)
         {
@@ -182,8 +201,8 @@ namespace LaCafelogy.Controllers
                 }).ToList();
                 int itemId = 0;
                 int.TryParse(id, out itemId);
-                var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd == model.ItemCd && w.ItemId != model.ItemId).FirstOrDefault();
-
+                //var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd == model.ItemCd && w.ItemId != model.ItemId).FirstOrDefault();
+                var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemId == model.ItemId).FirstOrDefault();
                 model.ItemId = itemId;
                 model.ItemCd = checkItem.ItemCd;
                 model.ItemCost = checkItem.ItemCost;
@@ -273,6 +292,43 @@ namespace LaCafelogy.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public JsonResult DeleteItem(int id)
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                var checkOrderDetail = _dbContext.tbl_OrderDetail.Where(w => w.ItemId == id).FirstOrDefault();
+                if (checkOrderDetail != null)
+                {
+                    response.Status = "0";
+                    response.Message = "Item has been used in order";
+
+                }
+                else
+                {
+                    var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemId == id).FirstOrDefault();
+                    if (checkItem != null)
+                    {
+                        checkItem.IsActive = 0;
+                        checkItem.ModifiedBy = 1;
+                        checkItem.ModifiedDate = DateTime.Now;
+                        _dbContext.SaveChanges();
+
+                        response.Status = "1";
+                        response.Message = "Item deleted successfully";
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Status = "0";
+                response.Message = "Error occurred";
+            }
+
+            return Json(response);
+        }
 
         public IActionResult UnitList()
         {
@@ -417,7 +473,7 @@ namespace LaCafelogy.Controllers
 
 
         [HttpPost]
-        public JsonResult DeleteItem(int id)
+        public JsonResult DeleteOrderItem(int id)
         {
             ResponseModel response = new ResponseModel();
             try
@@ -601,7 +657,7 @@ namespace LaCafelogy.Controllers
                 string uniqueFileName = UploadedFile(model);
                 model.GroupId = GroupId;
                 model.GroupName = checkgroup.GroupName;
-                model.ImageName = checkgroup.GroupImage == null ? "" : checkgroup.GroupImage;
+                model.ImageName = checkgroup.GroupImage;/* == null ? "" : checkgroup.GroupImage;*/
             }
             catch (Exception ex)
             {
@@ -629,7 +685,7 @@ namespace LaCafelogy.Controllers
                         checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
                         checkgroup.GroupId = model.GroupId;
                         checkgroup.GroupName = model.GroupName;
-                        checkgroup.ImageName = model.ImageName;
+                        checkgroup.GroupImageName = model.GroupImageName;
                         checkgroup.ModifiedBy = 1;
                         checkgroup.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();

@@ -130,6 +130,7 @@ namespace LaCafelogy.Models
         public string QBID { get; set; }
         public string QBDesc { get; set; }
         public int GroupId { get; set; }
+        public string ItemImage { get; set; }
     }
 
     [Table("ItemPrice")]
