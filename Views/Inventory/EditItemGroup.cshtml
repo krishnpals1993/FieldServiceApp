@@ -43,20 +43,46 @@
                        
                     </div>
                     <div class="col-sm-3">
-                        <img src="~/images/@Model.ImageName" height="50px" width="50px" asp-append-version="true" />
-
-                        <div class="custom-file">
+                        <img src="~/images/@Model.ImageName" height="200px" width="200px" asp-append-version="true" />
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                            Change
+                        </button>
+                        @*<div class="custom-file">
                             <input asp-for="GroupImageName" class="custom-file-input" id="customFile">
                             <label class="custom-file-label" for="customFile">Choose file</label>
                         </div>
-                        <span asp-validation-for="GroupImageName" class="text-danger"></span>
+                        <span asp-validation-for="GroupImageName" class="text-danger"></span>*@
                     </div>
                     <p class="text-danger">
                         @ViewBag.ErrorMessage
                     </p>
-
                 </div>
 
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Choose New Image</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="custom-file">
+                                    <input asp-for="GroupImageName" class="custom-file-input" id="customFile">
+                                    <label class="custom-file-label" for="customFile">Choose file</label>
+                                </div>
+                                <span asp-validation-for="GroupImageName" class="text-danger"></span>
+                            </div>
+                            @*<div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Understood</button>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
                 <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
                     <div class="offset-md-3 col-md-9 text-nowrap">
                         <button class="btn btn-info btn-bold px-4" type="submit">
@@ -122,7 +148,32 @@
                 var fileName = $(this).val().split("\\").pop();
                 $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
             });
+            //$(function () {
+            //    $('.custom-file-input').clearer();
+            //});
+            //$(function () {
+            //    $('.custom-file-input').clearer({
+            //        clearHtml: '&times;',
+            //        cssClass: 'input-clearer',
+            //        focusable: true
+            //    });
+            //});
 
+            //var myModal = document.getElementById('#exampleModal')
+            //var myInput = document.getElementById('myInput')
+
+            //myModal.addEventListener('shown.bs.modal', function () {
+            //    myInput.focus()
+            //})
+            //$(".modal").on('click', function (e) {
+            //    modelPopup(this);  
+            //});
+
+            //function modelPopup(this) {
+            //    debugger;
+            //    $('#exampleModal').find(".modal-dialog").html(data);
+            //    $('#exampleModal > .modal', data).modal("show");
+            //};
         })
     </script>
 }

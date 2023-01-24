@@ -177,10 +177,30 @@ namespace LaCafelogy.Controllers
         }
 
         public IActionResult EditItem(string id)
-        {
+         {
             ItemMasterViewModel model = new ItemMasterViewModel();
             try
             {
+                int itemId = 0;
+                int.TryParse(id, out itemId);
+                //var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd == model.ItemCd && w.ItemId != model.ItemId).FirstOrDefault();
+                //var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemId == model.ItemId).FirstOrDefault();
+                //var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd!= model.ItemCd && w.ItemId!=model.ItemId).FirstOrDefault();
+                var checkItem = _dbContext.tbl_ItemMaster.Where(w =>w.ItemId== itemId).FirstOrDefault();
+                model.ItemId = itemId;
+                model.ItemCd = checkItem.ItemCd;
+                model.ItemCost = checkItem.ItemCost;
+                model.ItemDescription = checkItem.ItemDescription;
+                model.ItemUnitId = checkItem.ItemUnitId.ToString();
+                model.ItemPrice = checkItem.ItemPrice;
+                model.ItemQOH = (checkItem.Service == "Y" ? 0 : (checkItem.ItemQOH));
+                model.Sellable = checkItem.Sellable;
+                model.Taxable = checkItem.Taxable;
+                model.Service = checkItem.Service;
+                model.CategoryId = checkItem.CategoryId ?? 0;
+                model.GroupId = checkItem.GroupId;
+                model.ImageName = checkItem.ItemImage;
+
                 model.UnitList = _dbContext.tbl_Units.Select(s => new UnitViewModel
                 {
                     UnitId = s.UnitId,
@@ -199,22 +219,6 @@ namespace LaCafelogy.Controllers
                     GroupName = s.GroupName
 
                 }).ToList();
-                int itemId = 0;
-                int.TryParse(id, out itemId);
-                //var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd == model.ItemCd && w.ItemId != model.ItemId).FirstOrDefault();
-                var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemId == model.ItemId).FirstOrDefault();
-                model.ItemId = itemId;
-                model.ItemCd = checkItem.ItemCd;
-                model.ItemCost = checkItem.ItemCost;
-                model.ItemDescription = checkItem.ItemDescription;
-                model.ItemUnitId = checkItem.ItemUnitId.ToString();
-                model.ItemPrice = checkItem.ItemPrice;
-                model.ItemQOH = (checkItem.Service == "Y" ? 0 : (checkItem.ItemQOH));
-                model.Sellable = checkItem.Sellable;
-                model.Taxable = checkItem.Taxable;
-                model.Service = checkItem.Service;
-                model.CategoryId = checkItem.CategoryId ?? 0;
-                model.GroupId = checkItem.GroupId;
             }
             catch (Exception ex)
             {
@@ -259,6 +263,7 @@ namespace LaCafelogy.Controllers
                         checkItem.Service = model.Service;
                         checkItem.CategoryId = model.CategoryId;
                         checkItem.GroupId = model.GroupId;
+                        checkItem.ItemImage = checkItem.ItemImage;
                         checkItem.ModifiedBy = 1;
                         checkItem.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();
@@ -653,8 +658,7 @@ namespace LaCafelogy.Controllers
             {
                 int GroupId = 0;
                 int.TryParse(id, out GroupId);
-                var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == GroupId).FirstOrDefault();
-                string uniqueFileName = UploadedFile(model);
+                var checkgroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == GroupId).FirstOrDefault();               
                 model.GroupId = GroupId;
                 model.GroupName = checkgroup.GroupName;
                 model.ImageName = checkgroup.GroupImage;/* == null ? "" : checkgroup.GroupImage;*/
@@ -682,12 +686,19 @@ namespace LaCafelogy.Controllers
                     }
                     else
                     {
-                        checkgroup = list.Where(w => w.GroupName.ToString().ToUpper() == model.GroupName.ToString().ToUpper()).FirstOrDefault();
-                        checkgroup.GroupId = model.GroupId;
-                        checkgroup.GroupName = model.GroupName;
-                        checkgroup.GroupImageName = model.GroupImageName;
-                        checkgroup.ModifiedBy = 1;
-                        checkgroup.ModifiedDate = DateTime.Now;
+                        //last
+                       var updategroup = _dbContext.tbl_ItemGroup.Where(w => w.GroupId == model.GroupId).FirstOrDefault();
+                        if (model.ImageName != null)
+                        {
+                            string filePath = Path.Combine(webHostEnvironment.WebRootPath, "images", updategroup.GroupImage);
+                            System.IO.File.Delete(filePath);
+                        }
+                        updategroup.GroupId = model.GroupId;
+                        updategroup.GroupName = model.GroupName;
+                        //lastr
+                        updategroup.GroupImage = uniqueFileName;
+                        updategroup.ModifiedBy = 1;
+                        updategroup.ModifiedDate = DateTime.Now;
                         _dbContext.SaveChanges();
                         ViewBag.SuccessMessage = "GroupName update successfully";
                     }
