@@ -180,7 +180,7 @@
                         @ViewBag.ErrorMessage
                     </p>
                 </div>
-                
+
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -274,7 +274,10 @@
             }
 
         })
-
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
         $("#Service").on("change", function () {
             if ($("#Service").val() == "Y") {
                 $("#ItemQOH").val('0');
