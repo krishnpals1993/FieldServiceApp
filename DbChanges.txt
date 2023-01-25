@@ -869,7 +869,9 @@ CREATE TABLE public."ItemMaster"
     "Service" character varying(1) COLLATE pg_catalog."default",
     "CategoryId" integer,
     "QBDesc" character varying COLLATE pg_catalog."default",
-    "QBID" character varying COLLATE pg_catalog."default"
+    "QBID" character varying COLLATE pg_catalog."default",
+    "GroupId" integer,
+    "ItemImage" varchar
 )
  
 CREATE TABLE public."ItemPrice"
@@ -1091,7 +1093,8 @@ create table public."ItemGroup"
     "CreatedBy" integer,
     "CreatedDate" timestamp without time zone,
     "ModifiedBy" integer,
-    "ModifiedDate" timestamp without time zone
+    "ModifiedDate" timestamp without time zone,
+    "GroupImage" varchar
 )
 
 
