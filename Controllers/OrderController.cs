@@ -110,7 +110,17 @@ namespace LaCafelogy.Controllers
                 model.ItemList.Add(item);
             }
 
+            var groups = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel
+            {
+                GroupId= s.GroupId,
+                ImageName = s.GroupImage == null ? "" : s.GroupImage,
+                GroupName = s.GroupName
+            }).ToList();
 
+            foreach (var group in groups)
+            {
+                model.ItemGroupList.Add(group);
+            }
 
             model.ContactList = _dbContext.tbl_Order.Select(s => new OrderCustomerDetailViewModel
             {

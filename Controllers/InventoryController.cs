@@ -583,7 +583,6 @@ namespace LaCafelogy.Controllers
 
             return View(model);
         }
-
         public IActionResult ItemGroupList()
         {
             List<ItemGroupViewModel> group = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel
@@ -714,7 +713,6 @@ namespace LaCafelogy.Controllers
             }
             return View(model);
         }
-
 
         [HttpPost]
         public JsonResult DeleteItemGroup(int id)

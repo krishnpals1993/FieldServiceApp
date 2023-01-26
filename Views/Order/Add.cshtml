@@ -7,132 +7,145 @@
 @inject IOptions<Appsettings> Settings
 
 
-
+@*id="main" col*@
 <div role="main" class="page-content container container-plus">
+    <div class="card-header">
+        <h3 class="card-title text-125">
+            @ViewData["Title"]
+        </h3>
+    </div>
     <div class="card bcard mt-2 mt-lg-3">
-        <div class="card-header">
-            <h3 class="card-title text-125">
-                @ViewData["Title"]
-            </h3>
-        </div>
+        <div ng-app="myApp" ng-controller="myCtrl" id="main" class="card-body px-3 pb-1">
+            <div class="row ">
+                <div class="col-2 px-1" id="sticky-sidebar">
+                    <div class="nav flex-column flex-nowrap overflow-auto text-white p-2">
+                        <div ng-repeat="item in itemArray" class="row form-group">
+                            <tr>
+                                <td>
 
-        <div ng-app="myApp" ng-controller="myCtrl" class="card-body px-3 pb-1">
-            <form>
-
-                <div class="row form-group">
-                    <div class="col-lg-1">
-                        <label class="col-form-label">Order No</label>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" ng-model="orderNo"
-                               readonly="readonly"
-                               class="form-control"
-                               placeholder="Order No" />
-                    </div>
-
-                </div>
-                <hr />
-
-                <div class="row form-group">
-                    <div class="col-lg-1">
-                        <label class="col-form-label">  Contact No</label>
-                    </div>
-                    <div class="col-md-2">
-                        <select id="customerContactNo"
-                                class="form-control chosen-select"
-                                name="customerContactNo">
-                        </select>
-
-                    </div>
-                    <div class="col-lg-1">
-                        <label class="col-form-label">Name</label>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" ng-model="customerName" class="form-control"
-                               placeholder="Contact Name" />
+                                </td>
+                            </tr>
+                        </div>
                     </div>
                 </div>
-                <hr />
-                <div ng-repeat="item in itemArray" class="row form-group">
+                <div class="col-10 card-body px-3 pb-1">
+                    <form>
 
-                    <div class="col-lg-1">
-                        <label class="col-form-label">Item</label>
-                    </div>
+                        <div class="row form-group">
+                            <div class="col-lg-1">
+                                <label class="col-form-label">Order No</label>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" ng-model="orderNo"
+                                       readonly="readonly"
+                                       class="form-control"
+                                       placeholder="Order No" />
+                            </div>
 
-                    <div class="col-md-6">
-                        <select class="form-control"
-                                ng-options="option.ItemId as option.ItemName for option in itemList | orderBy : 'ItemName'"
-                                ng-model="item.ItemId">
-                        </select>
-                    </div>
-                    <div class="col-lg-1">
-                        <label class="col-form-label">Quantity</label>
-                    </div>
+                        </div>
+                        <hr />
 
-                    <div class="col-md-2">
-                        <input type="number" class="form-control" placeholder="Quanity"
-                               ng-change="setTotalAmount()"
-                               ng-model="item.Quantity" />
-                    </div>
-                    <div class="col-md-2" style="display:none">
-                        <input type="number" class="form-control" placeholder="Quanity"
-                               ng-model="item.Amount" />
-                    </div>
+                        <div class="row form-group">
+                            <div class="col-lg-1">
+                                <label class="col-form-label">  Contact No</label>
+                            </div>
+                            <div class="col-md-2">
+                                <select id="customerContactNo"
+                                        class="form-control chosen-select"
+                                        name="customerContactNo">
+                                </select>
+
+                            </div>
+                            <div class="col-lg-1">
+                                <label class="col-form-label">Name</label>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" ng-model="customerName" class="form-control"
+                                       placeholder="Contact Name" />
+                            </div>
+                        </div>
+                        <hr />
+                        <div ng-repeat="item in itemArray" class="row form-group">
+
+                            <div class="col-lg-1">
+                                <label class="col-form-label">Item</label>
+                            </div>
+
+                            <div class="col-md-6">
+                                <select class="form-control"
+                                        ng-options="option.ItemId as option.ItemName for option in itemList | orderBy : 'ItemName'"
+                                        ng-model="item.ItemId">
+                                </select>
+                            </div>
+                            <div class="col-lg-1">
+                                <label class="col-form-label">Quantity</label>
+                            </div>
+
+                            <div class="col-md-2">
+                                <input type="number" class="form-control" placeholder="Quanity"
+                                       ng-change="setTotalAmount()"
+                                       ng-model="item.Quantity" />
+                            </div>
+                            <div class="col-md-2" style="display:none">
+                                <input type="number" class="form-control" placeholder="Quanity"
+                                       ng-model="item.Amount" />
+                            </div>
 
 
 
-                    <div class="col-md-1">
-                        <button ng-show="$index==itemArray.length-1" type="button" class="btn btn-sm btn-primary" ng-click="addItem(item,$index)">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                        <button ng-show="$index==itemArray.length-1 && $index>0" type="button" class="btn btn-sm btn-primary" ng-click="deleteItem(item,$index)">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </div>
+                            <div class="col-md-1">
+                                <button ng-show="$index==itemArray.length-1" type="button" class="btn btn-sm btn-primary" ng-click="addItem(item,$index)">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <button ng-show="$index==itemArray.length-1 && $index>0" type="button" class="btn btn-sm btn-primary" ng-click="deleteItem(item,$index)">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
 
 
+                        </div>
+
+                        <hr />
+
+                        <div class="row form-group" style="margin-top:5px;">
+                            <div class="col-lg-1">
+                                <label class="col-form-label">Total Amount</label>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" ng-model="totalAmount"
+                                       readonly="readonly"
+                                       class="form-control"
+                                       placeholder="Total Amount" />
+                            </div>
+
+                        </div>
+
+                        <div class="row form-group" style="margin-top:5px;">
+                            <div class="col-lg-1">
+                                <label class="col-form-label">Remarks</label>
+                            </div>
+                            <div class="col-md-4">
+                                <textarea ng-model="remarks"
+                                          class="form-control" placeholder="Remarks"></textarea>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group row">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a class="btn btn-white btn-sm" asp-action="OrderList">Cancel</a>
+                                <button class="btn btn-primary btn-sm" type="button" ng-click="saveForm()">Save</button>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
-
-                <hr />
-
-                <div class="row form-group" style="margin-top:5px;">
-                    <div class="col-lg-1">
-                        <label class="col-form-label">Total Amount</label>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" ng-model="totalAmount"
-                               readonly="readonly"
-                               class="form-control"
-                               placeholder="Total Amount" />
-                    </div>
-
-                </div>
-
-                 <div class="row form-group" style="margin-top:5px;">
-                    <div class="col-lg-1">
-                        <label class="col-form-label">Remarks</label>
-                    </div>
-                    <div class="col-md-4">
-                        <textarea ng-model="remarks"
-                               class="form-control" placeholder="Remarks"></textarea>
-                      
-                    </div>
-
-                </div>
-
-
-                <div class="hr-line-dashed"></div>
-                <div class="form-group row">
-                    <div class="col-sm-4 col-sm-offset-2">
-                        <a class="btn btn-white btn-sm" asp-action="OrderList">Cancel</a>
-                        <button class="btn btn-primary btn-sm" type="button" ng-click="saveForm()">Save</button>
-                    </div>
-                </div>
-
-            </form>
+            </div>
         </div>
     </div>
-
 </div>
 
 
@@ -141,7 +154,7 @@
         <link rel="stylesheet" href="~/lib/sweetalert/dist/sweetalert.css" />
         <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
     </environment>
-}
+    }
 
 @section Scripts {
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
@@ -153,9 +166,10 @@
 
     <script type="text/javascript">
 
-        window.mOrderno  = @Model.OrderNo;
+        window.mOrderno = @Model.OrderNo;
         window.itemList = @Html.Raw(Json.Serialize(Model.ItemList));
         window.contactList = @Html.Raw(Json.Serialize(Model.ContactList));
+        window.ItemGroupList = @Html.Raw(Json.Serialize(Model.ItemGroupList))
 
         window.contactList.push({ 'ContactNo': '8233252120' });
 
@@ -167,7 +181,8 @@
         $("#customerContactNo").chosen({ allow_single_deselect: true, width: '100%' });
 
         var app = angular.module('myApp', []);
-        app.controller('myCtrl', function ($scope) {
+        app.controller('myCtrl', function ($scope) 
+        {
             $scope.orderNo = window.mOrderno;
             $scope.itemArray = [];
             $scope.itemArray.push({
@@ -177,6 +192,7 @@
 
             $scope.itemList = window.itemList;
             $scope.contactList = window.contactList;
+            $scope.ItemGroupList = window.ItemGroupList;
 
             $scope.addItem = function (item, index) {
 
@@ -205,14 +221,14 @@
 
             }
 
-            
+
             $scope.setTotalAmount = function () {
                 var totalAmount = 0;
 
                 for (var i = 0; i < $scope.itemArray.length; i++) {
                     var itemAmount = getItemPrice($scope.itemArray[i]['ItemId']);
-                    $scope.itemArray[i]['Amount'] = itemAmount; 
-                    $scope.itemArray[i]['IsCombo'] = getItemIsCombo($scope.itemArray[i]['ItemId']); 
+                    $scope.itemArray[i]['Amount'] = itemAmount;
+                    $scope.itemArray[i]['IsCombo'] = getItemIsCombo($scope.itemArray[i]['ItemId']);
                     if (itemAmount && $scope.itemArray[i]['Quantity']) {
                         totalAmount = totalAmount + ((itemAmount) * $scope.itemArray[i]['Quantity'])
                     }
@@ -221,69 +237,69 @@
             };
 
             function getItemPrice(id) {
-               var price = 0;
-                for (var i = 0; i < window.itemList.length; i++){
+                var price = 0;
+                for (var i = 0; i < window.itemList.length; i++) {
                     if (window.itemList[i]['ItemId'] == id) {
-                             price = window.itemList[i]['ItemPrice'];
-                         }
-                }
-               return price;
-
-            }
-
-             function getItemIsCombo(id) {
-               var IsCombo = "";
-                for (var i = 0; i < window.itemList.length; i++){
-                    if (window.itemList[i]['ItemId'] == id) {
-                             IsCombo = window.itemList[i]['IsCombo'];
-                         }
-                }
-               return IsCombo;
-
-            }
-
-        //addColumnValue  deleteColumnValue
-
-
-        $scope.saveForm = function () {
-            //comboOfferName comboOfferPrice comboOfferType
-            if (!$scope.totalAmount) {
-                swal("Please add items/combo", "", "error");
-                return;
-            }
-
-            
-            var model = {
-                TotalAmount: $scope.totalAmount,
-                ContactNo: $("#customerContactNo").val(),
-                Name: $scope.customerName,
-                OrderNo: $scope.orderNo,
-                OrderItems: $scope.itemArray,
-                Remarks : $scope.remarks
-            }
-
-            $.ajax({
-                url: "/Order/AddOrder",
-                type: "POST",
-                dataType: "json",
-                data: { model: angular.toJson(model) },
-                success: function (data) {
-                    if (data.Status == "1") {
-                        swal(data.Message, "", "success")
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 500);
-                    }
-                    else {
-                        swal(data.Message, "", "error")
+                        price = window.itemList[i]['ItemPrice'];
                     }
                 }
-            })
+                return price;
 
-        }
+            }
+
+            function getItemIsCombo(id) {
+                var IsCombo = "";
+                for (var i = 0; i < window.itemList.length; i++) {
+                    if (window.itemList[i]['ItemId'] == id) {
+                        IsCombo = window.itemList[i]['IsCombo'];
+                    }
+                }
+                return IsCombo;
+
+            }
+
+            //addColumnValue  deleteColumnValue
 
 
-                        });
+            $scope.saveForm = function () {
+                //comboOfferName comboOfferPrice comboOfferType
+                if (!$scope.totalAmount) {
+                    swal("Please add items/combo", "", "error");
+                    return;
+                }
+
+
+                var model = {
+                    TotalAmount: $scope.totalAmount,
+                    ContactNo: $("#customerContactNo").val(),
+                    Name: $scope.customerName,
+                    OrderNo: $scope.orderNo,
+                    OrderItems: $scope.itemArray,
+                    Remarks: $scope.remarks
+                }
+
+                $.ajax({
+                    url: "/Order/AddOrder",
+                    type: "POST",
+                    dataType: "json",
+                    data: { model: angular.toJson(model) },
+                    success: function (data) {
+                        if (data.Status == "1") {
+                            swal(data.Message, "", "success")
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 500);
+                        }
+                        else {
+                            swal(data.Message, "", "error")
+                        }
+                    }
+                })
+
+            }
+
+
+        });
 
 
 
@@ -319,4 +335,4 @@
         });
     </script>
 
-}
+    }

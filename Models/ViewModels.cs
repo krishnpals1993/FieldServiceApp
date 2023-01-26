@@ -1024,14 +1024,16 @@ namespace LaCafelogy.Models
             ItemList = new List<ItemMasterViewModel>();
             OrderItems = new List<OrderItemsViewModel>();
             ContactList = new List<OrderCustomerDetailViewModel>();
+            ItemGroupList = new List<ItemGroupViewModel>();
         }
         public int OrderId { get; set; }
         public string OrderNo { get; set; }
         public string ContactNo { get; set; }
         public string Name { get; set; }
         public decimal TotalAmount { get; set; }
-        public  string Remarks { get; set; }
+        public string Remarks { get; set; }
         public List<ItemMasterViewModel> ItemList { get; set; }
+        public List<ItemGroupViewModel> ItemGroupList { get; set; }
         public List<OrderItemsViewModel> OrderItems { get; set; }
         public List<OrderCustomerDetailViewModel> ContactList { get; set; }
     }
