@@ -16,19 +16,48 @@
     </div>
     <div class="card bcard mt-2 mt-lg-3">
         <div ng-app="myApp" ng-controller="myCtrl" id="main" class="card-body px-3 pb-1">
-            <div class="row ">
-                <div class="col-2 px-1" id="sticky-sidebar">
-                    <div class="nav flex-column flex-nowrap overflow-auto text-white p-2">
-                        <div ng-repeat="item in itemArray" class="row form-group">
-                            <tr>
-                                <td>
-
-                                </td>
-                            </tr>
-                        </div>
+            <div class="row border-between">
+                <div class="col-2 px-1 border-right " id="sticky-sidebar" @*style="padding-right:20px; border-right: 1px solid #ccc;"*@ >
+                    <div class="nav flex-column flex-nowrap overflow-auto text-white p-2 ">
+                        @foreach (var group in Model.ItemGroupList)
+                        {
+                            @if (group.ImageName != null)
+                            {
+                                @if (group.IsActive == 1)
+                                {
+                                    <span class="mb-3px">
+                                        <img src="~/images/@group.ImageName" height="160px" width="160px" asp-append-version="true" />
+                                    </span>
+                                }
+                            }
+                        }
+                        @*<div ng-repeat="group in ItemGroupList">
+                            <div>
+                                @if (ImageName != null)
+                                {
+                                  <span>
+                                        <img src="@group.ImageName" alt="">@group.ImageName
+                                  </span>  
+                                }
+                            </div>
+                        </div>*@
+                        @*<div ng-repeat="item in itemArray" class="row form-group">
+                            <select class="form-control" required id="state" name="state" ng-disabled="!country" ng-model="state"
+                                    ng-change="SelectImage()" ng-options="state.Id as state.StateName for state in filterstateList">
+                            </select>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            {{item.}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>*@
                     </div>
                 </div>
-                <div class="col-10 card-body px-3 pb-1">
+                <div class="col-10 card-body pb-1">
                     <form>
 
                         <div class="row form-group">
@@ -193,6 +222,27 @@
             $scope.itemList = window.itemList;
             $scope.contactList = window.contactList;
             $scope.ItemGroupList = window.ItemGroupList;
+
+            //$scope.SelectImage = function () {
+            //    $scope.filterGroupList = $scope.itemList.filter(function (item) {
+            //        return item.GroupId == window.ItemGroupList;
+            //    })
+
+            //};
+
+            //debugger;
+            //$scope.ItemImage = function (id) {
+            //    var imageName = "";
+            //    for (i = 0; i < $scope.ItemList.length; i++) {
+
+            //        if ($scope.ItemList[i]['Id'] == id) {
+            //            imageName = $scope.ItemList[i]['ImageName']
+            //            break;
+            //        }
+            //    }
+
+            //    return imageName;
+            //}
 
             $scope.addItem = function (item, index) {
 

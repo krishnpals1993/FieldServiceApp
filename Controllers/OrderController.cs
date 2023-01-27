@@ -102,7 +102,9 @@ namespace LaCafelogy.Controllers
                 ItemId = s.ItemId,
                 ItemName = "Rs." + s.ItemPrice + "-" + s.ItemCd,
                 ItemPrice = s.ItemPrice,
-                IsCombo = "N"
+                IsCombo = "N",
+                GroupId = s.GroupId,                
+                ImageName =s.ItemImage 
             }).ToList();
 
             foreach (var item in items)
@@ -113,8 +115,9 @@ namespace LaCafelogy.Controllers
             var groups = _dbContext.tbl_ItemGroup.Select(s => new ItemGroupViewModel
             {
                 GroupId= s.GroupId,
+                GroupName = s.GroupName,
                 ImageName = s.GroupImage == null ? "" : s.GroupImage,
-                GroupName = s.GroupName
+                IsActive = s.IsActive
             }).ToList();
 
             foreach (var group in groups)
