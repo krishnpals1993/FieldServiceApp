@@ -80,7 +80,7 @@ namespace FieldServiceApp.Controllers
                                 RoleId = roleId,
                                 IsActive = 1,
                                 CreatedBy = 1,
-                                CreatedDate = DateTime.Now
+                                CreatedDate = DateTime.UtcNow
                             };
 
                             _dbContext.tbl_Users.Add(user);
@@ -96,7 +96,7 @@ namespace FieldServiceApp.Controllers
                                Color = model.Color,
                                 IsActive = 1,
                                 CreatedBy = 1,
-                                CreatedDate = DateTime.Now,
+                                CreatedDate = DateTime.UtcNow,
                                 UserId = user.UserId,
                             };
 
@@ -199,7 +199,7 @@ namespace FieldServiceApp.Controllers
                     {
                         checkEmployee.IsActive = 0;
                         checkEmployee.ModifiedBy = 1;
-                        checkEmployee.ModifiedDate = DateTime.Now;
+                        checkEmployee.ModifiedDate = DateTime.UtcNow;
                         _dbContext.SaveChanges();
 
                         response.Status = "1";

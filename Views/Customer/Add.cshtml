@@ -4,404 +4,24 @@
 @inject IOptions<Appsettings> Settings
 @{
 
-    ViewData["Title"] = "New Customer";
+    ViewData["Title"] = "Add Customer";
     List<string> CompanyTypeList = new List<string>();
     CompanyTypeList.Add("Business");
     CompanyTypeList.Add("Residential");
 
 }
-    <div role="main" class="page-content container container-plus">
-        <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Customer/Add" method="post">
-            <div class="card bcard mt-2 mt-lg-3">
-                <div class="card-header">
-                    <div class="card-title ">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <h3 class="text-125">
-                                    New Customer
-                                </h3>
-                            </div>
-                            <div class="col-md-9 text-nowrap text-right">
-                                <button class="btn btn-info btn-bold px-4" type="submit">
-                                    <i class="fa fa-check mr-1"></i>
-                                    Submit
-                                </button>
-
-                                <a href="~/Customer/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
-                                    <i class="fa fa-undo mr-1"></i>
-                                    Cancel
-                                </a>
-                            </div>
+<div role="main" class="page-content container container-plus" style="width:80%">
+    <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Customer/Add" method="post">
+        <div class="card bcard mt-2 mt-lg-3">
+            <div class="card-header">
+                <div class="card-title ">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h3 class="text-125">
+                                Add Customer
+                            </h3>
                         </div>
-
-                    </div>
-                </div>
-                
-
-                <div class="card-body px-3 pb-1">
-
-                    <div class="form-group row">
-
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Code
-                            </label>
-                        </div>
-
-                        <div class="col-sm-2">
-                            @Html.TextBoxFor(m => m.Code,
-                            new { @placeholder = "Code", @class = "form-control", maxlength = "44" })
-                            <span asp-validation-for="Code" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Name
-                            </label>
-                        </div>
-
-                        <div class="col-sm-2">
-                            @Html.TextBoxFor(m => m.CompanyName,
-                            new { @placeholder = "Company Name", @class = "form-control", maxlength = "250" })
-                            <span asp-validation-for="CompanyName" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Type
-                            </label>
-                        </div>
-
-                        <div class="col-sm-2">
-                            @Html.DropDownListFor(model => model.CompanyType, new SelectList(CompanyTypeList.Select(x => new { Value = x, Text = x }), "Value", "Text"), "Select", new { @class = "form-control", @placeholder = "Select company type" })
-                        </div>
-
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                First Name
-                            </label>
-                        </div>
-                        <div class="col-sm-2">
-                            @Html.TextBoxFor(m => m.FirstName,
-                            new { @placeholder = "First Name", @class = "form-control" })
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
-                        </div>
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Last Name
-                            </label>
-                        </div>
-                        <div class="col-sm-2">
-                            @Html.TextBoxFor(m => m.LastName,
-                              new { @placeholder = "Last Name", @class = "form-control" })
-                            <span asp-validation-for="LastName" class="text-danger"></span>
-                        </div>
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Address
-                            </label>
-                        </div>
-                        <div class="col-sm-4">
-                            @Html.TextBoxFor(m => m.Address,
-                            new { @placeholder = "Address", @class = "form-control", maxlength = "298" })
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                State
-                            </label>
-                        </div>
-
-                        <div class="col-sm-2">
-                            @Html.DropDownListFor(model => model.StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
-                            <span asp-validation-for="StateId" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                City
-                            </label>
-                        </div>
-
-                        <div class="col-sm-2">
-                            @Html.DropDownListFor(model => model.CityId, new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
-                            <span asp-validation-for="CityId" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                            <label for="id-form-field-1" class="mb-0">
-                                Zip
-                            </label>
-                        </div>
-
-                        <div class="col-sm-2">
-                            @Html.TextBoxFor(m => m.Zip1,
-                            new { @placeholder = "Zip 1", @class = "form-control" })
-                            <span asp-validation-for="Zip1" class="text-danger"></span>
-                        </div>
-
-
-
-                        <div class="col-sm-2">
-                            @Html.TextBoxFor(m => m.Zip2,
-                            new { @placeholder = "Zip 2", @class = "form-control" })
-                            <span asp-validation-for="Zip2" class="text-danger"></span>
-                        </div>
-
-                    </div>
-
-                    <h3 class="card-title text-125">
-                        Contact detail
-                    </h3>
-                    <hr />
-                    <div id="contactPanel">
-                        @for (int i = 0; i < Model.Contacts.Count(); i++)
-                        {
-
-                            <div class="form-group row">
-
-
-
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        First Name
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Contacts[i].FirstName,
-                                    new { @placeholder = "First Name", @class = "form-control" })
-                                    <span asp-validation-for="Contacts[i].FirstName" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Middle
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Contacts[i].MiddleName,
-                                       new { @placeholder = "Middle Name", @class = "form-control" })
-                                    <span asp-validation-for="Contacts[i].MiddleName" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Last
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Contacts[i].LastName,
-                                      new { @placeholder = "Last Name", @class = "form-control" })
-                                    <span asp-validation-for="Contacts[i].MiddleName" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Phone
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Contacts[i].Phone,
-                                      new { @placeholder = "Phone", @class = "form-control" })
-                                    <span asp-validation-for="Contacts[i].Phone" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Email
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Contacts[i].Email,
-                                      new { @placeholder = "Email", @class = "form-control" })
-                                    <span asp-validation-for="Contacts[i].Email" class="text-danger"></span>
-                                </div>
-
-                            </div>
-
-                            <hr />
-                        }
-                    </div>
-
-
-
-
-                    <h3 class="card-title text-125">
-                        Shipping detail
-                    </h3>
-                    <hr />
-                    <div id="shippingPanel">
-
-                        @for (int i = 0; i < Model.Shippings.Count(); i++)
-                        {
-                            @Html.HiddenFor(h => h.Shippings[i].ShipId)
-                            <div class="form-group row">
-                                <div class="col-1">
-                                    <span class="text-primary text-400">Shipping @(i + 1) </span>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        State
-                                    </label>
-                                </div>
-
-                                <div class="col-sm-2">
-                                    @Html.DropDownListFor(model => model.Shippings[i].StateId, new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state", new { @class = "form-control", @placeholder = "Select State" })
-                                    <span asp-validation-for="Shippings[i].StateId" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        City
-                                    </label>
-                                </div>
-
-                                <div class="col-sm-2">
-                                    @Html.DropDownListFor(model => model.Shippings[i].CityId, new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city", new { @class = "form-control", @placeholder = "Select city" })
-                                    <span asp-validation-for="Shippings[i].CityId" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Zip
-                                    </label>
-                                </div>
-
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Shippings[i].Zip1,
-                                      new { @placeholder = "Zip 1", @class = "zip form-control" })
-                                    <span asp-validation-for="Shippings[i].Zip1" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Shippings[i].Zip2,
-                                      new { @placeholder = "Zip 2", @class = "zip form-control" })
-                                    <span asp-validation-for="Shippings[i].Zip2" class="text-danger"></span>
-                                </div>
-
-
-
-                            </div>
-
-
-                            <div class="form-group row">
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Address
-                                    </label>
-                                </div>
-
-                                <div class="col-sm-5">
-                                    @Html.TextBoxFor(m => m.Shippings[i].Address,
-                                    new { @placeholder = "Address", @class = "form-control" })
-                                    <span asp-validation-for="Shippings[i].Address" class="text-danger"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Phone
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Shippings[i].Phone,
-                                      new { @placeholder = "Phone", @class = "form-control" })
-                                    <span asp-validation-for="Shippings[i].Phone" class="text-danger"></span>
-                                </div>
-                                <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                    <label for="id-form-field-1" class="mb-0">
-                                        Email
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    @Html.TextBoxFor(m => m.Shippings[i].Email,
-                                      new { @placeholder = "Email", @class = "form-control", maxlength = "150" })
-                                    <span asp-validation-for="Shippings[i].Email" class="text-danger"></span>
-                                </div>
-
-                            </div>
-
-
-
-
-                            <hr class="border-dashed" />
-                            @for (int j = 0; j < Model.Shippings[i].ApartmentList.Count(); j++)
-                            {
-                                @Html.HiddenFor(h => h.Shippings[i].ApartmentList[j].ApartmentId)
-
-                                <div id="apartmentPanel_@i">
-                                    <div class="form-group row">
-
-                                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                            <label for="id-form-field-1" class="mb-0">
-                                                @(j + 1)- Apartment No
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            @Html.TextBoxFor(m => m.Shippings[i].ApartmentList[j].ApartmentNo,
-                                            new { @placeholder = "Apartment No", @class = "form-control", maxlength = "150" })
-                                            <span asp-validation-for="Shippings[i].ApartmentList[j].ApartmentNo" class="text-danger"></span>
-                                        </div>
-
-                                        <div class="col-sm-1 col-form-label text-sm-right pr-0">
-                                            <label for="id-form-field-1" class="mb-0">
-                                                Apartment Name
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            @Html.TextBoxFor(m => m.Shippings[i].ApartmentList[j].ApartmentName,
-                                               new { @placeholder = "Apartment Name", @class = "form-control", maxlength = "150" })
-                                            <span asp-validation-for="Shippings[i].ApartmentList[j].ApartmentName"
-                                                  class="text-danger"></span>
-                                        </div>
-
-                                        <div class="col-lg-2">
-                                            <button onclick="addShippingApartment('@i')" type="button"
-                                                    class="btnAddApartment btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                                                Add More
-                                                <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <hr class="border-dashed" />
-                                </div>
-
-
-                            }
-
-                            {
-                                <div class="form-group row">
-                                    <div class="col-lg-3 offset-9">
-                                        <button onclick="addShipping()" type="button"
-                                                class="btnAddShipping btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
-                                            Add More Shipping Address
-                                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
-                                        </button>
-                                    </div>
-                                </div>}
-
-
-
-                            <hr />
-                        }
-
-
-                    </div>
-
-
-
-
-                    <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
-                        <div class="offset-md-3 col-md-9 text-nowrap">
+                        <div class="col-md-9 text-nowrap text-right">
                             <button class="btn btn-info btn-bold px-4" type="submit">
                                 <i class="fa fa-check mr-1"></i>
                                 Submit
@@ -416,8 +36,209 @@
 
                 </div>
             </div>
-           </form>
 
+            <div class="card-body px-3 pb-1">
+
+                @Html.HiddenFor(h => h.CustmoerId)
+
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Company Name
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.CompanyName,
+                        new { @placeholder = "Company Name", @class = "form-control", maxlength = "250" })
+                        <span asp-validation-for="CompanyName" class="text-danger"></span>
+                    </div>
+
+
+
+
+
+                </div>
+
+                <div class="form-group row">
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Full Name
+                        </label>
+                    </div>
+                    <div class="col-sm-1">
+                        <input type="text" placeholder="Mr/Ms/.." class="form-control" />
+
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.FirstName,
+                        new { @placeholder = "First Name", @class = "form-control" })
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.MiddleName,
+                           new { @placeholder = "Middle Name", @class = "form-control" })
+                        <span asp-validation-for="MiddleName" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.LastName,
+                          new { @placeholder = "Last Name", @class = "form-control" })
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Main Phone
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Phone,
+                        new { @placeholder = "Phone", @class = "form-control", maxlength = "15" })
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Main Email
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Email,
+                        new { @placeholder = "Email", @class = "form-control", maxlength = "50" })
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+
+
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Work Phone
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.AltPhone,
+                        new { @placeholder = "Work Phone", @class = "form-control", maxlength = "15" })
+                        <span asp-validation-for="AltPhone" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Mobile
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Mobile,
+                        new { @placeholder = "Mobile", @class = "form-control", maxlength = "10" })
+                        <span asp-validation-for="Mobile" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Fax
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Fax,
+                        new { @placeholder = "Fax", @class = "form-control", maxlength = "20" })
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+                </div>
+                <hr />
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Invoice/Bill To
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(model => model.BillingId, new SelectList(Model.Billings.Select(x => new { Value = x.CustomerBillingId, Text = ((x.Address1 ?? "") + (x.Address2 ?? "")) }), "Value", "Text"), "Select Bill To", new { @class = "form-control chosen-select", @placeholder = "Select Bill To" })
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Ship To
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(model => model.ShipId, new SelectList(Model.Shippings.Select(x => new { Value = x.ShipId, Text = ((x.Address ?? "")) }), "Value", "Text"), "Select Ship To", new { @class = "form-control chosen-select", @placeholder = "Select Ship To" })
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-lg-3"></div>
+                    <div class="col-sm-3">
+                        <button onclick="addBilling()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                            Add More
+                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="editBilling()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-edit text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="deleteBilling()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-trash text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                    </div>
+                    <div class="col-lg-3"></div>
+                    <div class="col-sm-3">
+                        <button onclick="addShipping()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                            Add More
+                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="editShipping()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-edit text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="deleteShipping()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-trash text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-3 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
+
+                        <a href="~/Customer/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
 </div>
 
 
@@ -425,9 +246,7 @@
 
 @section Styles {
     <environment names="Development,Staging,Production">
-        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
-        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
-        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+        <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
     </environment>
     <style>
         hr {
@@ -440,24 +259,58 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <environment names="Development,Staging,Production">
         <script src="~/lib/moment/moment.js"></script>
-        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
-        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
         <script src="~/lib/inputmask/jquery.inputmask.js"></script>
-        <script src="~/pages/form-basic/@@page-script.js"></script>
+        <script src="~/lib/chosen-js/chosen.jquery.js"></script>
     </environment>
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#Contacts_0__Phone").inputmask("(999) 999-9999")
-            $("#Zip1").inputmask("99999")
-            $("#Zip2").inputmask("99999");
-            $(".zip").inputmask("99999")
-            $("#Shippings_0__Phone").inputmask("(999) 999-9999");
+
+            $("#Phone").inputmask("(999) 999-9999");
+            $("#Mobile").inputmask("9999999999");
+           $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
+
+
+            if ($("#BillingId").val()) {
+                var shipId = $('#ShipId').val();
+                 var data = {
+                 'id':0,
+                 'custid':$("#CustmoerId").val(),
+            };
+
+            $.ajax({
+                url: "/Customer/GetCustomerShippingAddress",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+
+                     {
+                         $('#ShipId').html('');
+                       var options = '';
+
+                options += '<option value="">Select Ship To</option>';
+                       for (var i = 0; i < response.length; i++) {
+                        options += '<option cust="' + response[i]['CustmoerId'] + '" value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
+                        }
+
+                        $('#ShipId').append(options);
+                        $('#ShipId').val(shipId);
+                        $('#ShipId').trigger("chosen:updated");
+
+
+
+            }
+                }
+            })
+            }
+
+
 
         var SuccessMessage = '@ViewBag.SuccessMessage';
         var ErrorMessage = '@ViewBag.ErrorMessage';
         if (SuccessMessage) {
             swal(SuccessMessage, "", "success");
-            setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Customer/Add"; }, 500);
+            setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Customer/List"; }, 750);
         }
         if (ErrorMessage) {
             swal(ErrorMessage, "", "error");
@@ -465,83 +318,7 @@
 
         });
 
-        function addContacts() {
-
-            var index = $(".btnAddContact").length;
-
-            $.ajax({
-                url: "/Customer/GetCustomerContact/"+index,
-                type: "POST",
-                contentType: "application/json; charset=utf-8",
-                dataType: "html",
-                success: function (response) {
-                    $("#contactPanel").append(response);
-                    $(".btnAddContact").each(function (ind, ele) {
-                        if (ind !=index) {
-                            $(ele).hide();
-                        }
-                    })
-                    //Phone
-                }
-            })
-        }
-
-        function addShipping() {
-             var index = $(".btnAddShipping").length;
-
-            $.ajax({
-                url: "/Customer/GetCustomerShipping/"+index,
-                type: "POST",
-                 contentType: "application/json; charset=utf-8",
-                dataType: "html",
-                success: function (response) {
-                $("#shippingPanel").append(response);
-                $(".btnAddShipping").each(function (ind, ele) {
-                        if (ind != index) {
-                            $(ele).hide();
-                    }
-
-                    $("#Shippings_" + ind + "__Phone").inputmask("(999) 999-9999");
-
-                    });
-                $("#shippingPanel .form-control").each(function (ind, ele) {
-                        if ($(ele).attr('name1')) {
-                            $(ele).attr('name', $(ele).attr('name1'));
-                        }
-
-                    })
-                }
-            })
-        }
-
-          function addShippingApartment(i) {
-              
-              var index = $("#apartmentPanel_"+i+" .btnAddApartment").length;
-              var data = i+"_"+index;
-            $.ajax({
-                url: "/Customer/GetCustomerShippingApartment/"+data,
-
-                type: "POST",
-                 contentType: "application/json; charset=utf-8",
-                dataType: "html",
-                success: function (response) {
-                $("#apartmentPanel_"+i).append(response);
-                $("#apartmentPanel_"+i+" .btnAddApartment").each(function (ind, ele) {
-                        if (ind != index) {
-                            $(ele).hide();
-                        }
-                    });
-                $("#apartmentPanel_"+i+" .form-control").each(function (ind, ele) {
-                        if ($(ele).attr('name1')) {
-                            $(ele).attr('name', $(ele).attr('name1'));
-                        }
-
-                    })
-                }
-            })
-        }
-
-        $("#CompanyName").on("change", function () {
+       $("#CompanyName").on("change", function () {
             if ($("#CompanyName").val()) {
                 $("#CompanyType").val("Business");
                 $("#CompanyType").attr("readonly","readonly");
@@ -549,7 +326,181 @@
             else {
                    $("#CompanyType").removeAttr("readonly");
             }
+       });
+
+
+
+        function addShipping() {
+
+              if (!$("#BillingId").val()) {
+                swal("Please select Bill To address ", "", "error");
+                return;
+            }
+
+            var id = 0;
+             $.ajax({
+        url: "/Customer/GetCustomerShippingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+
+            modal = $(modal).appendTo('body');
+
+            $("#CustomerBillingId").val($("#BillingId").val());
+
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function editShipping() {
+            if (!$("#ShipId").val()) {
+                swal("Please select Ship To address to edit", "", "error");
+                return;
+            }
+            var id =$("#ShipId").val();
+            $.ajax({
+        url: "/Customer/GetCustomerShippingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function deleteShipping() {
+            if (!$("#ShipId").val()) {
+                swal("Please select Ship To address to delete", "", "error");
+                return;
+            }
+            var id = $("#ShipId").val();
+
+        }
+
+        function addBilling() {
+            var id = 0;
+            $.ajax({
+        url: "/Customer/GetCustomerBillingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function editBilling() {
+            if (!$("#BillingId").val()) {
+                swal("Please select Bill To address to edit", "", "error");
+                return;
+            }
+
+            var id = $("#BillingId").val();
+            $.ajax({
+        url: "/Customer/GetCustomerBillingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function deleteBilling() {
+            if (!$("#BillingId").val()) {
+                swal("Please select Bill To address to delete", "", "error");
+                return;
+            }
+
+        }
+
+        //cust="' + response[i]['CustmoerId'] + '"
+
+        $("#BillingId").on("change", function () {
+            $("#ShipId").html('');
+
+             var data = {
+                 'id': $("#BillingId").val(),
+                 'custid':$("#CustmoerId").val(),
+            };
+
+            $.ajax({
+                url: "/Customer/GetCustomerShippingAddress",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+
+                     {
+                         $('#ShipId').html('');
+                       var options = '';
+
+                options += '<option value="">Select Ship To</option>';
+                       for (var i = 0; i < response.length; i++) {
+                        options += '<option cust="' + response[i]['CustmoerId'] + '" value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
+                        }
+
+                       $('#ShipId').append(options);
+                        $('#ShipId').trigger("chosen:updated");
+
+
+
+            }
+                }
+            })
         });
+
+
+
+          $("#ShipId").on("change", function () {
+
+               if ($("#ShipId").val()) {
+                            var customerId = $($($("#ShipId option:selected"))[0]).attr("cust");
+                   if (customerId.toString()!=$("#BillingId").val().toString()) {
+                       $("#BillingId").val(customerId);
+                            $('#BillingId').trigger("chosen:updated");
+                   }
+
+                       }
+
+        });
+
 
 
     </script>

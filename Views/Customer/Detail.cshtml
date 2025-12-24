@@ -1,0 +1,176 @@
+﻿@model FieldServiceApp.Models.CustomerDetailViewModel
+@{
+    ViewData["Title"] = "View";
+}
+
+
+<div role="main" class="page-content container container-plus">
+    <div class="container px-0">
+
+        <div class="row mt-4">
+            <div class="col-lg-12">
+
+
+
+
+                <div class="card bcard mb-4">
+                    <div class="card-body px-4 px-lg-5">
+
+                        <div class="text-center">
+                            <i class="fa fa-user-circle text-200 text-green-m1 mr-1 ml-n4"></i>
+                            <span class="text-dark-m3 text-140">
+                                Customer Information
+                            </span>
+                            <br />
+
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Company Name :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.CompanyName
+                                </span>
+                            </div>
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Main Phone :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.Phone
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-25">
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Full Name :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.FullName
+                                </span>
+                            </div>
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Work Phone :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.AltPhone
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-25">
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Company Type :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.CompanyType
+                                </span>
+                            </div>
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Mobile :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.Mobile
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-25">
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Bill To :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.CompanyName
+                                </span>
+                                <br />
+                                <span class="text-600 text-125">
+                                    @Model.Billing?.Address1 @Model.Billing?.Address2 @Model.Billing?.Address3
+                                </span>
+                                <br />
+                                <span class="text-600 text-125">
+                                    @Model.Shipping?.CityName @Model.Shipping?.StateName @Model.Billing?.Zip1
+                                </span>
+                                
+                            </div>
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Fax :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                @Model.Fax
+                            </div>
+                        </div>
+
+                        <div class="row mt-25">
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Ship To :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.Shipping?.Address @Model.Shipping?.Address2 @Model.Shipping?.Address3
+                                </span>
+                                <br />
+                                <span class="text-600 text-125">
+                                    @Model.Shipping?.CityName @Model.Shipping?.StateName @Model.Shipping?.Zip1
+                                </span>
+                                
+                            </div>
+                            <div class="col-sm-2">
+                                <i class="fa fa-circle text-blue-m2 text-xs mr-1"></i>
+                                <span class="text-500 text-125">
+                                    Email :
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="text-600 text-125">
+                                    @Model.Email
+                                </span>
+
+                            </div>
+                        </div>
+
+                     
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

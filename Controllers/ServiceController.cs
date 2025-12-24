@@ -157,7 +157,7 @@ namespace FieldServiceApp.Controllers
                         Locations = model.Locations,
                         IsActive = 1,
                         CreatedBy = _userId,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
                         ApartmentId = model.ApartmentId
                     };
 
@@ -331,7 +331,7 @@ namespace FieldServiceApp.Controllers
                         checkServiceFormLog.Qty = model.Quantity.Value;
                         checkServiceFormLog.Locations = model.Locations;
                         checkServiceFormLog.ModifiedBy = _userId;
-                        checkServiceFormLog.ModifiedDate = DateTime.Now;
+                        checkServiceFormLog.ModifiedDate = DateTime.UtcNow;
                         _dbContext.SaveChanges();
                         ViewBag.SuccessMessage = "Detail added successfully";
 
@@ -529,7 +529,7 @@ namespace FieldServiceApp.Controllers
                 {
                     checkService.IsActive = 0;
                     checkService.ModifiedBy = _userId;
-                    checkService.ModifiedDate = DateTime.Now;
+                    checkService.ModifiedDate = DateTime.UtcNow;
                     _dbContext.SaveChanges();
 
                     response.Status = "1";

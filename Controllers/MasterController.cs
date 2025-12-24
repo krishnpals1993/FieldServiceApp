@@ -70,7 +70,7 @@ namespace FieldServiceApp.Controllers
                             StateName = model.StateName,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
 
                         _dbContext.tbl_States.Add(state);
@@ -119,7 +119,7 @@ namespace FieldServiceApp.Controllers
                         checkState = _dbContext.tbl_States.Where(w => w.StateId == model.StateId).FirstOrDefault();
                         checkState.StateName = model.StateName;
                         checkState.ModifiedBy = _userId;
-                        checkState.ModifiedDate = DateTime.Now;
+                        checkState.ModifiedDate = DateTime.UtcNow;
 
                         _dbContext.SaveChanges();
                         ViewBag.SuccessMessage = "State updated successfully";
@@ -156,7 +156,7 @@ namespace FieldServiceApp.Controllers
                     {
                         checkState.IsActive = 0;
                         checkState.ModifiedBy = 1;
-                        checkState.ModifiedDate = DateTime.Now;
+                        checkState.ModifiedDate = DateTime.UtcNow;
                         _dbContext.SaveChanges();
 
                         response.Status = "1";
@@ -232,7 +232,7 @@ namespace FieldServiceApp.Controllers
                             Tax= model.Tax,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
 
                         _dbContext.tbl_Cities.Add(city);
@@ -297,7 +297,7 @@ namespace FieldServiceApp.Controllers
                         checkCity.CityName = model.CityName;
                         checkCity.StateId = model.StateId;
                         checkCity.ModifiedBy = _userId;
-                        checkCity.ModifiedDate = DateTime.Now;
+                        checkCity.ModifiedDate = DateTime.UtcNow;
                         checkCity.Tax = model.Tax;
                         _dbContext.SaveChanges();
                         ViewBag.SuccessMessage = "City updated successfully";
@@ -331,7 +331,7 @@ namespace FieldServiceApp.Controllers
                 {
                     checkCity.IsActive = 0;
                     checkCity.ModifiedBy = 1;
-                    checkCity.ModifiedDate = DateTime.Now;
+                    checkCity.ModifiedDate = DateTime.UtcNow;
                     _dbContext.SaveChanges();
 
                     response.Status = "1";
@@ -348,7 +348,10 @@ namespace FieldServiceApp.Controllers
             return Json(response);
         }
 
-
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
 
     }
 }

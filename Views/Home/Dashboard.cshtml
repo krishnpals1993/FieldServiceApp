@@ -208,7 +208,7 @@
         </div>
     </div>
 </div>
-
+<div id="exampleModal"></div>
 @section Styles {
     <environment names="Development,Staging,Production">
         <link rel="stylesheet" href="~/lib/fullcalendar/main.css" />
@@ -263,16 +263,17 @@
 
 
         function openAddOrder(dt) {
-            if ( window.roleName=='Admin') {
+            if (window.roleName == 'Admin') {
+
                  $("#mdlBtn").trigger('click');
             $('.modal-body').html('')
             $('.modal-body').append('<iframe src="/Order/AddModal/2020-12-02" style="overflow:hidden;height:95%;width:100%"></iframe>');
 
-            $("iframe").attr('src','/Order/AddModal/'+dt);
+            $("iframe").attr('src','/Order/Add/'+(dt.split('+')[0].replace('T',' ')));
             }
 
 
-           
+
         }
          function openEditOrder(dt) {
              if (window.roleName == 'Admin') {
@@ -282,7 +283,7 @@
             $("#mdlBtn").trigger('click');
             $("iframe").attr('src','/Order/EditModal/'+dt);
              }
-             
+
         }
 
 
@@ -384,7 +385,7 @@
             return name;
         }
 
-         function updateOrderAssignee(orderId,start,end,employeeId,callback) {
+        function updateOrderAssignee(orderId,start,end,employeeId,callback) {
             var data = {
                 'orderId': orderId,
                 'start': (start==null ? null : new moment(start).format("MM/DD/YYYY HH:mm")) ,
@@ -431,6 +432,27 @@
 
         }
 
+        function updateOrderDateAllFuture(orderId,start,end,callback) {
+            var data = {
+                'orderId': orderId, 'start': (start==null ? null : new moment(start).format("MM/DD/YYYY HH:mm")) ,
+                'end': (end==null ? null : new moment(end).format("MM/DD/YYYY HH:mm"))
+            };
+            console.log(data);
+            $.ajax({
+                url: "/Order/UpdateOrderDateAllFuture",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (data) {
+                     callback(data)
+                },
+                error: function (data) {
+
+
+                }
+            })
+
+        }
 
         function updateOrder(orderId) {
 
@@ -460,6 +482,46 @@
             })
         }
 
+        function uploadOrderImage(OrderId) {
+
+            if ($("input[type='file']").get(0).files.length ==0) {
+                swal("Please select picture", "", "error");
+                return;
+            }
+
+            var formData = new FormData();
+            var pitcure = $("input[type='file']").get(0).files[0];
+            pitcure.name = "krishnpal singh gehlot";
+            formData.append('file', pitcure);
+            formData.append('OrderId', OrderId);
+            formData.append('Description', $("#Description").val());
+
+
+
+            $.ajax({
+                url: "/Home/AddImage/",
+                type: "POST",
+                dataType: "json",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data){
+                    if (data == "1") {
+                        swal("Picture Saved Successfully", "", "success");
+                        $("#Description").val('');
+                        $("#btnClsModelOrderDetail").trigger('click');
+                        showOrderDetail(OrderId);
+                    }
+                    else {
+                        swal(data, "", "error");
+                    }
+                },
+                error: function (data) {
+
+                }
+             })
+             };
+
         function showOrderDetail(id) {
              $.ajax({
                  url: "/Home/GetOrderPopup/" + id,
@@ -478,12 +540,150 @@
                     modal.find('button[data-action=delete]').on('click', function () {
                         modal.modal("hide");
                     });
+                    modal.find('button[data-action=cls]').on('click', function () {
+                        modal.remove();
+                    });
                     modal.modal('show').on('hidden.bs.modal', function () {
                         modal.remove();
                     });
                 }
             });
         }
+
+        function viewImageDetail(id) {
+                 $.ajax({
+                url: "/JobImages/GetImagesPopup/" + id,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "html",
+                success: function (response) {
+                    var modal = response;
+                    $("#exampleModal").html(modal);
+                }
+            });
+        }
+
+        function closeModel() {
+          $("#exampleModal").html('');
+        }
+
+        function deleteFun(id) {
+
+            swal({
+                title: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonText: "No",
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            },
+                function (isConfirm) {
+                    if (!isConfirm)
+                        return;
+
+                      $.ajax({
+                    url: "/JobImages/DeleteImage",
+                    type: "POST",
+                    dataType: "json",
+                    data: { id: id },
+                    success: function (data) {
+                        if (data.Status=="1") {
+                            swal(data.Message, "", "success")
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 750);
+
+                        }
+                        else {
+                              swal(data.Message, "", "error")
+                        }
+                    }
+                })
+
+                });
+
+        }
+
+        function openEmail(id) {
+             $.ajax({
+                url: "/JobImages/GetImageShareEmail/" + id,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "html",
+                success: function (response) {
+                    var modal = response;
+                    $("#exampleModal").html(modal);
+                }
+            });
+        }
+
+        function openWhatsapp(id,urlPath,CustomerName,orderid) {
+               var whatsapp_url = "whatsapp://send?text=Customer: " + CustomerName + "   OrderId: " + orderid + " Image-link: " + urlPath;
+                window.open(whatsapp_url, "_blank");
+                
+
+        }
+            
+        function shareEmail(orderId) {
+
+            if ((!$("#email1").val()) && (!$("#email2").val()) && (!$("#email3").val())) {
+                swal("Please enter atleast one email", "", "error");
+                return;
+            }
+            if ($("#email1").val()) {
+                if (!isEmail($("#email1").val())) {
+                    swal("Please enter valid email 1", "", "error");
+                    return;
+                }
+            }
+
+            if ($("#email2").val()) {
+                if (!isEmail($("#email2").val())) {
+                     swal("Please enter valid email 2", "", "error");
+                     return;
+                    }
+            }
+
+            if ($("#email3").val()) {
+                if (!isEmail($("#email3").val())) {
+                     swal("Please enter valid email 3", "", "error");
+                     return;
+                    }
+            }
+
+
+
+
+
+
+
+           var data = {
+                   'OrderId': orderId,
+                   'Email1': $("#email1").val(),
+                   'Email2': $("#email2").val(),
+                   'Email3': $("#email3").val()
+            };
+
+            console.log(data);
+
+            $.ajax({
+                url: "/JobImages/ShareWithEmail",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (data) {
+                   swal("Email sent successfully","","success");
+                    closeModel();
+                }
+            })
+        }
+
+        function isEmail(email) {
+        var EmailRegex = /^([a-zA-Z0-9_.+-])+\@@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return EmailRegex.test(email);
+      }
+
 
     </script>
 }

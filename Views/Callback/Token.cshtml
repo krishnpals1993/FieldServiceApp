@@ -37,7 +37,7 @@
 <p>
     <strong>Access Token Expires:</strong>
     <br />
-    @(DateTime.Now.AddSeconds(Model.AccessTokenExpiresIn).ToString())
+    @(DateTime.UtcNow.AddSeconds(Model.AccessTokenExpiresIn).ToString())
     @((Model.AccessTokenExpiresIn).ToString())
 
 </p>
@@ -45,7 +45,7 @@
 <p>
     <strong>Refresh Token Expires:</strong>
     <br />
-    @(DateTime.Now.AddSeconds(Model.RefreshTokenExpiresIn).ToString())
+    @(DateTime.UtcNow.AddSeconds(Model.RefreshTokenExpiresIn).ToString())
     @((Model.RefreshTokenExpiresIn).ToString())
 
   

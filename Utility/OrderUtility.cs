@@ -94,7 +94,7 @@ namespace FieldServiceApp.Utility
                     UnitId = item.UnitId,
                     IsActive = 1,
                     CreatedBy = 1,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTime.UtcNow
                 };
                 _dbContext.tbl_OrderDetail.Add(orderDetail);
                 _dbContext.SaveChanges();
@@ -196,11 +196,54 @@ namespace FieldServiceApp.Utility
                      {
                          CustmoerId = billing.CustomerBillingId,
                          //CompanyName = cust.CompanyName + (ship1 != null ? (" (" + (ship1.Address1 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (ship1.Zip1 ?? "") + ")") : ""),
-                         CompanyName = cust.CompanyName + (Convert.ToString(cust.CompanyName1).Trim() == "" ? "" : " (" + cust.CompanyName1 + ")") + " "+ (billing.Address1??"")+" "+ (billing.Address2 ?? "")
+                         CompanyName = cust.CompanyName  + " "+ (billing.Address1??"")+" "+ (billing.Address2 ?? "")
                      }
                      ).OrderBy(o=>o.CompanyName).ToList());
 
         }
+
+        public void updateReOccurenceOrderDateDashBoard(int orderId, OrderMaster order, DateTime shipdate)
+        {
+            var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == orderId).FirstOrDefault();
+            
+            if (order.ShipStartDate != null)
+            {
+                checkOrder.ShipStartDate = Convert.ToDateTime(checkOrder.ShipStartDate.Value.ToString("MM/dd/yyyy") + " " + order.ShipStartDate.Value.ToString("HH:mm"));
+                checkOrder.ShipDate = Convert.ToDateTime(checkOrder.ShipStartDate.Value.ToString("MM/dd/yyyy") + " " + order.ShipDate.Value.ToString("HH:mm"));
+            }
+            else
+            {
+                var curDayName = shipdate.DayOfWeek.ToString();
+                var checkCalenderDate1 = _dbContext.tbl_CalenderWorkingHours.Where(w => w.DayName == curDayName).FirstOrDefault();
+                if (checkCalenderDate1 != null)
+                {
+                    checkOrder.ShipStartDate = Convert.ToDateTime(checkOrder.ShipStartDate.Value.ToString("MM/dd/yyyy") + " " + checkCalenderDate1.StartTime.Value.ToString("HH:mm"));
+                }
+            }
+
+            if (order.ShipEndDate != null)
+            {
+                try
+                {
+                    checkOrder.ShipEndDate = checkOrder.ShipStartDate.Value.AddMinutes((order.ShipEndDate.Value - order.ShipStartDate.Value).TotalMinutes);
+                }
+                catch (Exception)
+                {
+
+                    checkOrder.ShipEndDate = null;
+                }
+
+            }
+            else
+            {
+                checkOrder.ShipEndDate = checkOrder.ShipStartDate.Value.AddMinutes(30);
+            }
+
+            _dbContext.SaveChanges();
+            
+
+        }
+
 
     }
 }

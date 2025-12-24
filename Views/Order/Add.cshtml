@@ -20,7 +20,7 @@
     ReOccurenceList.Add("WeekDay");
     ReOccurenceList.Add("WeekDay(Weekly)");
     ReOccurenceList.Add("Month's Day");
-    ReOccurenceList = ReOccurenceList.OrderBy(o=>o).ToList();
+    ReOccurenceList = ReOccurenceList.OrderBy(o => o).ToList();
 
     List<string> WeekDayList = new List<string>();
     WeekDayList.Add("Sunday");
@@ -1111,6 +1111,9 @@
         <script src="~/lib/chosen-js/chosen.jquery.js"></script>
     </environment>
     <script type="text/javascript">
+
+
+
         // Restricts input for each element in the set of matched elements to the given inputFilter.
         (function ($) {
             $.fn.inputFilter = function (inputFilter) {
@@ -1138,7 +1141,8 @@
                               date: new Date(),
 
                          })
-                          .on('statechange', function (ev) {
+                              .on('statechange', function (ev) {
+                                
                                var shipStartDate = new Date($("#ShipStartDate").val());
                 var shipEndDate = shipStartDate;
                 //shipEndDate.setMinutes(shipEndDate.getMinutes() + 30);
@@ -1215,8 +1219,8 @@
                showTodayButton: true,
                "format": "HH:mm:ss",
                 format: 'LT',
-                stepping: 5
-                 
+                stepping: 15
+
               });
 
             $("#datetimepicker3").on('dp.change', function (event) {
@@ -1248,7 +1252,7 @@
                  showTodayButton: true,
                  "format": "HH:mm:ss",
                 format: 'LT',
-                   stepping: 5
+                   stepping: 15
               });
 
             $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
@@ -1276,12 +1280,29 @@
                 });
                 $("#OrderDate").val(new moment().format("MM/DD/YYYY"));
 
-            //    try {
-            //        debugger;
-            //    $('#ReOccurenceEndDate').val(new moment($("#MaxReOccurenceEndDate").val()).format("MM/DD/YYYY"));
-            //} catch (e) {
+                 var checkFromDashboard = '@ViewBag.FromDashBoard';
+                
 
-            //}
+                if (checkFromDashboard) {
+
+                var checkDates = checkFromDashboard.split(' ');
+
+                $("#ShipStartDate").val(new moment(checkDates[0]).format("MM/DD/YYYY"))
+                $("#ShipEndDate").val(new moment(checkDates[0]).format("MM/DD/YYYY").toString());
+                window.reOccurenceStartDateSetBy = "System";
+                $('#ReOccurenceStartDate').val(new moment(checkDates[0]).format("MM/DD/YYYY"));
+                var reOccurenceendDate = new moment($("#ReOccurenceStartDate").val()).add(12, 'M');
+                $('#ReOccurenceEndDate').val(new moment(reOccurenceendDate).format("MM/DD/YYYY"));
+
+                    if (checkDates.length>1) {
+                       
+                        $("#ShipStartTime").val(new moment(checkFromDashboard).format("hh:mm a").toString().toUpperCase());
+                        $("#ShipEndTime").val(new moment(checkFromDashboard).add(15, 'minutes').format("hh:mm a").toString().toUpperCase());
+                    }
+
+
+            }
+
 
             }, 0);
             window.itemList = '@Json.Serialize(Model.ItemList)';
@@ -1289,8 +1310,20 @@
             console.log(window.itemList);
         var SuccessMessage = '@ViewBag.SuccessMessage';
         var ErrorMessage = '@ViewBag.ErrorMessage';
-        if (SuccessMessage) {
-            swal(SuccessMessage, "", "success");
+            if (SuccessMessage) {
+            var VReOccurenceCount = '@ViewBag.ReOccurenceCount';
+                if (VReOccurenceCount>0) {
+                     swal({
+                        title: "Recurrence Orders: " + VReOccurenceCount + " <br/> " + SuccessMessage + "",
+                        text: '',
+                        html: true,
+                        type: "success",
+                    });
+                }
+                else {
+                   swal(SuccessMessage, "", "success");
+                }
+
            setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Order/Add"; }, 500);
 
         }
@@ -1303,9 +1336,11 @@
 
         });
 
+
+
+
         $("#ShipStartDate").on("change", function () {
-
-
+             
               if ($(this).val()) {
                  var shipStartDate = new Date($(this).val());
                  var shipEndDate = new Date();
@@ -1428,7 +1463,7 @@
             }
 
             var taxAmount = Number(((total) * Number($("#Tax").val())) / 100).toFixed(2);
-            var grossAmount = total + taxAmount;
+            var grossAmount =Number(total) + Number(taxAmount);
             $("#TaxAmount").val(taxAmount);
             $("#GrossAmount").val(grossAmount);
 
@@ -1437,14 +1472,14 @@
 
         function getItemPrice(itemId) {
             var price = 0;
-              
+
             for (var i = 0; i <  window.itemList.length; i++) {
                 //if (window.itemList[i]["ItemId"].toString()== itemId) {
                 //    price = window.itemList[i]["ItemPrice"];
                 //    i = window.itemList.length;
                 //    break;
                 //}
-               
+
                 if (parseInt(window.itemList[i]["ItemId"]) == itemId) {
                     price = window.itemList[i]["ItemPrice"];
                     i = window.itemList.length;
@@ -1497,7 +1532,7 @@
                 success: function (response) {
 
                     if (response.length > 0) {
-                        
+
                 $('#ShipId').html('');
                        var options = '';
 
@@ -1546,7 +1581,7 @@
                  {
                 $('#ApartmentId').html('');
                         var options = '';
-                        
+
                         var tax = response.tax;
                         response = response.aList;
                         $("#Tax").val(tax);
@@ -1586,7 +1621,7 @@
                 data: data,
                 success: function (response) {
                         if (response) {
-                            
+
                             $("#ItemId").val(response.ItemId);
                             $("#PerUnitPrice").val(response.PerUnitPrice);
                             $("#Quantity").val(response.Quantity);
@@ -1790,12 +1825,13 @@
                 cancelButtonText: "No",
                 confirmButtonClass: "btn-danger",
                 confirmButtonText: "Yes",
-                closeOnConfirm: false
+                closeOnConfirm: true
             },
                 function (isConfirm) {
                     if (!isConfirm)
                         return;
 
+                    swal.close();
                  $("#mainSubmit").trigger('click');
 
                 });
@@ -1849,7 +1885,7 @@
                 dataType: "json",
                 data: data,
                 success: function (response) {
-                    
+
                     console.log(response);
                     $("#mApartmentNo").val('');
                     $("#mApartmentName").val('');
@@ -1915,7 +1951,7 @@
     <script type="text/javascript">
 
         function addItems(i) {
-            
+
             var index = $(".btnAdd").length;
 
             $.ajax({
@@ -2055,7 +2091,7 @@
         }
 
         function deleteItem(index) {
-           
+
             $(event.currentTarget).parent().parent().parent().remove();
             $(".btnAdd").each(function (ind, ele) {
                 if (ind == (index - 1)) {

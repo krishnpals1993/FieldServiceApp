@@ -9,6 +9,8 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 
 namespace FieldServiceApp.Controllers
 {
@@ -38,7 +40,7 @@ namespace FieldServiceApp.Controllers
             DashboardViewModel model = new DashboardViewModel();
             DashboardUtility _dashboardUtility = new DashboardUtility(_dbContext);
             model = _dashboardUtility.getDashBoardDetail(_rolename,_userId);
-            var todayDayName = DateTime.Now.DayOfWeek.ToString();
+            var todayDayName = DateTime.UtcNow.DayOfWeek.ToString();
             var checkCalenderHour = _dbContext.tbl_CalenderWorkingHours.Where(w=>w.DayName == todayDayName).FirstOrDefault();
             if (checkCalenderHour != null)
             {
@@ -64,6 +66,25 @@ namespace FieldServiceApp.Controllers
         {
             DashboardUtility _dashboardUtility = new DashboardUtility(_dbContext);
             var model = _dashboardUtility.getOrderDetailWithApartemt(id);
+
+            var items = (from images in _dbContext.tbl_OrderImages
+                         join order in _dbContext.tbl_OrderMaster on images.OrderId equals order.OrderId
+                         join customer in _dbContext.tbl_CustomerMaster on order.CustomerId equals customer.CustomerId
+                         where images.CreatedBy == _userId && order.OrderId == model.OrderId
+                         select new OrderImageViewModel
+                         {
+                             JobImageId = images.OrderImageId,
+                             IsActive = images.IsActive,
+                             OrderId = order.OrderId,
+                             CustomerName = customer.CompanyName,
+                             Image = images.Image,
+                             Description = images.Description,
+                             Base64 = images.Base64
+
+                         }).ToList();
+
+            model.OrderImageList = items;
+
             return PartialView("_DashboardOrder", model);
 
         }
@@ -84,6 +105,69 @@ namespace FieldServiceApp.Controllers
             }
             return Json(model);
         }
+
+        [HttpPost]
+        public JsonResult AddImage( IFormFile file, int OrderId, string Description)
+        {
+            try
+            {
+
+              
+
+                if (file == null || file.Length == 0)
+                {
+                    ViewBag.ErroMessage = "Please select file";
+                    return Json("1");
+
+                }
+
+                //convert uploaded image as image object like given below
+                Image image = Image.FromStream(file.OpenReadStream(), true, true);
+                //call 'ImageToBase64' function here
+                byte[] base64String = ImageToBase64(image, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                OrderImage orderImage = new OrderImage
+                {
+                    OrderId = OrderId,
+                    Description =  Description,
+                    Image = file.FileName,
+                    IsActive = 1,
+                    CreatedBy = _userId,
+                    CreatedDate = DateTime.UtcNow,
+                    Base64 = base64String
+
+
+                };
+                _dbContext.tbl_OrderImages.Add(orderImage);
+                _dbContext.SaveChanges();
+
+                ViewBag.SuccessMessage = "Detail added successfully";
+                return Json("1");
+
+            }
+            catch (Exception ex)
+            {
+
+                var a = "";
+            }
+
+
+            return Json("0");
+        }
+
+        public static byte[] ImageToBase64(Image image, System.Drawing.Imaging.ImageFormat format)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                //Convert Image to byte[]
+                image.Save(ms, format);
+                byte[] imageBytes = ms.ToArray();
+                //Convert byte[] to Base64 String
+                //string base64String = Convert.ToBase64String(imageBytes);
+                return imageBytes;
+            }
+        }
+
 
         protected override void Dispose(bool disposing)
         {

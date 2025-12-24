@@ -104,7 +104,7 @@
                         <nav aria-label="Main">
                             <ul class="nav flex-column mt-2 has-active-border active-on-top">
 
-                                <li class="nav-item @(routeControl=="Home" ?"active":"" )">
+                                <li class="nav-item @(routeControl == "Home" ? "active" : "" )">
 
                                     <a href="~/Home/Dashboard" class="nav-link">
                                         <i class="nav-icon fa fa-tachometer-alt"></i>
@@ -118,12 +118,35 @@
                                 </li>
                                 @if (RoleName != "Admin")
                                 {
-                                    <li class="nav-item @(routeControl=="Service" ?"active":"" )">
+                                    <li class="nav-item @(routeControl == "Service" ? "active" : "" )">
 
                                         <a href="~/Service/List" class="nav-link">
                                             <i class="nav-icon fa fa-user-tie"></i>
                                             <span class="nav-text fadeable">
                                                 <span>Service Form</span>
+                                            </span>
+                                        </a>
+
+                                        <b class="sub-arrow"></b>
+
+                                    </li>
+                                    <li class="nav-item @(routeControl == "Order" ? "active" : "" )">
+
+                                        <a href="~/Notes/List" class="nav-link">
+                                            <i class="nav-icon fa fa-sticky-note"></i>
+                                            <span class="nav-text fadeable">
+                                                <span> Note(s)</span>
+                                            </span>
+                                        </a>
+
+
+                                    </li>
+                                    <li class="nav-item @(routeControl == "JobImages" ? "active" : "" )">
+
+                                        <a href="~/JobImages/List" class="nav-link">
+                                            <i class="nav-icon fa fa-images"></i>
+                                            <span class="nav-text fadeable">
+                                                <span>Job Image</span>
                                             </span>
                                         </a>
 
@@ -136,7 +159,7 @@
                                 @if (RoleName == "Admin")
                                 {
 
-                                    <li class="nav-item @(routeControl=="Customer" ?"active":"" )">
+                                    <li class="nav-item @(routeControl == "Customer" ? "active" : "" )">
 
                                         <a href="~/Customer/List" class="nav-link">
                                             <i class="nav-icon fa fa-user-tie"></i>
@@ -150,9 +173,9 @@
                                     </li>
 
 
-                                    <li class="nav-item @(routeControl=="Inventory" ?"active open":"" )">
+                                    <li class="nav-item @(routeControl == "Inventory" ? "active open" : "" )">
 
-                                        <a href="#" class="nav-link dropdown-toggle  @(routeControl!="Inventory" ?"collapsed":"" )">
+                                        <a href="#" class="nav-link dropdown-toggle  @(routeControl != "Inventory" ? "collapsed" : "" )">
                                             <i class="nav-icon fa fa-box-open"></i>
                                             <span class="nav-text fadeable">
                                                 <span>Inventory</span>
@@ -161,11 +184,11 @@
                                             <b class="caret fa fa-angle-left rt-n90"></b>
                                         </a>
 
-                                        <div class="hideable submenu  @(routeControl!="Inventory" ?"collapse":"" )">
+                                        <div class="hideable submenu  @(routeControl != "Inventory" ? "collapse" : "" )">
                                             <ul class="submenu-inner">
 
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="ItemCategoryList" || routeAction=="AddItemCategory" || routeAction=="EditItemCategory" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "ItemCategoryList" || routeAction == "AddItemCategory" || routeAction == "EditItemCategory")) ? "active" : "" )">
 
                                                     <a href="~/Inventory/ItemCategoryList" class="nav-link">
 
@@ -176,8 +199,8 @@
 
 
                                                 </li>
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="ItemList" || routeAction=="AddItem" || routeAction=="EditItem" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "ItemList" || routeAction == "AddItem" || routeAction == "EditItem")) ? "active" : "" )">
 
                                                     <a href="~/Inventory/ItemList" class="nav-link">
 
@@ -189,8 +212,8 @@
 
                                                 </li>
 
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="ItemPriceList" || routeAction=="ItemPrice" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "ItemPriceList" || routeAction == "ItemPrice")) ? "active" : "" )">
                                                     <a href="~/Inventory/ItemPriceList" class="nav-link">
 
                                                         <span class="nav-text">
@@ -198,8 +221,8 @@
                                                         </span>
                                                     </a>
                                                 </li>
-                                                <li class="nav-item @((routeControl=="Inventory" &&
-                                        (routeAction=="UnitList" ))  ?"active":"" )">
+                                                <li class="nav-item @((routeControl == "Inventory" &&
+(routeAction == "UnitList")) ? "active" : "" )">
 
                                                     <a href="~/Inventory/UnitList" class="nav-link">
 
@@ -224,9 +247,9 @@
 
                                     </li>
 
-                                    <li class="nav-item @((routeControl=="Order")  ?"active open":"" )">
+                                    <li class="nav-item @((routeControl == "Order" || routeControl =="JobImages")  ?"active open":"" )">
 
-                                        <a class="nav-link dropdown-toggle @(routeControl!="Order" ?"collapsed":"" )">
+                                        <a class="nav-link dropdown-toggle @((routeControl!="Order" && routeControl!="JobImages" ) ?"collapsed":"" )">
                                             <i class="nav-icon fab fa-first-order-alt"></i>
                                             <span class="nav-text fadeable">
                                                 <span>Order</span>
@@ -266,6 +289,18 @@
                                                             <span>Invoice</span>
                                                         </span>
                                                     </a>
+                                                </li>
+                                                <li class="nav-item @(routeControl=="JobImages" ?"active":"" )">
+
+                                                    <a href="~/JobImages/ImageList" class="nav-link">
+
+                                                        <span class="nav-text fadeable">
+                                                            <span>Job Image</span>
+                                                        </span>
+                                                    </a>
+
+                                                    <b class="sub-arrow"></b>
+
                                                 </li>
                                             </ul>
                                         </div>
@@ -632,6 +667,7 @@
                 <footer class="footer d-none d-sm-block">
                     <div class="footer-inner">
                         <div class="h-100 pt-3 border-t-1 brc-secondary-l2 bgc-white-tp1 shadow">
+                            <a href="whatsapp://send?text=Hello world this is a message and a link http://www.example.com/image.jpg">Share with whatsapp</a>
                             <span class="text-primary-m1 font-bolder text-120">Field Service</span>
                             <span class="text-secondary-d2">Application &copy; 2020</span>
                         </div>
@@ -689,7 +725,6 @@
         <script src="~/js/bootstrap.js"></script>
         <script src="~/js/ace.js"></script>
         <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
-       
         <!-- Only for demo purpose -->
     </environment>
     <environment names="Staging,Production">
@@ -698,10 +733,10 @@
         <script src="~/js/bootstrap.js"></script>
         <script src="~/js/ace.js"></script>
         <script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
-      
+
     </environment>
 
     @RenderSection("scripts", required: false)
-
+   
 </body>
 </html>

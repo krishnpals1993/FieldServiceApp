@@ -103,7 +103,7 @@ namespace FieldServiceApp.Controllers
                             CategoryId= model.CategoryId,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
 
                         _dbContext.tbl_ItemMaster.Add(item);
@@ -210,7 +210,7 @@ namespace FieldServiceApp.Controllers
                         checkItem.Service = model.Service;
                         checkItem.CategoryId = model.CategoryId;
                         checkItem.ModifiedBy = 1;
-                        checkItem.ModifiedDate = DateTime.Now;
+                        checkItem.ModifiedDate = DateTime.UtcNow;
                         _dbContext.SaveChanges();
                         ViewBag.SuccessMessage = "Item update successfully";
 
@@ -278,7 +278,7 @@ namespace FieldServiceApp.Controllers
                             UnitName = model.UnitName,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
 
                         _dbContext.tbl_Units.Add(unit);
@@ -401,7 +401,7 @@ namespace FieldServiceApp.Controllers
                     {
                         checkItem.IsActive = 0;
                         checkItem.ModifiedBy = 1;
-                        checkItem.ModifiedDate = DateTime.Now;
+                        checkItem.ModifiedDate = DateTime.UtcNow;
                         _dbContext.SaveChanges();
 
                         response.Status = "1";
@@ -463,7 +463,7 @@ namespace FieldServiceApp.Controllers
                             CategoryName = model.CategoryName,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
 
                         _dbContext.tbl_ItemCategory.Add(itemCategory);

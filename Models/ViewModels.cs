@@ -9,6 +9,8 @@ namespace FieldServiceApp.Models
     {
         public string Status { get; set; }
         public string Message { get; set; }
+
+        public object AdditionalData { get; set; }
     }
     public class LoginViewModel
     {
@@ -196,6 +198,8 @@ namespace FieldServiceApp.Models
             Billings = new List<CustomerBillingViewModel>();
         }
         public int ShipId { get; set; }
+
+        public int BillingId { get; set; }
         public int CustomerBillingId { get; set; }
         public string Notes { get; set; }
         public int CustmoerId { get; set; }
@@ -228,6 +232,58 @@ namespace FieldServiceApp.Models
         public List<CustomerBillingViewModel> Billings { get; set; }
         public List<StateViewModel> StateList { get; set; }
         public List<CityViewModel> CityList { get; set; }
+
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Mobile { get; set; }
+        public string AltPhone { get; set; }
+        public string Fax { get; set; }
+        public string MiddleName { get; set; }
+        
+    }
+    public class CustomerDetailViewModel
+    {
+        public CustomerDetailViewModel()
+        {
+            Shipping = new CustmoerShippingViewModel();
+            Billing = new CustomerBillingViewModel();
+        }
+        public int ShipId { get; set; }
+        public int CustomerBillingId { get; set; }
+        public string Notes { get; set; }
+        public int CustmoerId { get; set; }
+        public string CompanyName { get; set; }
+
+        //[Required(ErrorMessage = "Please enter code")]
+        public string Code { get; set; }
+        public string Address { get; set; }
+        public string Zip1 { get; set; }
+        public string Zip2 { get; set; }
+        public string CompanyType { get; set; }
+        public int? CityId { get; set; }
+        public int? StateId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string CityName { get; set; }
+        public string StateName { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string ShipAddress { get; set; }
+        public CustmoerShippingViewModel Shipping { get; set; }
+        public CustomerBillingViewModel Billing { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Mobile { get; set; }
+        public string AltPhone { get; set; }
+        public string Fax { get; set; }
+       
     }
     public class CustomerMasterViewModel_datatable
     {
@@ -463,6 +519,7 @@ namespace FieldServiceApp.Models
         public DateTime? MaxReOccurenceEndDate { get; set; }
         public int? ReOccurenceParentOrderId { get; set; }
         public int ReOccurenceOrderCount { get; set; }
+        public int RemainingReOccurenceOrderCount { get; set; }
         public CustomerMasterViewModel CustomerDetail { get; set; }
         public CustmoerShippingViewModel CustomerShippingDetail { get; set; }
         public List<OrderItemViewModel> ItemList { get; set; }
@@ -481,6 +538,7 @@ namespace FieldServiceApp.Models
         public decimal? Tax { get; set; }
         public decimal? TaxAmount { get; set; }
         public decimal? GrossAmount { get; set; }
+        public string Notes { get; set; }
     }
 
     public class OrderMasterViewModel_Datatable
@@ -716,6 +774,7 @@ namespace FieldServiceApp.Models
         public DashboardOrderViewModel()
         {
             EmployeeList = new List<EmployeeMasterViewModel>();
+            OrderImageList = new List<OrderImageViewModel>();
         }
         public int OrderId { get; set; }
         public DateTime? ShipStartDate { get; set; }
@@ -732,6 +791,9 @@ namespace FieldServiceApp.Models
         public string Color { get; set; }
         public string Apartments { get; set; }
         public int ReOccurenceParentOrderId { get; set; }
+        public string Description { get; set; }
+
+        public List<OrderImageViewModel> OrderImageList { get; set; }
     }
     public class ServiceFormViewModel
     {
@@ -913,12 +975,16 @@ namespace FieldServiceApp.Models
         public CustomerBillingViewModel()
         {
             Shippings = new List<CustmoerShippingViewModel>();
+            StateList = new List<StateViewModel>();
+            CityList = new List<CityViewModel>();
         }
 
         public int CustomerBillingId { get; set; }
         public int CustomerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string bFirstName { get; set; }
+        public string bLastName { get; set; }
         public int? CityId { get; set; }
         public int? StateId { get; set; }
         public string Zip1 { get; set; }
@@ -934,6 +1000,8 @@ namespace FieldServiceApp.Models
         public DateTime? ModifiedDate { get; set; }
         public List<CustmoerShippingViewModel> Shippings { get; set; }
 
+        public List<StateViewModel> StateList { get; set; }
+        public List<CityViewModel> CityList { get; set; }
     }
 
     public class CustomerBillingViewModel_Datatable
@@ -978,5 +1046,55 @@ namespace FieldServiceApp.Models
         }
     }
 
+    public class OrderNoteViewModel : DashboardOrderViewModel
+    {
+        public OrderNoteViewModel()
+        {
+            OrderNoteList = new List<OrderNoteDetailViewModel>();
+        }
+        public int OrderNoteId { get; set; }
+
+        [Required(ErrorMessage = "Please enter notes")]
+        public string Note { get; set; }
+
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public List<OrderNoteDetailViewModel> OrderNoteList { get; set; }
+    }
+
+    public class OrderNoteDetailViewModel
+    {
+        public string Note { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+    }
+
+    public class OrderImageViewModel
+    {
+        public OrderImageViewModel()
+        {
+            
+            CustomerShipingAddressList = new List<CustmoerShippingViewModel>();
+            OrderList = new List<ServiceFormOrderViewModel>();
+        }
+        public int JobImageId { get; set; }
+
+        [Required(ErrorMessage = "Please select order")]
+        public int OrderId { get; set; }
+        public int ShipId { get; set; }
+        public string ShipAddress { get; set; }
+        public string Image { get; set; }
+        public string Description { get; set; }
+        public Byte[] Base64 { get; set; }
+        public string IsFollowUp { get; set; }
+        public Int16 IsActive { get; set; }
+        public string CustomerName { get; set; }
+        public string EmployeeName { get; set; }
+        public List<CustmoerShippingViewModel> CustomerShipingAddressList { get; set; }
+        public List<ServiceFormOrderViewModel> OrderList { get; set; }
+    }
 
 }

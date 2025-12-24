@@ -8,200 +8,412 @@
     //    this.classList.toggle('is-stuck', e.detail.isSticky)
     //})
 
+    var $_table;
 
-    var $_table = $('#datatable').DataTable({
-        "scrollY": "" + (window.outerHeight - 440) + "px",
-        "scrollCollapse": true,
-        "sScrollX": '100%',
-        responsive: true,
-        colReorder: true,
-        renderer: 'bootstrap',
-        language: {
-            search: '<i class="fa fa-search pos-abs mt-2 pt-3px ml-25 text-blue-m2"></i>',
-            searchPlaceholder: " Search ...",
-            processing: "Loading Data...",
-            zeroRecords: "No matching records found"
-
-        },
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-        processing: true,
-        serverSide: true,
-        orderCellsTop: true,
-        searching: true,
-        stateSave: true,
-        // autoWidth: true,
-        deferRender: true,
-        "pageLength": 50,
-        "lengthChange": true,
-        //dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6 text-right"l>><"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-        dom: '<"html5buttons"B>lTfgitp',
-        ajax: {
-            type: "POST",
-            url: '/Order/LoadTable/',
-            contentType: "application/json; charset=utf-8",
-            async: true,
-            data: function (data) {
-                let additionalValues = [];
-                data.AdditionalValues = additionalValues;
-                return JSON.stringify(data);
-            },
-            beforeSend: function () {
-                // Here, manually add the loading message.
-                $('#datatable > tbody').html(
-                    '<tr class="odd">' +
-                    '<td valign="top" colspan="10" class="dataTables_empty">Loading&hellip;</td>' +
-                    '</tr>'
-                );
-            }
-        },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.ScheduledOnNonWorkingDay.toString() === "true") {
-                $(nRow).addClass('nonWkDayOrder');
-            }
-
-        },
-        columns: [
-
-            {
-                //'className': 'details-control',
-                title: "Order No",
-                data: "OrderNo",
-                name: "co",
+    if (window.outerWidth > 1700) {
+          $_table = $('#datatable').DataTable({
+            "scrollY": "" + (window.outerHeight - 440) + "px",
+            "scrollCollapse": true,
+           // "sScrollX": '100%',
+            responsive: true,
+            colReorder: true,
+            renderer: 'bootstrap',
+            language: {
+                search: '<i class="fa fa-search pos-abs mt-2 pt-3px ml-25 text-blue-m2"></i>',
+                searchPlaceholder: " Search ...",
+                processing: "Loading Data...",
+                zeroRecords: "No matching records found"
 
             },
-            {
-                title: "Main Order No",
-                data: "ReoccurrenceOrderNo",
-                name: "co",
-                render: function (data, type, row) {
-                    try {
-                        if (row.ReOccurenceParentOrderId.toString() == "0") {
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            processing: true,
+            serverSide: true,
+            orderCellsTop: true,
+            searching: true,
+            stateSave: true,
+            // autoWidth: true,
+            deferRender: true,
+            "pageLength": 50,
+            "lengthChange": true,
+            //dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6 text-right"l>><"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            dom: '<"html5buttons"B>lTfgitp',
+            ajax: {
+                type: "POST",
+                url: '/Order/LoadTable/',
+                contentType: "application/json; charset=utf-8",
+                async: true,
+                data: function (data) {
+                    let additionalValues = [];
+                    additionalValues.push(($("#id-date-1").val()));
+                    additionalValues.push(($("#id-date-2").val()));
+                    additionalValues.push(($("#id-date-3").val()));
+                    additionalValues.push(($("#id-date-4").val()));
+
+                    data.AdditionalValues = additionalValues;
+                    return JSON.stringify(data);
+                },
+                beforeSend: function () {
+                    // Here, manually add the loading message.
+                    $('#datatable > tbody').html(
+                        '<tr class="odd">' +
+                        '<td valign="top" colspan="10" class="dataTables_empty">Loading&hellip;</td>' +
+                        '</tr>'
+                    );
+                }
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.ScheduledOnNonWorkingDay.toString() === "true") {
+                    $(nRow).addClass('nonWkDayOrder');
+                }
+
+            },
+            columns: [
+
+                {
+                    //'className': 'details-control',
+                    title: "Order No",
+                    data: "OrderNo",
+                    name: "co",
+
+                },
+                {
+                    title: "Main Order No",
+                    data: "ReoccurrenceOrderNo",
+                    name: "co",
+                    render: function (data, type, row) {
+                        try {
+                            if (row.ReOccurenceParentOrderId.toString() == "0") {
+                                return "";
+                            }
+                            else {
+                                return "#" + row.ReOccurenceParentOrderId.toString();
+                            }
+                        } catch (e) {
                             return "";
                         }
-                        else {
-                            return "#" + row.ReOccurenceParentOrderId.toString();
+
+
+                    }
+                },
+                {
+                    title: "Order Date",
+                    data: "OrderDate",
+                    name: "co",
+                    render: function (data, type, row) {
+                        return new moment(row.OrderDate).format("MM/DD/YYYY");
+
+                    }
+                },
+                {
+                    title: "Customer",
+                    data: "CustomerName",
+                    name: "co"
+
+                },
+                {
+                    title: "Ship Date",
+                    data: "ShipStartDate",
+                    name: "co",
+                    render: function (data, type, row) {
+                        return new moment(row.ShipStartDate).format("dddd") + " ," +
+                            new moment(row.ShipStartDate).format("MM/DD/YYYY hh:mm a");
+
+                    }
+                },
+                {
+                    title: "Amount($)",
+                    data: "TotalAmount",
+                    name: "co"
+
+                },
+                {
+                    title: "Assigned To",
+                    data: "EmployeeName",
+                    name: "co"
+
+                },
+                {
+                    title: "Ship Address",
+                    data: "CustomerShipAddress",
+                    name: "co"
+                },
+                {
+                    title: "Status",
+                    data: "IsActive",
+                    searchable: false,
+                    render: function (data, type, row) {
+                        if (row.IsActive === 0) {
+                            return '<span class="badge badge-danger mr-1">In Active</span>';
                         }
-                    } catch (e) {
-                        return "";
+                        else {
+                            return '<span class="badge badge-success mr-1"> Active</span>';
+                        }
                     }
-
-
-                }
-            },
-            {
-                title: "Order Date",
-                data: "OrderDate",
-                name: "co",
-                render: function (data, type, row) {
-                    return new moment(row.OrderDate).format("MM/DD/YYYY");
-
-                }
-            },
-            {
-                title: "Customer",
-                data: "CustomerName",
-                name: "co"
-
-            },
-            {
-                title: "Ship Date",
-                data: "ShipStartDate",
-                name: "co",
-                render: function (data, type, row) {
-                    return new moment(row.ShipStartDate).format("dddd") + " ," +
-                        new moment(row.ShipStartDate).format("MM/DD/YYYY hh:mm a");
-
-                }
-            },
-            {
-                title: "Amount($)",
-                data: "TotalAmount",
-                name: "co"
-
-            },
-            {
-                title: "Assigned To",
-                data: "EmployeeName",
-                name: "co"
-
-            },
-            {
-                title: "Ship Address",
-                data: "CustomerShipAddress",
-                name: "co"
-            },
-            {
-                title: "Status",
-                data: "IsActive",
-                searchable: false,
-                render: function (data, type, row) {
-                    if (row.IsActive === 0) {
-                        return '<span class="badge badge-danger mr-1">In Active</span>';
-                    }
-                    else {
-                        return '<span class="badge badge-success mr-1"> Active</span>';
+                },
+                {
+                    title: "Action",
+                    data: "UserId",
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return '<span><a href="/Order/Edit/' + row.OrderId + '">Edit</a>|</span >' +
+                            '<span><a href="#" onclick="deleteFun(' + row.OrderId + ')">Delete</a>|</span >' +
+                            '<a href="#" onclick="openOrderNotePopup(' + row.OrderId + ')">Add Note</a>';
                     }
                 }
+            ],
+            //colReorder: {
+            //    //disable column reordering for first and last columns
+            //    fixedColumnsLeft: 1,
+            //    fixedColumnsRight: 1
+            //},
+            classes: {
+                sLength: "dataTables_length text-left w-auto",
             },
-            {
-                title: "Action",
-                data: "UserId",
-                searchable: false,
-                render: function (data, type, row) {
-                    return '<span><a href="/Order/Edit/' + row.OrderId + '">Edit</a>|</span >' +
-                        '<a href="#" onclick="deleteFun(' + row.OrderId + ')">Delete</a>';
-                }
-            }
-        ],
-        //colReorder: {
-        //    //disable column reordering for first and last columns
-        //    fixedColumnsLeft: 1,
-        //    fixedColumnsRight: 1
-        //},
-        classes: {
-            sLength: "dataTables_length text-left w-auto",
-        },
-        buttons: {
-            dom: {
-                button: {
-                    className: 'btn' //remove the default 'btn-secondary'
+            buttons: {
+                dom: {
+                    button: {
+                        className: 'btn' //remove the default 'btn-secondary'
+                    },
+                    container: {
+                        className: 'dt-buttons btn-group bgc-white-tp2 text-right w-auto'
+                    }
                 },
-                container: {
-                    className: 'dt-buttons btn-group bgc-white-tp2 text-right w-auto'
+
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)',
+                        text: 'Select Column',
+                        "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                    },
+                    {
+                        "extend": "copy",
+                        "text": "<i class='far fa-copy text-125 text-purple'></i> <span class='d-none'>Copy to clipboard</span>",
+                        "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                    },
+
+                    {
+                        "extend": "csv",
+                        "text": "<i class='fa fa-database text-125 text-success-m1'></i> <span class='d-none'>Export to CSV</span>",
+                        "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                    },
+
+                    {
+                        "extend": "print",
+                        "text": "<i class='fa fa-print text-125 text-orange-d1'></i> <span class='d-none'>Print</span>",
+                        "className": "btn-light-default btn-bgc-white  btn-h-outline-primary btn-a-outline-primary",
+                        autoPrint: false,
+                        message: 'This print was produced using the Print button for DataTables'
+                    }
+                ]
+            },
+            "order": [[0, "desc"]],
+
+        });
+    }
+    else {
+          $_table = $('#datatable').DataTable({
+            "scrollY": "" + (window.outerHeight - 440) + "px",
+            "scrollCollapse": true,
+            "sScrollX": '100%',
+            responsive: true,
+            colReorder: true,
+            renderer: 'bootstrap',
+            language: {
+                search: '<i class="fa fa-search pos-abs mt-2 pt-3px ml-25 text-blue-m2"></i>',
+                searchPlaceholder: " Search ...",
+                processing: "Loading Data...",
+                zeroRecords: "No matching records found"
+
+            },
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            processing: true,
+            serverSide: true,
+            orderCellsTop: true,
+            searching: true,
+            stateSave: true,
+            // autoWidth: true,
+            deferRender: true,
+            "pageLength": 50,
+            "lengthChange": true,
+            //dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6 text-right"l>><"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            dom: '<"html5buttons"B>lTfgitp',
+            ajax: {
+                type: "POST",
+                url: '/Order/LoadTable/',
+                contentType: "application/json; charset=utf-8",
+                async: true,
+                data: function (data) {
+                    let additionalValues = [];
+                    additionalValues.push(($("#id-date-1").val()));
+                    additionalValues.push(($("#id-date-2").val()));
+                    additionalValues.push(($("#id-date-3").val()));
+                    additionalValues.push(($("#id-date-4").val()));
+
+                    data.AdditionalValues = additionalValues;
+                    return JSON.stringify(data);
+                },
+                beforeSend: function () {
+                    // Here, manually add the loading message.
+                    $('#datatable > tbody').html(
+                        '<tr class="odd">' +
+                        '<td valign="top" colspan="10" class="dataTables_empty">Loading&hellip;</td>' +
+                        '</tr>'
+                    );
                 }
             },
-
-            buttons: [
-                {
-                    extend: 'colvis',
-                    columns: ':not(.noVis)',
-                    text: 'Select Column',
-                    "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
-                },
-                {
-                    "extend": "copy",
-                    "text": "<i class='far fa-copy text-125 text-purple'></i> <span class='d-none'>Copy to clipboard</span>",
-                    "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
-                },
-
-                {
-                    "extend": "csv",
-                    "text": "<i class='fa fa-database text-125 text-success-m1'></i> <span class='d-none'>Export to CSV</span>",
-                    "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
-                },
-
-                {
-                    "extend": "print",
-                    "text": "<i class='fa fa-print text-125 text-orange-d1'></i> <span class='d-none'>Print</span>",
-                    "className": "btn-light-default btn-bgc-white  btn-h-outline-primary btn-a-outline-primary",
-                    autoPrint: false,
-                    message: 'This print was produced using the Print button for DataTables'
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.ScheduledOnNonWorkingDay.toString() === "true") {
+                    $(nRow).addClass('nonWkDayOrder');
                 }
-            ]
-        },
-        "order": [[0, "desc"]],
 
-    });
+            },
+            columns: [
+
+                {
+                    //'className': 'details-control',
+                    title: "Order No",
+                    data: "OrderNo",
+                    name: "co",
+
+                },
+                {
+                    title: "Main Order No",
+                    data: "ReoccurrenceOrderNo",
+                    name: "co",
+                    render: function (data, type, row) {
+                        try {
+                            if (row.ReOccurenceParentOrderId.toString() == "0") {
+                                return "";
+                            }
+                            else {
+                                return "#" + row.ReOccurenceParentOrderId.toString();
+                            }
+                        } catch (e) {
+                            return "";
+                        }
+
+
+                    }
+                },
+                {
+                    title: "Order Date",
+                    data: "OrderDate",
+                    name: "co",
+                    render: function (data, type, row) {
+                        return new moment(row.OrderDate).format("MM/DD/YYYY");
+
+                    }
+                },
+                {
+                    title: "Customer",
+                    data: "CustomerName",
+                    name: "co"
+
+                },
+                {
+                    title: "Ship Date",
+                    data: "ShipStartDate",
+                    name: "co",
+                    render: function (data, type, row) {
+                        return new moment(row.ShipStartDate).format("dddd") + " ," +
+                            new moment(row.ShipStartDate).format("MM/DD/YYYY hh:mm a");
+
+                    }
+                },
+                {
+                    title: "Amount($)",
+                    data: "TotalAmount",
+                    name: "co"
+
+                },
+                {
+                    title: "Assigned To",
+                    data: "EmployeeName",
+                    name: "co"
+
+                },
+                {
+                    title: "Ship Address",
+                    data: "CustomerShipAddress",
+                    name: "co"
+                },
+                {
+                    title: "Status",
+                    data: "IsActive",
+                    searchable: false,
+                    render: function (data, type, row) {
+                        if (row.IsActive === 0) {
+                            return '<span class="badge badge-danger mr-1">In Active</span>';
+                        }
+                        else {
+                            return '<span class="badge badge-success mr-1"> Active</span>';
+                        }
+                    }
+                },
+                {
+                    title: "Action",
+                    data: "UserId",
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return '<span><a href="/Order/Edit/' + row.OrderId + '">Edit</a>|</span >' +
+                            '<span><a href="#" onclick="deleteFun(' + row.OrderId + ')">Delete</a>|</span >' +
+                            '<a href="#" onclick="openOrderNotePopup(' + row.OrderId + ')">Add Note</a>';
+                    }
+                }
+            ],
+            //colReorder: {
+            //    //disable column reordering for first and last columns
+            //    fixedColumnsLeft: 1,
+            //    fixedColumnsRight: 1
+            //},
+            classes: {
+                sLength: "dataTables_length text-left w-auto",
+            },
+            buttons: {
+                dom: {
+                    button: {
+                        className: 'btn' //remove the default 'btn-secondary'
+                    },
+                    container: {
+                        className: 'dt-buttons btn-group bgc-white-tp2 text-right w-auto'
+                    }
+                },
+
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)',
+                        text: 'Select Column',
+                        "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                    },
+                    {
+                        "extend": "copy",
+                        "text": "<i class='far fa-copy text-125 text-purple'></i> <span class='d-none'>Copy to clipboard</span>",
+                        "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                    },
+
+                    {
+                        "extend": "csv",
+                        "text": "<i class='fa fa-database text-125 text-success-m1'></i> <span class='d-none'>Export to CSV</span>",
+                        "className": "btn-light-default btn-bgc-white btn-h-outline-primary btn-a-outline-primary"
+                    },
+
+                    {
+                        "extend": "print",
+                        "text": "<i class='fa fa-print text-125 text-orange-d1'></i> <span class='d-none'>Print</span>",
+                        "className": "btn-light-default btn-bgc-white  btn-h-outline-primary btn-a-outline-primary",
+                        autoPrint: false,
+                        message: 'This print was produced using the Print button for DataTables'
+                    }
+                ]
+            },
+            "order": [[0, "desc"]],
+
+        });
+    }
+   
+    window.$_table = $_table;
 
     $_table.columns().every(function (index) {
         $('#fingers10 thead tr:last th:eq(' + index + ') input')
@@ -305,6 +517,8 @@
     });
 
 
+
+
     //enable tooltips
     setTimeout(function () {
         $('.dt-buttons button')
@@ -364,4 +578,10 @@
 
 
 
-}
+};
+
+
+
+
+
+

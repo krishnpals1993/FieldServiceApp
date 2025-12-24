@@ -105,7 +105,7 @@ namespace FieldServiceApp.Controllers
                             RoleId = model.iRoleId,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
 
                         _dbContext.tbl_Users.Add(user);

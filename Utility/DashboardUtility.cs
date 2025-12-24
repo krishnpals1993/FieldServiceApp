@@ -196,17 +196,18 @@ namespace FieldServiceApp.Utility
         public DashboardViewModel getDashBoardDetail(string _rolename, int _userId)
         {
             DashboardViewModel model = new DashboardViewModel();
-            model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                               .Select(s => new EmployeeMasterViewModel
-                               {
-                                   EmployeeId = s.EmployeeId,
-                                   FirstName = s.FirstName,
-                                   LastName = s.LastName,
-                                   MiddleName = s.MiddleName
-                               })
-                               .ToList();
+
             try
             {
+                model.EmployeeList = _dbContext.tbl_EmployeeMaster
+                   .Select(s => new EmployeeMasterViewModel
+                   {
+                       EmployeeId = s.EmployeeId,
+                       FirstName = s.FirstName,
+                       LastName = s.LastName,
+                       MiddleName = s.MiddleName
+                   })
+                   .ToList();
                 if (_rolename == "Admin")
                 {
                     model.OrderList = (from order in _dbContext.tbl_OrderMaster
@@ -228,7 +229,7 @@ namespace FieldServiceApp.Utility
                                                     join item in _dbContext.tbl_ItemMaster on orderDetail.ItemId equals item.ItemId
                                                     where item.ItemId == orderDetail.ItemId && orderDetail.OrderId == order.OrderId && order.IsActive == 1
                                                     select item.ItemCd).Distinct().ToList()
-                                       where order.IsActive == 1
+                                       where order.IsActive == 1  
                                        select new OrderMasterViewModel
                                        {
                                            OrderNo = order.OrderNo,
@@ -245,7 +246,7 @@ namespace FieldServiceApp.Utility
                                            CustomerShipAddress = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + (shipping.Address2 ?? ""),
                                            Status = (orderAssign1 == null ? "New" : (orderAssign1.CompletedDate == null ? "Assigned" : "Completed")),
                                            Color = employee1.Color ?? "rgb(228 211 91 / 63%)",
-                                           ReOccurenceParentOrderId = (order.ReOccurence == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
+                                           ReOccurenceParentOrderId = ((order.ReOccurence??0) == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
                                        })
                                                .ToList();
                 }
@@ -288,7 +289,7 @@ namespace FieldServiceApp.Utility
                                            CustomerShipAddress = (city1.CityName ?? "") + " " + (state1.StateName ?? "") + " " + (shipping.Address ?? "") + (shipping.Address2 ?? ""),
                                            Status = (orderAssign1 == null ? "New" : (orderAssign1.CompletedDate == null ? "Assigned" : "Completed")),
                                            Color = employee1.Color ?? "rgb(228 211 91 / 63%)",
-                                           ReOccurenceParentOrderId = (order.ReOccurence == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
+                                           ReOccurenceParentOrderId = ((order.ReOccurence??0) == 1 ? 1 : (order.ReOccurenceParentOrderId ?? 0))
                                            // Color = employee.Color
                                        })
                                   .ToList();

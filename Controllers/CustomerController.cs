@@ -26,13 +26,18 @@ namespace FieldServiceApp.Controllers
         private readonly IOptions<EmailSettings> _emailSettings;
         private readonly DBContext _dbContext;
         private readonly IConfigurationProvider _mappingConfiguration;
-
-        public CustomerController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext, IConfigurationProvider mappingConfiguration)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private ISession _session => _httpContextAccessor.HttpContext.Session;
+        private int UserId = 0;
+        public CustomerController(IOptions<Appsettings> appSettings, IOptions<EmailSettings> emailSettings, DBContext dbContext, IConfigurationProvider mappingConfiguration,
+             IHttpContextAccessor HttpContextAccessor)
         {
             _appSettings = appSettings;
             _emailSettings = emailSettings;
             _dbContext = dbContext;
+            _httpContextAccessor = HttpContextAccessor;
             _mappingConfiguration = mappingConfiguration;
+            int.TryParse(_session.GetString("UserId"), out UserId);
         }
 
         public IActionResult List()
@@ -52,14 +57,33 @@ namespace FieldServiceApp.Controllers
                 HttpContext.Session.SetString(nameof(JqueryDataTablesParameters), System.Text.Json.JsonSerializer.Serialize(param));
                 IQueryable<CustomerMasterViewModel_datatable> customerList;
                 customerList = (from customer in _dbContext.tbl_CustomerMaster
+                                where customer.IsActive != 2
                                 select new CustomerMasterViewModel_datatable
                                 {
                                     CustmoerId = customer.CustomerId,
-                                    CompanyName = customer.CompanyName + (Convert.ToString(customer.CompanyName1).Trim()=="" ?"" : " ("+ customer.CompanyName1+")") ,
+                                    CompanyName = customer.CompanyName ,
                                     CompanyType = customer.CompanyType,
                                     IsActive = customer.IsActive
                                 });
 
+
+                var customerShippingAllAddresses = (from shipping in _dbContext.tbl_CustmoerShipping
+                                                    join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                                    into city
+                                                    from city1 in city.DefaultIfEmpty()
+                                                    join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                                    into state
+                                                    from state1 in state.DefaultIfEmpty()
+                                                    select new CustmoerShippingViewModel
+                                                    {
+                                                        ShipId = shipping.CustomerShipId,
+                                                        Address = (shipping.Address ?? "") + (shipping.Address2 ?? "") + (shipping.Address2 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? ""),
+                                                        Zip1 = shipping.Zip1,
+                                                        Zip2 = shipping.Zip2,
+                                                        CustmoerId = shipping.CustomerId,
+                                                        CustomerBillingId = shipping.CustomerBillingId
+
+                                                    }).ToList();
 
                 var size = customerList.Count();
 
@@ -72,60 +96,23 @@ namespace FieldServiceApp.Controllers
                                   ((w.CompanyName ?? "").ToLower().Contains(serchValue) ? true :
                                   ((w.CompanyType ?? "").ToLower().Contains(serchValue) ? true : false)));
 
-                     customerBillingAll = _dbContext.tbl_CustomerBillings.Where(w =>
-                                   ((w.Address1 ?? "").ToLower().Contains(serchValue) ? true :
-                                   ((w.Address2 ?? "").ToLower().Contains(serchValue) ? true :
-                                   ((w.Address2 ?? "").ToLower().Contains(serchValue) ? true :
-                                   ((w.FirstName ?? "").ToLower().Contains(serchValue) ? true :
-                                   ((w.LastName ?? "").ToLower().Contains(serchValue) ? true :
-                                   ((w.Zip1 ?? "").ToLower().Contains(serchValue) ? true :
-                                   ((w.Zip2 ?? "").ToLower().Contains(serchValue) ? true : false))))))))
-                                   .Select(s => new CustomerBillingViewModel
-                                   {
-                                       CustomerBillingId = s.CustomerBillingId,
-                                       CustomerId = s.CustomerId
-
-
-                                   })
-                                   .ToList();
-                    
-                    var customerBilling = customerBillingAll.Select(s => s.CustomerId).Distinct().ToList();
-
-                    var customerBillingList = customerList.Where(w => customerBilling.Contains(w.CustmoerId));
-
-                     customerShippingAll = (from shipping in _dbContext.tbl_CustmoerShipping
-                                               join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
-                                               into city
-                                               from city1 in city.DefaultIfEmpty()
-                                               join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                               into state
-                                               from state1 in state.DefaultIfEmpty()
-                                               select new CustmoerShippingViewModel
-                                               {
-                                                   ShipId = shipping.CustomerShipId,
-                                                   Address =   (shipping.Address ?? "") + (shipping.Address2 ?? "") + (shipping.Address2 ?? "") +" "+ (city1.CityName ?? "") + " " + (state1.StateName ?? ""),
-                                                   Zip1 = shipping.Zip1,
-                                                   Zip2 = shipping.Zip2,
-                                                   CustmoerId = shipping.CustomerId,
-                                                   CustomerBillingId = shipping.CustomerBillingId
-
-                                               })
-                                                  .Where(w =>
-                                  ((w.Address ?? "").ToLower().Contains(serchValue) ? true :
-                                  ((w.Zip1 ?? "").ToLower().Contains(serchValue) ? true :
-                                  (w.Zip2 ?? "").ToLower().Contains(serchValue) ? true : false)))
-                                                  .Select(s => new CustmoerShippingViewModel
-                                                  {
-                                                      ShipId = s.ShipId,
-                                                      CustmoerId = s.CustmoerId,
-                                                      CustomerBillingId = s.CustomerBillingId
-                                                  }).ToList(); ;
+                    customerShippingAll = customerShippingAllAddresses
+                                                 .Where(w =>
+                                 ((w.Address ?? "").ToLower().Contains(serchValue) ? true :
+                                 ((w.Zip1 ?? "").ToLower().Contains(serchValue) ? true :
+                                 (w.Zip2 ?? "").ToLower().Contains(serchValue) ? true : false)))
+                                                 .Select(s => new CustmoerShippingViewModel
+                                                 {
+                                                     ShipId = s.ShipId,
+                                                     CustmoerId = s.CustmoerId,
+                                                     CustomerBillingId = s.CustomerBillingId
+                                                 }).ToList(); ;
 
                     var customerShipping = customerShippingAll.Select(s => s.CustmoerId).Distinct().ToList();
 
                     var customerShippingList = customerList.Where(w => customerShipping.Contains(w.CustmoerId));
 
-                    customerList = customerFilterList.Union(customerBillingList).Union(customerShippingList);
+                    customerList = customerFilterList.Union(customerShippingList);
 
 
 
@@ -207,7 +194,7 @@ namespace FieldServiceApp.Controllers
                         var customerIds = items.Select(s => s.CustmoerId).ToList();
                         var billingIds = customerBillingAll.Select(s => s.CustomerBillingId).ToList().Union(customerShippingAll.Select(s => s.CustomerBillingId).ToList()).ToList();
                         var shippings = customerShippingAll.Select(s => s.ShipId).ToList();
-                        var customerBillings = _dbContext.tbl_CustomerBillings.Where(w => billingIds.Contains(w.CustomerBillingId)).ToList();
+                        var customerBillings = _dbContext.tbl_CustomerBillings.Where(w => customerIds.Contains(w.CustomerId)).ToList();
                         var customerShippings = (from shipping in _dbContext.tbl_CustmoerShipping
                                                  join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                                  into city
@@ -215,7 +202,8 @@ namespace FieldServiceApp.Controllers
                                                  join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                                                  into state
                                                  from state1 in state.DefaultIfEmpty()
-                                                 where shippings.Contains(shipping.CustomerShipId)
+                                                 where customerIds.Contains(shipping.CustomerId)
+                                                 && (((shipping.Address ?? "") != "") || ((shipping.Address2 ?? "") != "") || ((shipping.Address3 ?? "") != ""))
                                                  select new CustmoerShippingViewModel_Datatable
                                                  {
                                                      CustomerBillingId = shipping.CustomerBillingId,
@@ -334,8 +322,9 @@ namespace FieldServiceApp.Controllers
             CustomerMasterViewModel model = new CustomerMasterViewModel();
             try
             {
+
+
                 model.CityList = _dbContext.tbl_Cities
-                    .Where(w => w.IsActive == 1)
                             .Select(s => new CityViewModel
                             {
                                 CityId = s.CityId,
@@ -344,16 +333,25 @@ namespace FieldServiceApp.Controllers
                             .ToList();
 
                 model.StateList = _dbContext.tbl_States
-                    .Where(w => w.IsActive == 1)
                             .Select(s => new StateViewModel
                             {
                                 StateId = s.StateId,
                                 StateName = s.StateName
                             })
                             .ToList();
-                model.Contacts.Add(new CustmoerContactViewModel());
-                model.Shippings.Add(new CustmoerShippingViewModel());
-                model.Shippings.FirstOrDefault().ApartmentList.Add(new CustomerShippingApartmentViewModel());
+
+                CustomerMaster customerMaster = new CustomerMaster()
+                {
+                    IsActive = 2,
+                    CreatedBy = UserId,
+                    CreatedDate = DateTime.UtcNow
+
+                };
+
+                _dbContext.tbl_CustomerMaster.Add(customerMaster);
+                _dbContext.SaveChanges();
+
+                model.CustmoerId = customerMaster.CustomerId;
 
             }
             catch (Exception ex)
@@ -366,10 +364,11 @@ namespace FieldServiceApp.Controllers
             return View(model);
         }
 
+
         [HttpPost]
         public ActionResult Add(CustomerMasterViewModel model)
         {
-            var a = new Exception();
+            
             try
             {
 
@@ -377,7 +376,7 @@ namespace FieldServiceApp.Controllers
                 if (ModelState.IsValid)
                 {
 
-                    var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName).FirstOrDefault();
+                    var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName && w.CustomerId != model.CustmoerId).FirstOrDefault();
                     if (checkCustomer != null)
                     {
                         ViewBag.ErrorMessage = "Customer name is already exists";
@@ -400,129 +399,46 @@ namespace FieldServiceApp.Controllers
 
                     }
 
-                    CustomerMaster customerMaster = new CustomerMaster()
+                     checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName && w.CustomerId != model.CustmoerId).FirstOrDefault();
+                    if (checkCustomer != null)
                     {
-                        CompanyName = model.CompanyName,
-                        //CityId = model.CityId == null ? 0 : model.CityId.Value,
-                        //StateId = model.StateId == null ? 0 : model.StateId.Value,
-                        //FirstName = model.FirstName,
-                        //LastName = model.LastName,
-                        //Address = model.Address,
-                        //Address2 = model.Address2??"",
-                        //Address3 = model.Address3??"",
-                        CompanyType = model.CompanyType,
-                        //Zip1 = model.Zip1,
-                        //Zip2 = model.Zip2,
-                        CompanyCode = model.Code,
-                        IsActive = 1,
-                        CreatedBy = 1,
-                        CreatedDate = DateTime.Now
-                    };
+                        ViewBag.ErrorMessage = "Customer name is already exists";
+                        model.CityList = _dbContext.tbl_Cities
+                           .Select(s => new CityViewModel
+                           {
+                               CityId = s.CityId,
+                               CityName = s.CityName
+                           })
+                           .ToList();
 
-                    _dbContext.tbl_CustomerMaster.Add(customerMaster);
+                        model.StateList = _dbContext.tbl_States
+                                    .Select(s => new StateViewModel
+                                    {
+                                        StateId = s.StateId,
+                                        StateName = s.StateName
+                                    })
+                                    .ToList();
+                        return View(model);
+
+                    }
+
+                    checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustomerId == model.CustmoerId).FirstOrDefault();
+                    checkCustomer.CompanyName = model.CompanyName;
+                    checkCustomer.FullName = model.FullName;
+                    checkCustomer.FirstName = model.FirstName;
+                    checkCustomer.MiddleName = model.MiddleName;
+                    checkCustomer.LastName = model.LastName;
+                    checkCustomer.Phone = model.Phone;
+                    checkCustomer.Email = model.Email;
+                    checkCustomer.AltPhone = model.AltPhone;
+                    checkCustomer.Mobile = model.Mobile;
+                    checkCustomer.Fax = model.Fax;
+                    checkCustomer.CompanyCode = model.Code;
+                    checkCustomer.ModifiedBy = UserId;
+                    checkCustomer.Notes = model.Notes;
+                    checkCustomer.IsActive = 1;
+                    checkCustomer.ModifiedDate = DateTime.UtcNow;
                     _dbContext.SaveChanges();
-
-                    foreach (var item in model.Shippings)
-                    {
-                        if (Convert.ToString(item.Zip1 ?? "") != "" ||
-                            Convert.ToString(item.Zip2 ?? "") != "" ||
-                            Convert.ToString(item.Email ?? "") != "" ||
-                            Convert.ToString(item.Phone ?? "") != "" ||
-                            Convert.ToString(item.StateId) != "0" ||
-                            Convert.ToString(item.CityId) != "0" ||
-                            Convert.ToString(item.Address ?? "") != "")
-                        {
-                            CustomerShipping custmoerShipping = new CustomerShipping()
-                            {
-                                CustomerId = customerMaster.CustomerId,
-                                FirstName = item.FirstName,
-                                MiddleName = item.MiddleName,
-                                LastName = item.LastName,
-                                Email = item.Email,
-                                Phone = item.Phone,
-                                CityId = item.CityId == null ? 0 : item.CityId.Value,
-                                StateId = item.StateId == null ? 0 : item.StateId.Value,
-                                Zip1 = item.Zip1,
-                                Zip2 = item.Zip2,
-                                Address = item.Address,
-                                IsActive = 1,
-                                CreatedBy = 1,
-                                CreatedDate = DateTime.Now
-                            };
-                            _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
-                            _dbContext.SaveChanges();
-
-
-                            foreach (var apartment in item.ApartmentList)
-                            {
-                                if (Convert.ToString(apartment.ApartmentNo ?? "") != "" ||
-                                Convert.ToString(apartment.ApartmentName ?? "") != "")
-                                {
-
-                                    try
-                                    {
-                                        var checkAprtment = _dbContext.tbl_CustomerShippingApartments.Where(w => w.CustomerShipId == custmoerShipping.CustomerShipId && w.ApartmentNo == apartment.ApartmentNo).FirstOrDefault();
-                                        if (checkAprtment == null)
-                                        {
-                                            CustomerShippingApartment customerShippingApartment = new CustomerShippingApartment()
-                                            {
-                                                CustomerShipId = custmoerShipping.CustomerShipId,
-                                                ApartmentNo = apartment.ApartmentNo,
-                                                ApartmentName = apartment.ApartmentName,
-                                                IsActive = 1,
-                                                CreatedBy = 1,
-                                                CreatedDate = DateTime.Now
-                                            };
-                                            _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
-                                            _dbContext.SaveChanges();
-                                        }
-
-                                    }
-                                    catch (Exception wx)
-                                    {
-
-                                        a = wx;
-                                    }
-
-
-                                }
-
-
-                            }
-
-
-                        }
-                    }
-
-                    foreach (var item in model.Contacts)
-                    {
-                        if (Convert.ToString(item.FirstName ?? "") != "" ||
-                            Convert.ToString(item.MiddleName ?? "") != "" ||
-                            Convert.ToString(item.LastName ?? "") != "" ||
-                            Convert.ToString(item.Email ?? "") != "" ||
-                            Convert.ToString(item.Phone ?? "") != "")
-                        {
-                            CustomerContact customerContactDetail = new CustomerContact()
-                            {
-                                FirstName = item.FirstName,
-                                MiddleName = item.MiddleName,
-                                LastName = item.LastName,
-                                Email = item.Email,
-                                Phone = item.Phone,
-                                CustomerId = customerMaster.CustomerId,
-                                IsActive = 1,
-                                CreatedBy = 1,
-                                CreatedDate = DateTime.Now
-                            };
-                            _dbContext.tbl_CustmoerContact.Add(customerContactDetail);
-                            _dbContext.SaveChanges();
-                        }
-                    }
-
-
-
-
-
 
                     ViewBag.SuccessMessage = "Customer added successfully";
 
@@ -531,13 +447,13 @@ namespace FieldServiceApp.Controllers
 
             catch (Exception ex)
             {
-                a = ex;
+         
             }
 
             return View(model);
         }
 
-        public IActionResult Edit(string id, string CustomerBillingId="", string ShipId="")
+        public IActionResult Edit(string id, string CustomerBillingId = "", string ShipId = "")
         {
             CustomerMasterViewModel model = new CustomerMasterViewModel();
             try
@@ -546,7 +462,7 @@ namespace FieldServiceApp.Controllers
                 var count = 0;
                 foreach (var item in checkIds)
                 {
-                    if (count==0)
+                    if (count == 0)
                     {
                         id = item;
                     }
@@ -619,13 +535,13 @@ namespace FieldServiceApp.Controllers
                     }
 
                     var checkCustomerBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerId == _customerId).ToList();
-                    var checkCusomerShippingList  = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerId == _customerId).ToList();
+                    var checkCusomerShippingList = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerId == _customerId).ToList();
                     var checkShippingIds = checkCusomerShippingList.Select(s => s.CustomerShipId).ToList();
                     var checkCusomerShippingApartmentList = _dbContext.tbl_CustomerShippingApartments.Where(w => checkShippingIds.Contains(w.CustomerShipId) && w.IsActive == 1).ToList();
-                    
+
                     if (checkCustomerBilling.Count() > 0)
                     {
-                        
+
                         model.Billings = checkCustomerBilling.Select(s => new CustomerBillingViewModel
                         {
                             CustomerBillingId = s.CustomerBillingId,
@@ -643,30 +559,30 @@ namespace FieldServiceApp.Controllers
 
                         }).ToList();
 
-                        if (model.CustomerBillingId>0)
+                        if (model.CustomerBillingId > 0)
                         {
                             var billingAddressDetail = model.Billings.Where(w => w.CustomerBillingId == model.CustomerBillingId).FirstOrDefault();
                             model.Billings.Remove(model.Billings.Where(w => w.CustomerBillingId == model.CustomerBillingId).FirstOrDefault());
                             model.Billings.Insert(0, billingAddressDetail);
                             model.Billings = model.Billings.Take(28).ToList();
-                         
+
                         }
 
                         foreach (var item in model.Billings)
                         {
-                            
+
                             var checkCustomerShipping = checkCusomerShippingList.Where(w => w.CustomerBillingId == item.CustomerBillingId).ToList();
 
                             if (item.CustomerBillingId == model.CustomerBillingId)
                             {
-                                if (model.ShipId>0)
+                                if (model.ShipId > 0)
                                 {
                                     var shippingAddressDetail = checkCustomerShipping.Where(w => w.CustomerShipId == model.ShipId).FirstOrDefault();
 
                                     checkCustomerShipping.Remove(checkCustomerShipping.Where(w => w.CustomerShipId == model.ShipId).FirstOrDefault());
                                     checkCustomerShipping.Insert(0, shippingAddressDetail);
                                 }
-                               
+
                             }
 
                             if (checkCustomerShipping.Count() > 0)
@@ -736,6 +652,123 @@ namespace FieldServiceApp.Controllers
             return View(model);
         }
 
+        public IActionResult EditV2(string id, string CustomerBillingId = "", string ShipId = "")
+        {
+            CustomerMasterViewModel model = new CustomerMasterViewModel();
+            try
+            {
+                var checkIds = id.Split("-");
+                var count = 0;
+                foreach (var item in checkIds)
+                {
+                    if (count == 0)
+                    {
+                        id = item;
+                    }
+                    if (count == 1)
+                    {
+                        ShipId = item;
+                    }
+                    if (count == 2)
+                    {
+                        ShipId = item;
+                    }
+                    count++;
+                }
+
+                model.CityList = _dbContext.tbl_Cities
+                            .Select(s => new CityViewModel
+                            {
+                                CityId = s.CityId,
+                                CityName = s.CityName
+                            })
+                            .ToList();
+
+                model.StateList = _dbContext.tbl_States
+                            .Select(s => new StateViewModel
+                            {
+                                StateId = s.StateId,
+                                StateName = s.StateName
+                            })
+                            .ToList();
+                int _customerId = 0;
+                int.TryParse(id, out _customerId);
+
+                var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustomerId == _customerId).FirstOrDefault();
+                if (checkCustomer != null)
+                {
+                    model.CompanyName = checkCustomer.CompanyName;
+                    model.CustmoerId = checkCustomer.CustomerId;
+                    model.CompanyType = checkCustomer.CompanyType;
+                    model.Notes = checkCustomer.Notes;
+                    model.Code = checkCustomer.CompanyCode;
+                    model.ShipId = 0;
+                    model.CustomerBillingId = 0;
+
+                    if (!String.IsNullOrEmpty(ShipId))
+                    {
+                        model.ShipId = Convert.ToInt32(ShipId);
+                        if (model.ShipId > 0)
+                        {
+                            model.CustomerBillingId = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == model.ShipId).
+                                                        Select(s => s.CustomerBillingId).FirstOrDefault();
+                        }
+                    }
+
+
+                    var checkCustomerBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerId == _customerId).ToList();
+                    model.Billings = checkCustomerBilling.Select(s => new CustomerBillingViewModel
+                    {
+                        CustomerBillingId = s.CustomerBillingId,
+                        FirstName = s.FirstName,
+                        LastName = s.LastName,
+                        CustomerId = s.CustomerId,
+                        CityId = s.CityId,
+                        StateId = s.StateId,
+                        Address1 = s.Address1,
+                        Address2 = s.Address2,
+                        Address3 = s.Address3,
+                        Zip1 = s.Zip1,
+                        Zip2 = s.Zip2,
+                        Notes = s.Notes
+
+                    }).ToList();
+
+                    var checkCusomerShippingList = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerId == _customerId).ToList();
+                    var checkShippingIds = checkCusomerShippingList.Select(s => s.CustomerShipId).ToList();
+
+                    model.Shippings = (from shipping in _dbContext.tbl_CustmoerShipping
+                                       join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                       into city
+                                       from city1 in city.DefaultIfEmpty()
+                                       join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                       into state
+                                       from state1 in state.DefaultIfEmpty()
+                                       where shipping.CustomerId == _customerId
+                                       select new CustmoerShippingViewModel
+                                       {
+                                           ShipId = shipping.CustomerShipId,
+                                           Address = (shipping.Address ?? "") + " " + (shipping.Address2 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? ""),
+                                           CustmoerId = shipping.CustomerBillingId
+                                       })
+                                                   .ToList();
+
+                    model.BillingId = model.CustomerBillingId;
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                var a = "";
+            }
+
+
+            return View(model);
+        }
+
+
         [HttpPost]
         public ActionResult Edit(CustomerMasterViewModel model)
         {
@@ -772,7 +805,7 @@ namespace FieldServiceApp.Controllers
                     checkCustomer.CompanyCode = model.Code;
                     checkCustomer.ModifiedBy = 1;
                     checkCustomer.Notes = model.Notes;
-                    checkCustomer.ModifiedDate = DateTime.Now;
+                    checkCustomer.ModifiedDate = DateTime.UtcNow;
 
                     _dbContext.SaveChanges();
 
@@ -799,7 +832,7 @@ namespace FieldServiceApp.Controllers
                             checkBilling.Zip2 = item.Zip2;
                             checkBilling.Notes = item.Notes;
                             checkBilling.ModifiedBy = 1;
-                            checkBilling.ModifiedDate = DateTime.Now;
+                            checkBilling.ModifiedDate = DateTime.UtcNow;
                             _dbContext.SaveChanges();
 
                             foreach (var ship in item.Shippings)
@@ -821,7 +854,7 @@ namespace FieldServiceApp.Controllers
                                     checkShipping.Zip2 = ship.Zip2;
                                     checkShipping.Notes = ship.Notes;
                                     checkShipping.ModifiedBy = 1;
-                                    checkShipping.ModifiedDate = DateTime.Now;
+                                    checkShipping.ModifiedDate = DateTime.UtcNow;
                                     _dbContext.SaveChanges();
 
                                     var checkPreviousApartments = checkCusomerShippingApartmentListAll.Where(w => w.CustomerShipId == ship.ShipId).ToList();
@@ -829,8 +862,8 @@ namespace FieldServiceApp.Controllers
                                     {
                                         previousApartment.IsActive = 0;
                                         previousApartment.ModifiedBy = 1;
-                                        previousApartment.ModifiedDate = DateTime.Now;
-                                      
+                                        previousApartment.ModifiedDate = DateTime.UtcNow;
+
                                     }
                                     _dbContext.SaveChanges();
                                     foreach (var apartment in ship.ApartmentList)
@@ -847,7 +880,7 @@ namespace FieldServiceApp.Controllers
                                             checkApartment.Notes = apartment.Notes;
                                             checkApartment.IsActive = 1;
                                             checkApartment.ModifiedBy = 1;
-                                            checkApartment.ModifiedDate = DateTime.Now;
+                                            checkApartment.ModifiedDate = DateTime.UtcNow;
                                             _dbContext.SaveChanges();
                                         }
                                         else
@@ -866,7 +899,7 @@ namespace FieldServiceApp.Controllers
                                                         Notes = apartment.Notes,
                                                         IsActive = 1,
                                                         CreatedBy = 1,
-                                                        CreatedDate = DateTime.Now
+                                                        CreatedDate = DateTime.UtcNow
                                                     };
                                                     _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
                                                     _dbContext.SaveChanges();
@@ -910,7 +943,7 @@ namespace FieldServiceApp.Controllers
                                             Notes = ship.Notes,
                                             IsActive = 1,
                                             CreatedBy = 1,
-                                            CreatedDate = DateTime.Now
+                                            CreatedDate = DateTime.UtcNow
                                         };
                                         _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                                         _dbContext.SaveChanges();
@@ -932,7 +965,7 @@ namespace FieldServiceApp.Controllers
                                                         ApartmentName = apartment.ApartmentName,
                                                         IsActive = 1,
                                                         CreatedBy = 1,
-                                                        CreatedDate = DateTime.Now
+                                                        CreatedDate = DateTime.UtcNow
                                                     };
                                                     _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
                                                     _dbContext.SaveChanges();
@@ -973,7 +1006,7 @@ namespace FieldServiceApp.Controllers
                                     Address3 = item.Address3,
                                     IsActive = 1,
                                     CreatedBy = 1,
-                                    CreatedDate = DateTime.Now
+                                    CreatedDate = DateTime.UtcNow
                                 };
                                 _dbContext.tbl_CustomerBillings.Add(custmoerBilling);
                                 _dbContext.SaveChanges();
@@ -1009,7 +1042,7 @@ namespace FieldServiceApp.Controllers
                                                 Address3 = ship.Address3,
                                                 IsActive = 1,
                                                 CreatedBy = 1,
-                                                CreatedDate = DateTime.Now
+                                                CreatedDate = DateTime.UtcNow
                                             };
                                             _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                                             _dbContext.SaveChanges();
@@ -1030,7 +1063,7 @@ namespace FieldServiceApp.Controllers
                                                             Notes = apartment.Notes,
                                                             IsActive = 1,
                                                             CreatedBy = 1,
-                                                            CreatedDate = DateTime.Now
+                                                            CreatedDate = DateTime.UtcNow
                                                         };
                                                         _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
                                                         _dbContext.SaveChanges();
@@ -1069,7 +1102,7 @@ namespace FieldServiceApp.Controllers
                             checkCustomerContact.Phone = item.Phone;
                             checkCustomerContact.CustomerId = checkCustomer.CustomerId;
                             checkCustomerContact.ModifiedBy = 1;
-                            checkCustomerContact.ModifiedDate = DateTime.Now;
+                            checkCustomerContact.ModifiedDate = DateTime.UtcNow;
                             _dbContext.SaveChanges();
                         }
                         else
@@ -1090,7 +1123,7 @@ namespace FieldServiceApp.Controllers
                                     CustomerId = checkCustomer.CustomerId,
                                     IsActive = 1,
                                     CreatedBy = 1,
-                                    CreatedDate = DateTime.Now
+                                    CreatedDate = DateTime.UtcNow
                                 };
                                 _dbContext.tbl_CustmoerContact.Add(customerContactDetail);
                                 _dbContext.SaveChanges();
@@ -1118,6 +1151,101 @@ namespace FieldServiceApp.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public ActionResult EditV2(CustomerMasterViewModel model)
+        {
+            try
+            {
+                if (true)
+                {
+                    var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName && w.CustomerId != model.CustmoerId).FirstOrDefault();
+                    if (checkCustomer != null)
+                    {
+                        ViewBag.ErrorMessage = "Customer name is already exists";
+                        model.CityList = _dbContext.tbl_Cities
+                           .Select(s => new CityViewModel
+                           {
+                               CityId = s.CityId,
+                               CityName = s.CityName
+                           })
+                           .ToList();
+
+                        model.StateList = _dbContext.tbl_States
+                                    .Select(s => new StateViewModel
+                                    {
+                                        StateId = s.StateId,
+                                        StateName = s.StateName
+                                    })
+                                    .ToList();
+                        return View(model);
+
+                    }
+
+                    checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustomerId == model.CustmoerId).FirstOrDefault();
+                    checkCustomer.CompanyName = model.CompanyName;
+                    checkCustomer.FullName = model.FullName;
+                    checkCustomer.FirstName = model.FirstName;
+                    checkCustomer.MiddleName = model.MiddleName;
+                    checkCustomer.LastName = model.LastName;
+                    checkCustomer.Phone = model.Phone;
+                    checkCustomer.Email = model.Email;
+                    checkCustomer.AltPhone = model.AltPhone;
+                    checkCustomer.Mobile = model.Mobile;
+                    checkCustomer.Fax = model.Fax;
+                    checkCustomer.CompanyCode = model.Code;
+                    checkCustomer.ModifiedBy = UserId;
+                    checkCustomer.Notes = model.Notes;
+                    checkCustomer.ModifiedDate = DateTime.UtcNow;
+
+                    _dbContext.SaveChanges();
+
+
+
+                    ViewBag.SuccessMessage = "Customer updated successfully";
+
+                }
+            }
+            catch (Exception ex)
+            {
+                var a = "";
+            }
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public JsonResult GetCustomerShippingAddress(int id, int custid)
+        {
+            List<CustmoerShippingViewModel> CustomerShipingAddressList = new List<CustmoerShippingViewModel>();
+            try
+            {
+                CustomerShipingAddressList = (from shipping in _dbContext.tbl_CustmoerShipping
+                                              join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                              into city
+                                              from city1 in city.DefaultIfEmpty()
+                                              join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                              into state
+                                              from state1 in state.DefaultIfEmpty()
+                                              where (id == 0 ? shipping.CustomerId == custid : shipping.CustomerBillingId == id)
+                                              select new CustmoerShippingViewModel
+                                              {
+                                                  ShipId = shipping.CustomerShipId,
+                                                  Address = (shipping.Address ?? "") + " " + (shipping.Address2 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? ""),
+                                                  CustmoerId = shipping.CustomerBillingId
+                                              })
+                                                 .ToList();
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return Json(CustomerShipingAddressList);
+        }
+
 
         public IActionResult GetCustomerContact(int id)
         {
@@ -1134,7 +1262,7 @@ namespace FieldServiceApp.Controllers
             var ids = id.Split("_");
             ViewBag.index = ids[0];
             ViewBag.parentIndex = ids[1];
-            
+
 
             model.CityList = _dbContext.tbl_Cities
                                .Select(s => new CityViewModel
@@ -1165,6 +1293,138 @@ namespace FieldServiceApp.Controllers
             return PartialView("_CustomerShippingApartment", model);
         }
 
+        public IActionResult Detail(int id)
+        {
+
+            var shipDetail = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == id).FirstOrDefault();
+
+            var customerdetail = (from customer in _dbContext.tbl_CustomerMaster
+                                  where customer.CustomerId == shipDetail.CustomerId
+                                  select new CustomerDetailViewModel
+                                  {
+                                      CustmoerId = customer.CustomerId,
+                                      CompanyName = customer.CompanyName,
+                                      FullName = customer.CompanyName1,
+                                      Email = customer.Email,
+                                      Phone = customer.Phone,
+                                      AltPhone = customer.AltPhone,
+                                      Mobile = customer.Mobile,
+                                      Fax = customer.Fax,
+                                      CompanyType = customer.CompanyType,
+                                      IsActive = customer.IsActive
+                                  }).FirstOrDefault();
+
+
+            customerdetail.Shipping = (from shipping in _dbContext.tbl_CustmoerShipping
+                                       join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                       into city
+                                       from city1 in city.DefaultIfEmpty()
+                                       join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                       into state
+                                       from state1 in state.DefaultIfEmpty()
+                                       where shipping.CustomerShipId == id
+                                       select new CustmoerShippingViewModel
+                                       {
+                                           ShipId = shipping.CustomerShipId,
+                                           Address = (shipping.Address ?? ""),
+                                           Address2 = shipping.Address2,
+                                           Address3 = shipping.Address3,
+                                           CityName = city1.CityName,
+                                           StateName = state1.StateName,
+                                           Zip1 = shipping.Zip1,
+                                           Zip2 = shipping.Zip2,
+                                           CustmoerId = shipping.CustomerId,
+                                           CustomerBillingId = shipping.CustomerBillingId
+
+                                       }).FirstOrDefault();
+
+            customerdetail.Billing = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == shipDetail.CustomerBillingId).
+                                       Select(s => new CustomerBillingViewModel
+                                       {
+                                           FirstName = s.FirstName,
+                                           LastName = s.LastName,
+                                           Address1 = s.Address1,
+                                           Address2 = s.Address2,
+                                           Address3 = s.Address3,
+                                           Zip1 = s.Zip1,
+                                           Zip2 = s.Zip2
+
+                                       }).FirstOrDefault();
+
+            return View(customerdetail);
+
+        }
+
+        public IActionResult GetCustomerDetailPopup(int id)
+        {
+            try
+            {
+                var shipDetail = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == id).FirstOrDefault();
+
+                var customerdetail = (from customer in _dbContext.tbl_CustomerMaster
+                                      where customer.CustomerId == shipDetail.CustomerId
+                                      select new CustomerDetailViewModel
+                                      {
+                                          CustmoerId = customer.CustomerId,
+                                          CompanyName = customer.CompanyName,
+                                          FullName = customer.CompanyName1,
+                                          Email = customer.Email,
+                                          Phone = customer.Phone,
+                                          AltPhone = customer.AltPhone,
+                                          Mobile = customer.Mobile,
+                                          Fax = customer.Fax,
+                                          CompanyType = customer.CompanyType,
+                                          IsActive = customer.IsActive
+                                      }).FirstOrDefault();
+
+
+                customerdetail.Shipping = (from shipping in _dbContext.tbl_CustmoerShipping
+                                           join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                           into city
+                                           from city1 in city.DefaultIfEmpty()
+                                           join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                           into state
+                                           from state1 in state.DefaultIfEmpty()
+                                           where shipping.CustomerShipId == id
+                                           select new CustmoerShippingViewModel
+                                           {
+                                               ShipId = shipping.CustomerShipId,
+                                               Address = (shipping.Address ?? ""),
+                                               Address2 = shipping.Address2,
+                                               Address3 = shipping.Address3,
+                                               CityName = city1.CityName,
+                                               StateName = state1.StateName,
+                                               Zip1 = shipping.Zip1,
+                                               Zip2 = shipping.Zip2,
+                                               CustmoerId = shipping.CustomerId,
+                                               CustomerBillingId = shipping.CustomerBillingId
+
+                                           }).FirstOrDefault();
+
+                customerdetail.Billing = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == shipDetail.CustomerBillingId).
+                                           Select(s => new CustomerBillingViewModel
+                                           {
+                                               FirstName = s.FirstName,
+                                               LastName = s.LastName,
+                                               Address1 = s.Address1,
+                                               Address2 = s.Address2,
+                                               Address3 = s.Address3,
+                                               Zip1 = s.Zip1,
+                                               Zip2 = s.Zip2
+
+                                           }).FirstOrDefault();
+
+
+                return PartialView("_CustomerDetail", customerdetail);
+            }
+            catch (Exception ex)
+            {
+
+                return PartialView("_CustomerDetail", new CustomerDetailViewModel());
+            }
+
+
+        }
 
         [HttpPost]
         public JsonResult Delete(int id)
@@ -1178,7 +1438,7 @@ namespace FieldServiceApp.Controllers
                 {
                     checkCustomer.IsActive = 0;
                     checkCustomer.ModifiedBy = 1;
-                    checkCustomer.ModifiedDate = DateTime.Now;
+                    checkCustomer.ModifiedDate = DateTime.UtcNow;
                     _dbContext.SaveChanges();
                 }
 
@@ -1195,6 +1455,343 @@ namespace FieldServiceApp.Controllers
 
             return Json(response);
         }
+
+        [HttpPost]
+        public JsonResult AddShipping(CustmoerShippingViewModel model)
+        {
+
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                if (model.ShipId == 0)
+                {
+                    var checkShipping = _dbContext.tbl_CustmoerShipping.
+                   Where(w => w.CustomerId == model.CustmoerId && w.CustomerBillingId == model.CustomerBillingId
+                   && (w.Address == model.Address && w.Address2 == model.Address2 & w.Address3 == model.Address3))
+                   .FirstOrDefault();
+
+                    if (checkShipping != null)
+                    {
+                        response.Status = "0";
+                        response.Message = "Shipping address already exists";
+
+                    }
+                    else
+                    {
+                        CustomerShipping customerShipping = new CustomerShipping()
+                        {
+                            CustomerId = model.CustmoerId,
+                            CustomerBillingId = model.CustomerBillingId,
+                            Address = model.Address,
+                            Address2 = model.Address2,
+                            Address3 = model.Address3,
+                            CityId = model.CityId ?? 0,
+                            StateId = model.StateId ?? 0,
+                            Zip1 = model.Zip1,
+                            Zip2 = model.Zip2,
+                            Notes = model.Notes,
+                            CreatedBy = 1,
+                            CreatedDate = DateTime.UtcNow
+                        };
+
+                        _dbContext.tbl_CustmoerShipping.Add(customerShipping);
+                        _dbContext.SaveChanges();
+
+                        response.Status = "1";
+                        response.Message = customerShipping.CustomerShipId.ToString();
+
+
+                    }
+                }
+                else
+                {
+
+                    var checkShipping = _dbContext.tbl_CustmoerShipping.
+                 Where(w => w.CustomerId == model.CustmoerId && w.CustomerBillingId == model.CustomerBillingId
+                 && (w.Address == model.Address && w.Address2 == model.Address2 & w.Address3 == model.Address3)
+                 && w.CustomerShipId != model.ShipId)
+                 .FirstOrDefault();
+                    if (checkShipping != null)
+                    {
+                        response.Status = "0";
+                        response.Message = "Shipping address already exists";
+
+                    }
+                    else
+                    {
+                        checkShipping = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == model.ShipId).FirstOrDefault();
+                        if (checkShipping != null)
+                        {
+                            checkShipping.Address = model.Address;
+                            checkShipping.Address2 = model.Address2;
+                            checkShipping.Address3 = model.Address3;
+                            checkShipping.Zip1 = model.Zip1;
+                            checkShipping.Zip2 = model.Zip2;
+                            checkShipping.CityId = model.CityId ?? 0;
+                            checkShipping.StateId = model.StateId ?? 0;
+                            checkShipping.Notes = model.Notes;
+                            checkShipping.Address = model.Address;
+                            checkShipping.ModifiedBy = 1;
+                            checkShipping.ModifiedDate = DateTime.UtcNow;
+                            _dbContext.SaveChanges();
+
+
+                            response.Status = "1";
+                            response.Message = checkShipping.CustomerShipId.ToString();
+
+                        }
+                    }
+
+
+                }
+
+                response.AdditionalData = (from shipping in _dbContext.tbl_CustmoerShipping
+                                           join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
+                                           into city
+                                           from city1 in city.DefaultIfEmpty()
+                                           join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
+                                           into state
+                                           from state1 in state.DefaultIfEmpty()
+                                           where shipping.CustomerId == model.CustmoerId
+                                           select new CustmoerShippingViewModel
+                                           {
+                                               ShipId = shipping.CustomerShipId,
+                                               Address = (shipping.Address ?? "") + " " + (shipping.Address2 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? ""),
+                                               CustmoerId = shipping.CustomerBillingId
+                                           })
+                                                 .ToList();
+
+            }
+            catch (Exception ex)
+            {
+                response.Status = "0";
+                response.Message = "Error occurred";
+            }
+
+            return Json(response);
+        }
+
+
+        public IActionResult GetCustomerShippingPopup(int id)
+        {
+            var model = new CustmoerShippingViewModel();
+
+            model.ShipId = id;
+
+            if (model.ShipId > 0)
+            {
+
+                model = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == id)
+                     .Select(s => new CustmoerShippingViewModel
+                     {
+                         ShipId = s.CustomerShipId,
+                         FirstName = s.FirstName,
+                         MiddleName = s.MiddleName,
+                         LastName = s.LastName,
+                         Email = s.Email,
+                         Phone = s.Phone,
+                         CustmoerId = s.CustomerId,
+                         CityId = s.CityId,
+                         StateId = s.StateId,
+                         Address = s.Address,
+                         Address2 = s.Address2,
+                         Address3 = s.Address3,
+                         Zip1 = s.Zip1,
+                         Zip2 = s.Zip2,
+                         Notes = s.Notes,
+                         CustomerBillingId = s.CustomerBillingId
+                     }).FirstOrDefault();
+
+            }
+
+            model.CityList = _dbContext.tbl_Cities
+                               .Select(s => new CityViewModel
+                               {
+                                   CityId = s.CityId,
+                                   CityName = s.CityName
+                               })
+                               .ToList();
+
+            model.StateList = _dbContext.tbl_States
+                        .Select(s => new StateViewModel
+                        {
+                            StateId = s.StateId,
+                            StateName = s.StateName
+                        })
+                        .ToList();
+            return PartialView("_Shipping", model);
+        }
+
+
+        [HttpPost]
+        public JsonResult AddBilling(CustomerBillingViewModel model)
+        {
+
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                if (model.CustomerBillingId == 0)
+                {
+                    var checkBilling = _dbContext.tbl_CustomerBillings.
+                   Where(w => w.CustomerId == model.CustomerId
+                   && (w.Address1 == model.Address1 && w.Address2 == model.Address2 & w.Address3 == model.Address3))
+                   .FirstOrDefault();
+
+                    if (checkBilling != null)
+                    {
+                        response.Status = "0";
+                        response.Message = "Billing address already exists";
+
+                    }
+                    else
+                    {
+                        CustomerBilling customerBilling = new CustomerBilling()
+                        {
+                            CustomerId = model.CustomerId,
+                            Address1 = model.Address1,
+                            Address2 = model.Address2,
+                            Address3 = model.Address3,
+                            CityId = model.CityId ?? 0,
+                            StateId = model.StateId ?? 0,
+                            Zip1 = model.Zip1,
+                            Zip2 = model.Zip2,
+                            Notes = model.Notes,
+                            FirstName = model.FirstName,
+                            LastName = model.LastName,
+                            CreatedBy = 1,
+                            CreatedDate = DateTime.UtcNow
+                        };
+
+                        _dbContext.tbl_CustomerBillings.Add(customerBilling);
+                        _dbContext.SaveChanges();
+
+                        response.Status = "1";
+                        response.Message = customerBilling.CustomerBillingId.ToString();
+
+
+                    }
+                }
+                else
+                {
+
+                    var checkBilling = _dbContext.tbl_CustomerBillings.
+                   Where(w => w.CustomerId == model.CustomerId && w.CustomerBillingId != model.CustomerBillingId
+                   && (w.Address1 == model.Address1 && w.Address2 == model.Address2 & w.Address3 == model.Address3))
+                   .FirstOrDefault();
+
+                    if (checkBilling != null)
+                    {
+                        response.Status = "0";
+                        response.Message = "Billing address already exists";
+
+                    }
+                    else
+                    {
+                        checkBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == model.CustomerBillingId).FirstOrDefault();
+                        if (checkBilling != null)
+                        {
+                            checkBilling.Address1 = model.Address1;
+                            checkBilling.Address2 = model.Address2;
+                            checkBilling.Address3 = model.Address3;
+                            checkBilling.Zip1 = model.Zip1;
+                            checkBilling.Zip2 = model.Zip2;
+                            checkBilling.CityId = model.CityId ?? 0;
+                            checkBilling.StateId = model.StateId ?? 0;
+                            checkBilling.Notes = model.Notes;
+                            checkBilling.FirstName = model.FirstName;
+                            checkBilling.LastName = model.LastName;
+                            checkBilling.ModifiedBy = 1;
+                            checkBilling.ModifiedDate = DateTime.UtcNow;
+                            _dbContext.SaveChanges();
+
+                            response.Status = "1";
+                            response.Message = checkBilling.CustomerBillingId.ToString();
+
+                        }
+                    }
+
+
+                }
+
+
+                var checkCustomerBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerId == model.CustomerId).ToList();
+                var billings = checkCustomerBilling.Select(s => new CustomerBillingViewModel
+                {
+                    CustomerBillingId = s.CustomerBillingId,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    CustomerId = s.CustomerId,
+                    CityId = s.CityId,
+                    StateId = s.StateId,
+                    Address1 = s.Address1 ?? "",
+                    Address2 = s.Address2 ?? "",
+                    Address3 = s.Address3 ?? "",
+                    Zip1 = s.Zip1,
+                    Zip2 = s.Zip2,
+                    Notes = s.Notes,
+                    CreatedDate = DateTime.UtcNow
+
+                }).ToList();
+
+                response.AdditionalData = billings;
+
+            }
+            catch (Exception ex)
+            {
+                response.Status = "0";
+                response.Message = "Error occurred";
+            }
+
+            return Json(response);
+        }
+
+        public IActionResult GetCustomerBillingPopup(int id)
+        {
+            var model = new CustomerBillingViewModel();
+
+            model.CustomerBillingId = id;
+
+            if (id > 0)
+            {
+                model = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == id)
+                                        .Select(s => new CustomerBillingViewModel
+                                        {
+                                            CustomerBillingId = s.CustomerBillingId,
+                                            FirstName = s.FirstName,
+                                            LastName = s.LastName,
+                                            CustomerId = s.CustomerId,
+                                            CityId = s.CityId,
+                                            StateId = s.StateId,
+                                            Address1 = s.Address1,
+                                            Address2 = s.Address2,
+                                            Address3 = s.Address3,
+                                            Zip1 = s.Zip1,
+                                            Zip2 = s.Zip2,
+                                            Notes = s.Notes
+
+                                        }).FirstOrDefault();
+
+
+            }
+
+            model.CityList = _dbContext.tbl_Cities
+                               .Select(s => new CityViewModel
+                               {
+                                   CityId = s.CityId,
+                                   CityName = s.CityName
+                               })
+                               .ToList();
+
+            model.StateList = _dbContext.tbl_States
+                        .Select(s => new StateViewModel
+                        {
+                            StateId = s.StateId,
+                            StateName = s.StateName
+                        })
+                        .ToList();
+            return PartialView("_Billing", model);
+        }
+
 
         protected override void Dispose(bool disposing)
         {

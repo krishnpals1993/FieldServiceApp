@@ -247,14 +247,14 @@ namespace FieldServiceApp.Controllers
                     BilHeader bilHeader = new BilHeader()
                     {
                         BillNo = (maxBillNo + 1),
-                        BillInvoiceDate = DateTime.Now,
+                        BillInvoiceDate = DateTime.UtcNow,
                         OrderId = orderDetail.OrderId,
                         ShipId = model.ShipId,
                         CustomerId = orderDetail.CustomerId,
                         TotalAmount = model.TotalAmount,
                         IsActive = 1,
                         CreatedBy = 1,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
 
                     };
 
@@ -275,7 +275,7 @@ namespace FieldServiceApp.Controllers
                         Bill2Price = model.PerUnitPrice,
                         IsActive = 1,
                         CreatedBy = 1,
-                        CreatedDate = DateTime.Now
+                        CreatedDate = DateTime.UtcNow
                     };
                     _dbContext.tbl_BilDetail.Add(bilDetail);
                     _dbContext.SaveChanges();

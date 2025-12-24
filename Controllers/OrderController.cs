@@ -42,12 +42,21 @@ namespace FieldServiceApp.Controllers
             _mappingConfiguration = mappingConfiguration;
         }
 
-        public IActionResult Add()
+        public IActionResult Add(string id)
         {
             OrderMasterViewModel model = new OrderMasterViewModel();
 
             try
             {
+                if (!String.IsNullOrEmpty(id))
+                {
+                    ViewBag.FromDashBoard = id;
+                }
+                else
+                {
+                    ViewBag.FromDashBoard = "";
+                }
+
                 var checkTemData = TempData["NewCustomer"];
                 if (checkTemData != null)
                 {
@@ -61,7 +70,7 @@ namespace FieldServiceApp.Controllers
                                 ItemId = s.ItemId,
                                 ItemCd = s.ItemCd,
                                 ItemPrice = s.ItemPrice,
-                                ItemDescription = (String.IsNullOrEmpty(s.ItemDescription) ? "" : Regex.Replace(Convert.ToString(s.ItemDescription), @"\t|\n|\r", "")) 
+                                ItemDescription = (String.IsNullOrEmpty(s.ItemDescription) ? "" : Regex.Replace(Convert.ToString(s.ItemDescription), @"\t|\n|\r", ""))
                             })
                             .ToList();
 
@@ -152,7 +161,7 @@ namespace FieldServiceApp.Controllers
         {
             ViewBag.dt = id;
             OrderMasterViewModel model = new OrderMasterViewModel();
-            DateTime modelDate = DateTime.Now;
+            DateTime modelDate = DateTime.UtcNow;
             try
             {
                 try
@@ -161,7 +170,7 @@ namespace FieldServiceApp.Controllers
                 }
                 catch (Exception)
                 {
-                    modelDate = DateTime.Now;
+                    modelDate = DateTime.UtcNow;
 
                 }
 
@@ -268,6 +277,8 @@ namespace FieldServiceApp.Controllers
             return View(model);
         }
 
+
+        
         [HttpPost]
         public ActionResult Add(OrderMasterViewModel model)
         {
@@ -412,7 +423,7 @@ namespace FieldServiceApp.Controllers
                         TaxAmount = model.TaxAmount,
                         IsActive = 1,
                         CreatedBy = 1,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
                         ApartmentIds = model.ApartmentIds,
                         ParentOrderId = model.ParentOrderId,
                         ReOccurenceCycle = model.ReOccurenceCycle,
@@ -454,7 +465,7 @@ namespace FieldServiceApp.Controllers
                             UnitId = item.UnitId,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
                         _dbContext.tbl_OrderDetail.Add(orderDetail);
                         _dbContext.SaveChanges();
@@ -472,7 +483,7 @@ namespace FieldServiceApp.Controllers
                             {
                                 OrderId = orderMaster.OrderId,
                                 EmployeeId = model.EmployeeId,
-                                AssignmentDate = DateTime.Now,
+                                AssignmentDate = DateTime.UtcNow,
                                 Status = "Assigned"
                             };
                             _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -495,7 +506,7 @@ namespace FieldServiceApp.Controllers
                             model.ReOccurenceEndDate = Convert.ToDateTime(checkReOccurrenceEndDate);
                         }
 
-                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.Now.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
+                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.UtcNow.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
                         OrderUtility _orderUtility = new OrderUtility(_dbContext);
                         var orderId = orderMaster.OrderId;
                         if (model.ReOccurenceCycle == "Days")
@@ -736,9 +747,16 @@ namespace FieldServiceApp.Controllers
 
                     }
 
+                    if (model.ReOccurence == "Yes")
+                    {
+                        ViewBag.ReOccurenceCount = (reoccurrenceOrderCount);
+                    }
+                    else
+                    {
+                        ViewBag.ReOccurenceCount = 0;
+                    }
 
                     ViewBag.SuccessMessage = "Order added successfully";
-
                 }
             }
             catch (Exception ex)
@@ -952,7 +970,7 @@ namespace FieldServiceApp.Controllers
                         TaxAmount = model.TaxAmount,
                         IsActive = 1,
                         CreatedBy = 1,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
                         ApartmentIds = model.ApartmentIds,
                         ParentOrderId = model.ParentOrderId,
                         ReOccurenceCycle = model.ReOccurenceCycle,
@@ -994,7 +1012,7 @@ namespace FieldServiceApp.Controllers
                             UnitId = item.UnitId,
                             IsActive = 1,
                             CreatedBy = 1,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
                         };
                         _dbContext.tbl_OrderDetail.Add(orderDetail);
                         _dbContext.SaveChanges();
@@ -1012,7 +1030,7 @@ namespace FieldServiceApp.Controllers
                             {
                                 OrderId = orderMaster.OrderId,
                                 EmployeeId = model.EmployeeId,
-                                AssignmentDate = DateTime.Now,
+                                AssignmentDate = DateTime.UtcNow,
                                 Status = "Assigned"
                             };
                             _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -1036,7 +1054,7 @@ namespace FieldServiceApp.Controllers
 
 
 
-                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.Now.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
+                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.UtcNow.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
                         OrderUtility _orderUtility = new OrderUtility(_dbContext);
                         var orderId = orderMaster.OrderId;
                         if (model.ReOccurenceCycle == "Days")
@@ -1370,7 +1388,7 @@ namespace FieldServiceApp.Controllers
                            ItemId = s.ItemId,
                            ItemCd = s.ItemCd,
                            ItemPrice = s.ItemPrice,
-                          
+
                        })
                        .ToList();
                         model.CustomerList = _dbContext.tbl_CustomerMaster
@@ -1434,7 +1452,7 @@ namespace FieldServiceApp.Controllers
                         CompanyCode = model.CustomerDetail.Code,
                         IsActive = 1,
                         CreatedBy = 1,
-                        CreatedDate = DateTime.Now
+                        CreatedDate = DateTime.UtcNow
                     };
 
                     _dbContext.tbl_CustomerMaster.Add(customerMaster);
@@ -1466,7 +1484,7 @@ namespace FieldServiceApp.Controllers
                                 Address = item.Address,
                                 IsActive = 1,
                                 CreatedBy = 1,
-                                CreatedDate = DateTime.Now
+                                CreatedDate = DateTime.UtcNow
                             };
                             _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                             _dbContext.SaveChanges();
@@ -1492,7 +1510,7 @@ namespace FieldServiceApp.Controllers
                                 CustomerId = customerMaster.CustomerId,
                                 IsActive = 1,
                                 CreatedBy = 1,
-                                CreatedDate = DateTime.Now
+                                CreatedDate = DateTime.UtcNow
                             };
                             _dbContext.tbl_CustmoerContact.Add(customerContactDetail);
                             _dbContext.SaveChanges();
@@ -1794,10 +1812,35 @@ namespace FieldServiceApp.Controllers
 
                                     }).ToList();
 
-
-
-
                 var size = customerListMain.Count();
+
+                var additionalValues = param.AdditionalValues;
+                var shipFromDate = param.AdditionalValues.ElementAt(0);
+                var shipDateTo = param.AdditionalValues.ElementAt(1);
+                var orderDateFrom = param.AdditionalValues.ElementAt(2);
+                var orderDateTo = param.AdditionalValues.ElementAt(3);
+
+                if (!(String.IsNullOrEmpty(shipFromDate)))
+                {
+                    customerListMain = customerListMain.Where(w => w.ShipStartDate >= Convert.ToDateTime(shipFromDate)).ToList();
+                }
+
+                if (!(String.IsNullOrEmpty(shipDateTo)))
+                {
+                    customerListMain = customerListMain.Where(w => w.ShipStartDate <= Convert.ToDateTime(shipDateTo)).ToList();
+                }
+
+                if (!(String.IsNullOrEmpty(orderDateFrom)))
+                {
+                    customerListMain = customerListMain.Where(w => w.OrderDate >= Convert.ToDateTime(orderDateFrom)).ToList();
+                }
+
+                if (!(String.IsNullOrEmpty(orderDateTo)))
+                {
+                    customerListMain = customerListMain.Where(w => w.OrderDate <= Convert.ToDateTime(orderDateTo)).ToList();
+                }
+
+
 
                 if (Convert.ToString(param.Search?.Value) != "")
                 {
@@ -2064,7 +2107,7 @@ namespace FieldServiceApp.Controllers
                                 {
                                     OrderId = orderId,
                                     EmployeeId = employeeId,
-                                    AssignmentDate = DateTime.Now,
+                                    AssignmentDate = DateTime.UtcNow,
                                     Status = "Assigned"
                                 };
                                 _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -2093,6 +2136,68 @@ namespace FieldServiceApp.Controllers
             return Json(model);
         }
 
+
+        [HttpPost]
+        public JsonResult UpdateOrderDateAllFuture(int orderId, DateTime? start, DateTime? end, int employeeId, string status)
+        {
+            DashboardOrderViewModel model = new DashboardOrderViewModel();
+            try
+            {
+                var checkOrder = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == orderId).FirstOrDefault();
+
+                if (checkOrder != null)
+                {
+                    {
+                        checkOrder.ShipStartDate = start;
+                        if (start != null)
+                        {
+                            if (start.Value.ToShortTimeString() == "12:00 AM")
+                            {
+                                var currentDayName = start.Value.DayOfWeek.ToString();
+                                var checkCalenderDate = _dbContext.tbl_CalenderWorkingHours.Where(w => w.DayName == currentDayName).FirstOrDefault();
+                                if (checkCalenderDate != null)
+                                {
+                                    var calenderStartDate = Convert.ToDateTime(start.Value.ToString("MM/dd/yyyy") + " " + checkCalenderDate.StartTime.Value.ToString("HH:mm"));
+                                    start = calenderStartDate;
+                                    CommanUtility _commanUtility = new CommanUtility(_appSettings);
+                                    //start = _commanUtility.RoundUp(start.Value, TimeSpan.FromMinutes(15));
+
+                                }
+
+                            }
+
+
+
+                        }
+                        checkOrder.ShipDate = start;
+                        checkOrder.ShipStartDate = start;
+                        checkOrder.ShipEndDate = end;
+                        _dbContext.SaveChanges();
+
+
+                        var checkReOccurenceOrders = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == checkOrder.OrderId && w.IsActive == 1).ToList();
+                        foreach (var item in checkReOccurenceOrders)
+                        {
+                            _orderUtility.updateReOccurenceOrderDateDashBoard(item.OrderId, checkOrder, item.OrderDate);
+
+                        }
+
+
+                    }
+
+                }
+                DashboardUtility _dashboardUtility = new DashboardUtility(_dbContext);
+                model = _dashboardUtility.getOrderDetail(orderId);
+            }
+            catch (Exception ex)
+            {
+                var a = "";
+            }
+
+            return Json(model);
+        }
+
+
         [HttpPost]
         public JsonResult UpdateOrderAssignee(int orderId, int employeeId)
         {
@@ -2111,7 +2216,7 @@ namespace FieldServiceApp.Controllers
                     {
                         OrderId = orderId,
                         EmployeeId = employeeId,
-                        AssignmentDate = DateTime.Now,
+                        AssignmentDate = DateTime.UtcNow,
                         Status = "Assigned"
                     };
                     _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -2142,28 +2247,29 @@ namespace FieldServiceApp.Controllers
             tax = _dbContext.tbl_Cities.Where(w => w.CityId == cityId).Select(s => s.Tax).FirstOrDefault();
             if (tax != null)
             {
-                if (tax == 0)
-                {
-                    tax = 1;
-                }
+                //if (tax == 0)
+                //{
+                //    tax = 1;
+                //}
 
             }
             else
             {
-                tax = 1;
+                tax = 0;
             }
 
 
             try
             {
                 CustomerShipingAddressList = (from shipping in _dbContext.tbl_CustmoerShipping
+                                              join customer in _dbContext.tbl_CustomerMaster on shipping.CustomerId equals customer.CustomerId
                                               join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                               into city
                                               from city1 in city.DefaultIfEmpty()
                                               join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                                               into state
                                               from state1 in state.DefaultIfEmpty()
-                                              where (CustomerId == 0 ? true : shipping.CustomerBillingId == CustomerId) && ((Convert.ToString(shipping.Address) != "") || (Convert.ToString(shipping.Address2) != ""))
+                                              where customer.IsActive ==1 && (CustomerId == 0 ? true : shipping.CustomerBillingId == CustomerId) && ((Convert.ToString(shipping.Address) != "") || (Convert.ToString(shipping.Address2) != ""))
                                               select new CustmoerShippingViewModel
                                               {
                                                   Tax = tax,
@@ -2177,13 +2283,14 @@ namespace FieldServiceApp.Controllers
                 {
                     CustomerId = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == CustomerId).Select(s => s.CustomerId).FirstOrDefault();
                     CustomerShipingAddressList = (from shipping in _dbContext.tbl_CustmoerShipping
+                                                  join customer in _dbContext.tbl_CustomerMaster on shipping.CustomerId equals customer.CustomerId
                                                   join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
                                                   into city
                                                   from city1 in city.DefaultIfEmpty()
                                                   join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
                                                   into state
                                                   from state1 in state.DefaultIfEmpty()
-                                                  where (CustomerId == 0 ? true : shipping.CustomerId == CustomerId) && ((Convert.ToString(shipping.Address) != "") || (Convert.ToString(shipping.Address2) != ""))
+                                                  where customer.IsActive == 1 && (CustomerId == 0 ? true : shipping.CustomerId == CustomerId) && ((Convert.ToString(shipping.Address) != "") || (Convert.ToString(shipping.Address2) != ""))
                                                   select new CustmoerShippingViewModel
                                                   {
                                                       Tax = tax,
@@ -2212,7 +2319,7 @@ namespace FieldServiceApp.Controllers
             var CustomerShipingApartmentList = new List<CustomerShippingApartmentViewModel>(); ;
 
             int billingId = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == ShipId)
-                         .Select(s => s.CityId).FirstOrDefault();
+                         .Select(s => s.CustomerBillingId).FirstOrDefault();
 
             int cityId = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == billingId)
                          .Select(s => s.CityId).FirstOrDefault();
@@ -2222,15 +2329,15 @@ namespace FieldServiceApp.Controllers
             tax = _dbContext.tbl_Cities.Where(w => w.CityId == cityId).Select(s => s.Tax).FirstOrDefault();
             if (tax != null)
             {
-                if (tax == 0)
-                {
-                    tax = 1;
-                }
+                //if (tax == 0)
+                //{
+                //    tax = 1;
+                //}
 
             }
             else
             {
-                tax = 1;
+                tax = 0;
             }
             try
             {
@@ -2404,6 +2511,11 @@ namespace FieldServiceApp.Controllers
                         model.ReOccurence = "Yes";
                         model.ReOccurenceOrderCount = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == model.OrderId).Count();
                     }
+
+                    // check remaining reoccurrence 
+                    var checkChildRecurrenceMainOrderNo = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).Select(s => s.ReOccurenceParentOrderId).FirstOrDefault();
+                    var checkRemainingRecurrenceList = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == checkChildRecurrenceMainOrderNo && w.OrderId > model.OrderId && w.IsActive == 1).ToList();
+                    model.RemainingReOccurenceOrderCount = checkRemainingRecurrenceList.Count();
 
 
                     if (model.ApartmentIds != null)
@@ -2747,7 +2859,7 @@ namespace FieldServiceApp.Controllers
                         checkOrder.TotalAmount = model.TotalAmount;
                         checkOrder.TaxAmount = model.TaxAmount;
                         checkOrder.ModifiedBy = 1;
-                        checkOrder.ModifiedDate = DateTime.Now;
+                        checkOrder.ModifiedDate = DateTime.UtcNow;
                         checkOrder.OrderNo = model.OrderNo;
                         checkOrder.ApartmentIds = model.ApartmentIds;
                         checkOrder.ParentOrderId = model.ParentOrderId;
@@ -2782,7 +2894,7 @@ namespace FieldServiceApp.Controllers
                         {
                             item.IsActive = 0;
                             item.ModifiedBy = _userId;
-                            item.ModifiedDate = DateTime.Now;
+                            item.ModifiedDate = DateTime.UtcNow;
                             _dbContext.SaveChanges();
 
                         }
@@ -2805,7 +2917,7 @@ namespace FieldServiceApp.Controllers
                                     checkOrderDetail.UnitId = item.UnitId;
                                     checkOrderDetail.IsActive = 1;
                                     checkOrderDetail.ModifiedBy = _userId;
-                                    checkOrderDetail.ModifiedDate = DateTime.Now;
+                                    checkOrderDetail.ModifiedDate = DateTime.UtcNow;
                                     _dbContext.SaveChanges();
 
 
@@ -2825,7 +2937,7 @@ namespace FieldServiceApp.Controllers
                                     UnitId = item.UnitId,
                                     IsActive = 1,
                                     CreatedBy = 1,
-                                    CreatedDate = DateTime.Now
+                                    CreatedDate = DateTime.UtcNow
                                 };
                                 _dbContext.tbl_OrderDetail.Add(orderDetail);
                                 _dbContext.SaveChanges();
@@ -2861,7 +2973,7 @@ namespace FieldServiceApp.Controllers
                                 {
                                     OrderId = checkOrder.OrderId,
                                     EmployeeId = model.EmployeeId,
-                                    AssignmentDate = DateTime.Now,
+                                    AssignmentDate = DateTime.UtcNow,
                                     Status = "Assigned"
                                 };
                                 _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -2871,7 +2983,7 @@ namespace FieldServiceApp.Controllers
                             }
                         }
 
-                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.Now.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
+                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.UtcNow.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
 
                         if (prevReOccurence == 0 && checkOrder.ReOccurence == 1)
                         {
@@ -3109,7 +3221,7 @@ namespace FieldServiceApp.Controllers
                                 }
                             }
 
-
+                            ViewBag.ReOccurenceCount = (reoccurrenceOrderCount);
                         }
 
                         if (prevReOccurence == 1 && checkOrder.ReOccurence == 0)
@@ -3120,7 +3232,7 @@ namespace FieldServiceApp.Controllers
                             {
                                 item.IsActive = 0;
                                 item.ModifiedBy = _userId;
-                                item.ModifiedDate = DateTime.Now;
+                                item.ModifiedDate = DateTime.UtcNow;
                                 _dbContext.SaveChanges();
 
                             }
@@ -3145,7 +3257,7 @@ namespace FieldServiceApp.Controllers
                                     {
                                         item.IsActive = 0;
                                         item.ModifiedBy = _userId;
-                                        item.ModifiedDate = DateTime.Now;
+                                        item.ModifiedDate = DateTime.UtcNow;
                                         _dbContext.SaveChanges();
 
                                     }
@@ -3374,6 +3486,7 @@ namespace FieldServiceApp.Controllers
                                         }
                                     }
 
+                                    ViewBag.ReOccurenceCount = (reoccurrenceOrderCount);
                                 }
 
                             }
@@ -3401,7 +3514,7 @@ namespace FieldServiceApp.Controllers
                                 item.CustomerId = checkOrder.CustomerId;
                                 item.TotalAmount = checkOrder.TotalAmount;
                                 item.ModifiedBy = 1;
-                                item.ModifiedDate = DateTime.Now;
+                                item.ModifiedDate = DateTime.UtcNow;
                                 item.ApartmentIds = checkOrder.ApartmentIds;
                                 item.ParentOrderId = checkOrder.ParentOrderId;
 
@@ -3414,7 +3527,7 @@ namespace FieldServiceApp.Controllers
                                     foreach (var item1 in checkOrderItems)
                                     {
                                         item1.IsActive = 0;
-                                        item1.ModifiedDate = DateTime.Now;
+                                        item1.ModifiedDate = DateTime.UtcNow;
                                         _dbContext.SaveChanges();
                                     }
 
@@ -3431,7 +3544,7 @@ namespace FieldServiceApp.Controllers
                                             UnitId = item1.UnitId,
                                             IsActive = 1,
                                             CreatedBy = 1,
-                                            CreatedDate = DateTime.Now
+                                            CreatedDate = DateTime.UtcNow
                                         };
                                         _dbContext.tbl_OrderDetail.Add(orderDetail);
                                         _dbContext.SaveChanges();
@@ -3465,7 +3578,7 @@ namespace FieldServiceApp.Controllers
                                                 {
                                                     OrderId = item.OrderId,
                                                     EmployeeId = model.EmployeeId,
-                                                    AssignmentDate = DateTime.Now,
+                                                    AssignmentDate = DateTime.UtcNow,
                                                     Status = "Assigned"
                                                 };
                                                 _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -3480,6 +3593,111 @@ namespace FieldServiceApp.Controllers
                                 }
 
                             }
+                        }
+
+                        if (model.ReOccurenceOrderCount != -1)
+                        {
+                            var checkChildRecurrenceMainOrderNo = _dbContext.tbl_OrderMaster.Where(w => w.OrderId == model.OrderId).Select(s => s.ReOccurenceParentOrderId).FirstOrDefault();
+                            if (checkChildRecurrenceMainOrderNo > 0)
+                            {
+                                var checkRemainingRecurrenceList = _dbContext.tbl_OrderMaster.Where(w => w.ReOccurenceParentOrderId == checkChildRecurrenceMainOrderNo && w.OrderId > model.OrderId && w.IsActive == 1).ToList();
+                                foreach (var item in checkRemainingRecurrenceList)
+                                {
+                                    _orderUtility.updateReOccurenceOrder(item.OrderId, checkOrder, orderDetailReoccurence, orderAssignmentReoccurence, item.OrderDate);
+
+                                }
+
+                                foreach (var item in checkRemainingRecurrenceList)
+                                {
+                                    item.OrderDate = checkOrder.OrderDate;
+                                    item.ShipId = checkOrder.ShipId;
+                                    item.CustomerId = checkOrder.CustomerId;
+                                    item.TotalAmount = checkOrder.TotalAmount;
+                                    item.ModifiedBy = 1;
+                                    item.ModifiedDate = DateTime.UtcNow;
+                                    item.ApartmentIds = checkOrder.ApartmentIds;
+                                    item.ParentOrderId = checkOrder.ParentOrderId;
+
+                                    _dbContext.SaveChanges();
+
+                                    if (model.OrderItemList.Count() > 0)
+                                    {
+
+                                        var checkOrderItems = _dbContext.tbl_OrderDetail.Where(w => w.OrderId == item.OrderId).ToList();
+                                        foreach (var item1 in checkOrderItems)
+                                        {
+                                            item1.IsActive = 0;
+                                            item1.ModifiedDate = DateTime.UtcNow;
+                                            _dbContext.SaveChanges();
+                                        }
+
+                                        foreach (var item1 in model.OrderItemList)
+                                        {
+                                            OrderDetail orderDetail = new OrderDetail()
+                                            {
+                                                ItemId = item1.ItemId,
+                                                Description = item1.Description,
+                                                OrderId = item.OrderId,
+                                                PerUnitPrice = item1.PerUnitPrice,
+                                                Quantity = item1.Quantity,
+                                                TotalPrice = item1.TotalPrice,
+                                                UnitId = item1.UnitId,
+                                                IsActive = 1,
+                                                CreatedBy = 1,
+                                                CreatedDate = DateTime.UtcNow
+                                            };
+                                            _dbContext.tbl_OrderDetail.Add(orderDetail);
+                                            _dbContext.SaveChanges();
+
+                                        }
+
+                                        if (orderAssignmentReoccurence != null)
+                                        {
+                                            var checkOrderAssignmentDetail = _dbContext.tbl_OrderAssignment.Where(w => w.OrderId == item.OrderId).FirstOrDefault();
+                                            if (checkOrderAssignmentDetail != null)
+                                            {
+                                                if (Convert.ToString(model.AssigneeId) != "")
+                                                {
+                                                    model.EmployeeId = Convert.ToInt32(model.AssigneeId);
+                                                    checkOrderAssignmentDetail.EmployeeId = model.EmployeeId;
+                                                    _dbContext.SaveChanges();
+
+                                                }
+                                                else
+                                                {
+                                                    checkOrderAssignmentDetail.EmployeeId = 0;
+                                                    _dbContext.SaveChanges();
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (Convert.ToString(model.AssigneeId) != "")
+                                                {
+                                                    OrderAssignment orderAssignment = new OrderAssignment()
+                                                    {
+                                                        OrderId = item.OrderId,
+                                                        EmployeeId = model.EmployeeId,
+                                                        AssignmentDate = DateTime.UtcNow,
+                                                        Status = "Assigned"
+                                                    };
+                                                    _dbContext.tbl_OrderAssignment.Add(orderAssignment);
+                                                    _dbContext.SaveChanges();
+
+
+                                                }
+                                            }
+
+
+                                        }
+                                    }
+
+                                }
+
+                                ViewBag.ReOccurenceCount = checkRemainingRecurrenceList.Count() + 1;
+
+                            }
+
                         }
                     }
 
@@ -3647,7 +3865,7 @@ namespace FieldServiceApp.Controllers
                         checkOrder.TotalAmount = model.TotalAmount;
                         checkOrder.TaxAmount = model.TaxAmount;
                         checkOrder.ModifiedBy = 1;
-                        checkOrder.ModifiedDate = DateTime.Now;
+                        checkOrder.ModifiedDate = DateTime.UtcNow;
                         checkOrder.OrderNo = model.OrderNo;
                         checkOrder.ApartmentIds = model.ApartmentIds;
                         checkOrder.ParentOrderId = model.ParentOrderId;
@@ -3710,7 +3928,7 @@ namespace FieldServiceApp.Controllers
                                     UnitId = item.UnitId,
                                     IsActive = 1,
                                     CreatedBy = 1,
-                                    CreatedDate = DateTime.Now
+                                    CreatedDate = DateTime.UtcNow
                                 };
                                 _dbContext.tbl_OrderDetail.Add(orderDetail);
                                 _dbContext.SaveChanges();
@@ -3746,7 +3964,7 @@ namespace FieldServiceApp.Controllers
                                 {
                                     OrderId = checkOrder.OrderId,
                                     EmployeeId = model.EmployeeId,
-                                    AssignmentDate = DateTime.Now,
+                                    AssignmentDate = DateTime.UtcNow,
                                     Status = "Assigned"
                                 };
                                 _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -3756,7 +3974,7 @@ namespace FieldServiceApp.Controllers
                             }
                         }
 
-                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.Now.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
+                        var checkShipStartDateFormatted = (model.ShipStartDate == null ? DateTime.UtcNow.AddDays(-1).ToShortDateString() : model.ShipStartDate.Value.ToShortDateString());
 
                         if (prevReOccurence == 0 && checkOrder.ReOccurence == 1)
                         {
@@ -4005,7 +4223,7 @@ namespace FieldServiceApp.Controllers
                             {
                                 item.IsActive = 0;
                                 item.ModifiedBy = _userId;
-                                item.ModifiedDate = DateTime.Now;
+                                item.ModifiedDate = DateTime.UtcNow;
                                 _dbContext.SaveChanges();
 
                             }
@@ -4030,7 +4248,7 @@ namespace FieldServiceApp.Controllers
                                     {
                                         item.IsActive = 0;
                                         item.ModifiedBy = _userId;
-                                        item.ModifiedDate = DateTime.Now;
+                                        item.ModifiedDate = DateTime.UtcNow;
                                         _dbContext.SaveChanges();
 
                                     }
@@ -4286,7 +4504,7 @@ namespace FieldServiceApp.Controllers
                                 item.CustomerId = checkOrder.CustomerId;
                                 item.TotalAmount = checkOrder.TotalAmount;
                                 item.ModifiedBy = 1;
-                                item.ModifiedDate = DateTime.Now;
+                                item.ModifiedDate = DateTime.UtcNow;
                                 item.ApartmentIds = checkOrder.ApartmentIds;
                                 item.ParentOrderId = checkOrder.ParentOrderId;
 
@@ -4299,7 +4517,7 @@ namespace FieldServiceApp.Controllers
                                     foreach (var item1 in checkOrderItems)
                                     {
                                         item1.IsActive = 0;
-                                        item1.ModifiedDate = DateTime.Now;
+                                        item1.ModifiedDate = DateTime.UtcNow;
                                         _dbContext.SaveChanges();
                                     }
 
@@ -4316,7 +4534,7 @@ namespace FieldServiceApp.Controllers
                                             UnitId = item1.UnitId,
                                             IsActive = 1,
                                             CreatedBy = 1,
-                                            CreatedDate = DateTime.Now
+                                            CreatedDate = DateTime.UtcNow
                                         };
                                         _dbContext.tbl_OrderDetail.Add(orderDetail);
                                         _dbContext.SaveChanges();
@@ -4350,7 +4568,7 @@ namespace FieldServiceApp.Controllers
                                                 {
                                                     OrderId = item.OrderId,
                                                     EmployeeId = model.EmployeeId,
-                                                    AssignmentDate = DateTime.Now,
+                                                    AssignmentDate = DateTime.UtcNow,
                                                     Status = "Assigned"
                                                 };
                                                 _dbContext.tbl_OrderAssignment.Add(orderAssignment);
@@ -4395,7 +4613,7 @@ namespace FieldServiceApp.Controllers
                 {
                     checkOrder.IsActive = 0;
                     checkOrder.ModifiedBy = 1;
-                    checkOrder.ModifiedDate = DateTime.Now;
+                    checkOrder.ModifiedDate = DateTime.UtcNow;
                     _dbContext.SaveChanges();
 
                     response.Status = "1";
@@ -4404,6 +4622,37 @@ namespace FieldServiceApp.Controllers
 
 
 
+
+            }
+            catch (Exception ex)
+            {
+                response.Status = "0";
+                response.Message = "Error occurred";
+            }
+
+            return Json(response);
+        }
+
+        [HttpPost]
+        public JsonResult AddNote(int id, string note)
+        {
+            ResponseModel response = new ResponseModel();
+            try
+            {
+                OrderNote orderNote = new OrderNote()
+                {
+                    OrderId = id,
+                    Note = note,
+                    IsActive = 1,
+                    CreatedBy = 1,
+                    CreatedDate = DateTime.UtcNow
+                };
+
+                _dbContext.tbl_OrderNotes.Add(orderNote);
+                _dbContext.SaveChanges();
+
+                response.Status = "1";
+                response.Message = "Note saved";
 
             }
             catch (Exception ex)
@@ -4480,7 +4729,7 @@ namespace FieldServiceApp.Controllers
                         Address = Address,
                         IsActive = 1,
                         CreatedBy = 1,
-                        CreatedDate = DateTime.Now
+                        CreatedDate = DateTime.UtcNow
                     };
                     _dbContext.tbl_CustmoerShipping.Add(custmoerShipping);
                     _dbContext.SaveChanges();
@@ -4517,7 +4766,7 @@ namespace FieldServiceApp.Controllers
                         Notes = Notes,
                         IsActive = 1,
                         CreatedBy = 1,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
                         CustomerShipId = ShipId
                     };
                     _dbContext.tbl_CustomerShippingApartments.Add(customerShippingApartment);
@@ -4574,6 +4823,46 @@ namespace FieldServiceApp.Controllers
                             .ToList();
 
             return PartialView("_ItemDetail", model);
+        }
+
+
+        public IActionResult GetOrderNotePopup(int id)
+        {
+            try
+            {
+                DashboardUtility _dashboardUtility = new DashboardUtility(_dbContext);
+                var model = _dashboardUtility.getOrderDetailWithApartemt(id);
+                OrderNoteViewModel orderNote = new OrderNoteViewModel();
+                orderNote.OrderId = model.OrderId;
+                orderNote.CustomerName = model.CustomerName;
+                orderNote.Apartments = model.Apartments;
+                orderNote.CustomerShipAddress = model.CustomerShipAddress;
+                orderNote.EmployeeList = model.EmployeeList;
+                orderNote.ItemName = model.ItemName;
+                orderNote.ItemDescription = model.ItemDescription;
+                orderNote.OrderId = model.OrderId;
+
+                orderNote.OrderNoteList = (from note in _dbContext.tbl_OrderNotes
+                                           join user in _dbContext.tbl_Users on note.CreatedBy equals user.UserId
+                                           where note.OrderId == orderNote.OrderId
+                                           select new OrderNoteDetailViewModel
+                                           {
+
+                                               Note = note.Note,
+                                               CreatedBy = user.UserName,
+                                               CreatedDate = note.CreatedDate
+
+                                           }).ToList();
+               
+                return PartialView("_OrderNotes", orderNote);
+            }
+            catch (Exception ex)
+            {
+
+                return PartialView("_OrderNotes", new OrderNoteViewModel());
+            }
+            
+
         }
 
         protected override void Dispose(bool disposing)

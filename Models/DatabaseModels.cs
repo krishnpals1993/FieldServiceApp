@@ -35,6 +35,12 @@ namespace FieldServiceApp.Models
         public DbSet<BilHeader> tbl_BilHeaders { get; set; }
         public DbSet<BilDetail> tbl_BilDetail { get; set; }
         public DbSet<GlobalSetting> tbl_GlobalSetting { get; set; }
+        public DbSet<OrderNote> tbl_OrderNotes { get; set; }
+        public DbSet<OrderImage> tbl_OrderImages { get; set; }
+        public DbSet<OrderImageShareDetail> tbl_OrderImageShareDetail { get; set; }
+        public DbSet<EmailAddressDetail> tbl_EmailAddressDetail { get; set; }
+
+
 
     }
 
@@ -445,7 +451,7 @@ namespace FieldServiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CustomerContactId { get; set; }
-        public int CustomerShipId { get; set; } 
+        public int CustomerShipId { get; set; }
         public int CustomerId { get; set; }
         public string FirstName { get; set; }
         public string MiddleName { get; set; }
@@ -526,4 +532,71 @@ namespace FieldServiceApp.Models
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
+
+    [Table("OrderNotes")]
+    public class OrderNote
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderNoteId { get; set; }
+
+        public int OrderId { get; set; }
+
+        public string Note { get; set; }
+
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("OrderImages")]
+    public class OrderImage
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderImageId { get; set; }
+
+        public int OrderId { get; set; }
+
+        public string Image { get; set; }
+        public string Description { get; set; }
+        public Byte[] Base64 { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("OrderImageShareDetail")]
+    public class OrderImageShareDetail
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int OrderImageShareDetailId { get; set; }
+        public int OrderId { get; set; }
+        public int OrderImageId { get; set; }
+        public string Type { get; set; }
+        public string ToEmail { get; set; }
+        public string Subject { get; set; }
+        public string Body { get; set; }
+        public Int16 IsActive { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+    }
+
+    [Table("EmailAddressDetail")]
+    public class EmailAddressDetail
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int EmailAddressDetailId { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+
 }

@@ -1,0 +1,272 @@
+﻿@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@model FieldServiceApp.Models.OrderImageViewModel
+@inject IOptions<Appsettings> Settings
+@{
+
+
+    ViewData["Title"] = "Job Image Add";
+
+}
+<div role="main" class="page-content container container-plus">
+    <form class="mt-lg-3" autocomplete="off" enctype="multipart/form-data"
+          novalidate action="@Settings.Value.WebBaseURL/JobImages/Add" method="post">
+        <div class="card bcard mt-2 mt-lg-3">
+            <div class="card-header">
+
+            </div>
+            <div class="card-header">
+                <div class="card-title ">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h3 class="text-125">
+                                <h3 class="card-title text-125">
+                                    @ViewData["Title"]
+                                </h3>
+                            </h3>
+                        </div>
+                        <div class="col-md-9 text-nowrap text-right">
+                            <button class="btn btn-info btn-bold px-4" type="submit">
+                                <i class="fa fa-check mr-1"></i>
+                                Submit
+                            </button>
+
+                            <a href="~/Service/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                                <i class="fa fa-undo mr-1"></i>
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-body px-3 pb-1">
+
+                @Html.HiddenFor(h => h.ShipId)
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Customer
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.DropDownListFor(model => model.OrderId, new SelectList(Model.OrderList.Select(x => new { Value = x.OrderId, Text = x.CustomerName }), "Value", "Text"), "Select Customer", new { @class = "form-control", @placeholder = "Select Company" })
+
+                        <span class="btn btn-link" id="btnOrder" onclick="getOrderDetail()"> View Order Detail </span>
+
+                        <span asp-validation-for="OrderId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Ship Address
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.ShipAddress,
+                           new { @placeholder = "Ship Address", @readonly = "readonly", @class = "form-control" })
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Picture
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <input type="file" name="file" class="form-control" placeholder="Picture"  accept="image/*" />
+
+                    </div>
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Description
+                        </label>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextAreaFor(m => m.Description,
+                              new { @placeholder = "Description",  @class = "form-control" })
+
+                    </div>
+
+                </div>
+
+
+                <hr />
+
+                <div class="row" id="existingServiceLog">
+
+                </div>
+
+
+
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-2 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
+
+                        <a href="~/JobImages/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="exampleModal">
+
+</div>
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/tiny-date-picker.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap-datepicker/date-range-picker.css" />
+        <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
+    </environment>
+    <style>
+        hr {
+            /*margin-bottom: 2rem !important;*/
+        }
+    </style>
+}
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/bootstrap-datepicker/bootstrap-datetimepicker.js"></script>
+        <script src="~/lib/bootstrap-datepicker/date-range-picker.js"></script>
+        <script src="~/pages/form-basic/@@page-script.js"></script>
+        <script src="~/lib/chosen-js/chosen.jquery.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        // Restricts input for each element in the set of matched elements to the given inputFilter.
+        (function ($) {
+            $.fn.inputFilter = function (inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            };
+        }(jQuery));
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+              $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
+
+            $("#Quantity").inputFilter(function(value) {
+                 return /^-?\d*[.,]?\d*$/.test(value); });
+
+            if ( $("#OrderId").val()) {
+                $("#btnOrder").show();
+            }
+            else {
+                $("#btnOrder").hide();
+            }
+
+
+            if ($("#OrderId").val()) {
+                $("#OrderId").trigger('change');
+            }
+
+            if ($("#ServiceType").val()) {
+                $("#ServiceType").trigger('change');
+            }
+
+
+        var SuccessMessage = '@ViewBag.SuccessMessage';
+        var ErrorMessage = '@ViewBag.ErrorMessage';
+        if (SuccessMessage) {
+            swal(SuccessMessage, "", "success");
+
+        }
+        if (ErrorMessage) {
+            swal(ErrorMessage, "", "error");
+        }
+
+      });
+
+
+        $("#OrderId").on("change", function () {
+            $("#ShipId").html('');
+             var data = {
+                'OrderId':  $("#OrderId").val(),
+            };
+
+            $.ajax({
+                url: "/Service/GetCustomerShippingAddress",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+                    console.log(response);
+                    $('#ShipAddress').val('');
+                   {
+                        $('#ShipAddress').val(response.Address);
+
+                   }
+                }
+            });
+
+
+
+
+        });
+
+
+
+
+        function getOrderDetail() {
+              $.ajax({
+                url: "/Service/GetOrderPopup/" + $("#OrderId").val(),
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "html",
+                success: function (response) {
+                    var modal = response;
+                    $("#exampleModal").html(modal);
+                }
+            });
+        }
+
+
+
+        function closeModel() {
+          $("#exampleModal").html('');
+        }
+
+    </script>
+}

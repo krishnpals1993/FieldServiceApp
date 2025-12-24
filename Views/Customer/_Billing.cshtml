@@ -1,0 +1,232 @@
+﻿@model FieldServiceApp.Models.CustomerBillingViewModel
+@using Microsoft.AspNetCore.Http
+<div class="modal fade">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Billing Address</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="m-2">
+                    @Html.HiddenFor(h => h.CustomerBillingId)
+                    @Html.HiddenFor(h => h.CustomerId)
+                    <div class="">
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                First Name
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.FirstName,
+                                 new { @placeholder = "First Name", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Last Name
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.LastName,
+                                 new { @placeholder = "Last Name", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Address 1
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Address1,
+                                 new { @placeholder = "Address 1", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Address 2
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Address2,
+                                 new { @placeholder = "Address 2", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Address 3
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Address3,
+                                 new { @placeholder = "Address 3", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                State
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.DropDownListFor(model => model.StateId,
+                               new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state",
+                                    new { @class = "form-control", @placeholder = "Select state" })
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                City
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.DropDownListFor(model => model.CityId,
+                               new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city",
+                                    new { @class = "form-control", @placeholder = "Select city" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                ZipCode 1
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Zip1,
+                                 new { @placeholder = "ZipCode 1", @class = "form-control" })
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                ZipCode 2
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Zip2,
+                                 new { @placeholder = "ZipCode 2", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Notes
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Notes,
+                                 new { @placeholder = "Notes", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="  brc-secondary-l2 py-35 mx-n25">
+                            <div class="offset-md-3 col-md-9 text-nowrap">
+                                <button type="button" onclick="saveBilling()" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" id="btnModalClose" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+         $("#Zip1").inputmask("99999");
+            $("#Zip2").inputmask("99999");
+    });
+
+    function saveBilling() {
+        if ((!$("#Address1").val()) && (!$("#Address2").val()) && (!$("#Address3").val())) {
+            swal("Please enter address", "", "error");
+            return;
+        }
+
+        var dataToPass = {};
+        dataToPass.CustomerBillingId = $("#CustomerBillingId").val();
+        dataToPass.FirstName = $("#bFirstName").val();
+        dataToPass.LastName = $("#bLastName").val();
+        dataToPass.Address1 = $("#Address1").val();
+        dataToPass.Address2 = $("#Address2").val();
+        dataToPass.Address3 = $("#Address3").val();
+        dataToPass.Zip1 = $("#Zip1").val();
+        dataToPass.Zip2 = $("#Zip2").val();
+        dataToPass.Notes = $("#Notes").val();
+        dataToPass.StateId = $("#StateId").val();
+        dataToPass.CityId = $("#CityId").val();
+        dataToPass.CustomerId = $("#CustmoerId").val();
+
+        $.ajax({
+            url: "/Customer/AddBilling",
+            type: "POST",
+            dataType: "json",
+            data: { model: dataToPass },
+            success: function (data) {
+                if (data.Status == "1") {
+                    //AdditionalData
+
+
+                    $('#BillingId').html('');
+                    var options = '';
+
+                    options += '<option value="">Select Bill To</option>';
+                    for (var i = 0; i < data.AdditionalData.length; i++) {
+                        options += '<option  value="' + data.AdditionalData[i]['CustomerBillingId'] + '">' + (data.AdditionalData[i]['Address1'] + data.AdditionalData[i]['Address2']) + '</option>';
+                    }
+
+                    $('#BillingId').append(options);
+                    $('#BillingId').val(data.Message);
+                     $('#BillingId').trigger("chosen:updated");
+                    $("#BillingId").trigger('change');
+                    $("#btnModalClose").trigger('click');
+                }
+                else {
+                    swal(data.Message, "", "error")
+                }
+            }
+        })
+
+    }
+
+</script>

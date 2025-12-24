@@ -1,0 +1,203 @@
+﻿@model FieldServiceApp.Models.CustmoerShippingViewModel
+@using Microsoft.AspNetCore.Http
+<div class="modal fade">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Shipping Address</h5>
+                <button type="button" id="btnTClose" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="m-2">
+                    @Html.HiddenFor(h => h.ShipId)
+                    @Html.HiddenFor(h => h.CustomerBillingId)
+                    @Html.HiddenFor(h => h.CustmoerId)
+                    <div class="">
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Address 1
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Address,
+                                 new { @placeholder = "Address 1", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Address 2
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Address2,
+                                 new { @placeholder = "Address 2", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Address 3
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Address3,
+                                 new { @placeholder = "Address 3", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                State
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.DropDownListFor(model => model.StateId,
+                               new SelectList(Model.StateList.Select(x => new { Value = x.StateId, Text = x.StateName }), "Value", "Text"), "Select state",
+                                    new { @class = "form-control", @placeholder = "Select state" })
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                City
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.DropDownListFor(model => model.CityId,
+                               new SelectList(Model.CityList.Select(x => new { Value = x.CityId, Text = x.CityName }), "Value", "Text"), "Select city",
+                                    new { @class = "form-control", @placeholder = "Select city" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                ZipCode 1
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Zip1,
+                                 new { @placeholder = "ZipCode 1", @class = "form-control" })
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                ZipCode 2
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextBoxFor(m => m.Zip2,
+                                 new { @placeholder = "ZipCode 2", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+
+                            <div class="col-lg-3">
+                                Notes
+                            </div>
+
+                            <div class="col-sm-9">
+                                @Html.TextAreaFor(m => m.Notes,
+                                 new { @placeholder = "Notes", @class = "form-control" })
+                            </div>
+
+                        </div>
+
+
+                        <div class="  brc-secondary-l2 py-35 mx-n25">
+                            <div class="offset-md-3 col-md-9 text-nowrap">
+                                <button type="button" onclick="saveShipping()" class="btn btn-sm btn-success btn-bold"><i class="fa fa-check mr-2px"></i> Save</button>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-bold ml-2px" id="btnModalClose" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+       $(document).ready(function () {
+        
+           $("#Zip1").inputmask("99999");
+            $("#Zip2").inputmask("99999");
+    });
+
+    function saveShipping() {
+        if ((!$("#Address").val()) && (!$("#Address2").val()) && (!$("#Address3").val())) {
+            swal("Please enter address", "", "error");
+            return;
+        }
+
+        var dataToPass = {};
+        dataToPass.ShipId = $("#ShipId").val();
+        dataToPass.CustomerBillingId = $("#CustomerBillingId").val();
+        dataToPass.Address = $("#Address").val();
+        dataToPass.Address2 = $("#Address2").val();
+        dataToPass.Address3 = $("#Address3").val();
+        dataToPass.Zip1 = $("#Zip1").val();
+        dataToPass.Zip2 = $("#Zip2").val();
+        dataToPass.Notes = $("#Notes").val();
+        dataToPass.StateId = $("#StateId").val();
+        dataToPass.CityId = $("#CityId").val();
+        dataToPass.CustmoerId = $("#CustmoerId").val();
+
+        $.ajax({
+            url: "/Customer/AddShipping",
+            type: "POST",
+            dataType: "json",
+            data: { model: dataToPass },
+            success: function (data) {
+                if (data.Status == "1") {
+
+                       $('#ShipId').html('');
+                    var options = '';
+
+                    options += '<option value="">Select Ship To</option>';
+                    for (var i = 0; i < data.AdditionalData.length; i++) {
+                        options += '<option  value="' + data.AdditionalData[i]['ShipId'] + '">' + (data.AdditionalData[i]['Address']) + '</option>';
+                    }
+
+                    $('#ShipId').append(options);
+                    $('#ShipId').val(data.Message);
+                     $('#ShipId').trigger("chosen:updated");
+                    //$("#ShipId").trigger('change');
+                    $("#btnTClose").trigger('click');
+                }
+                else {
+                    swal(data.Message, "", "error")
+                }
+            }
+        })
+
+    }
+
+</script>

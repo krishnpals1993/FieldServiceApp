@@ -85,7 +85,7 @@ namespace FieldServiceApp.Controllers
                         if (checkCalenderDay != null)
                         {
                             checkCalenderDay.ModifiedBy = _userId;
-                            checkCalenderDay.ModifiedDate = DateTime.Now;
+                            checkCalenderDay.ModifiedDate = DateTime.UtcNow;
                             checkCalenderDay.Type = model.Type;
                             checkCalenderDay.DayName = model.DayName;
                             _dbContext.SaveChanges();
@@ -99,7 +99,7 @@ namespace FieldServiceApp.Controllers
                                 Type = model.Type,
                                 IsActive = 1,
                                 CreatedBy = _userId,
-                                CreatedDate = DateTime.Now
+                                CreatedDate = DateTime.UtcNow
 
                             };
 
@@ -114,7 +114,7 @@ namespace FieldServiceApp.Controllers
                         if (checkCalenderDay != null)
                         {
                             checkCalenderDay.ModifiedBy = _userId;
-                            checkCalenderDay.ModifiedDate = DateTime.Now;
+                            checkCalenderDay.ModifiedDate = DateTime.UtcNow;
                             checkCalenderDay.Type = model.Type;
                             checkCalenderDay.HolidayDate = model.HolidayDate;
                             _dbContext.SaveChanges();
@@ -128,7 +128,7 @@ namespace FieldServiceApp.Controllers
                                 Type = model.Type,
                                 IsActive = 1,
                                 CreatedBy = _userId,
-                                CreatedDate = DateTime.Now
+                                CreatedDate = DateTime.UtcNow
 
                             };
 
@@ -161,7 +161,7 @@ namespace FieldServiceApp.Controllers
                     if (checkCalenderHour != null)
                     {
                         checkCalenderHour.ModifiedBy = _userId;
-                        checkCalenderHour.ModifiedDate = DateTime.Now;
+                        checkCalenderHour.ModifiedDate = DateTime.UtcNow;
                         checkCalenderHour.StartTime = model.StartTime;
                         checkCalenderHour.EndTime = model.EndTime;
                         _dbContext.SaveChanges();
@@ -175,7 +175,7 @@ namespace FieldServiceApp.Controllers
                             EndTime = model.EndTime,
                             IsActive = 1,
                             CreatedBy = _userId,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
 
                         };
 
@@ -226,7 +226,7 @@ namespace FieldServiceApp.Controllers
                     if (checkCalenderHour != null)
                     {
                         checkCalenderHour.ModifiedBy = _userId;
-                        checkCalenderHour.ModifiedDate = DateTime.Now;
+                        checkCalenderHour.ModifiedDate = DateTime.UtcNow;
                         checkCalenderHour.StartTime = model.StartTime;
                         checkCalenderHour.EndTime = model.EndTime;
                         _dbContext.SaveChanges();
@@ -240,7 +240,7 @@ namespace FieldServiceApp.Controllers
                             EndTime = model.EndTime,
                             IsActive = 1,
                             CreatedBy = _userId,
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.UtcNow
 
                         };
 

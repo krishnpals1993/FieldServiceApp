@@ -45,7 +45,7 @@ namespace FieldServiceApp.Controllers
                 if (ModelState.IsValid)
                 {
 
-                    var checkUser = _dbContext.tbl_Roles.ToList();
+                    //var checkUser = _dbContext.tbl_Roles.ToList();
 
                     DbfunctionUtility dbfunction = new DbfunctionUtility(_appSettings);
                     DataSet ds = dbfunction.GetDataset(@"select * from ""Users"" u join ""Roles"" r on u.""RoleId"" = r.""RoleId""
@@ -101,7 +101,7 @@ namespace FieldServiceApp.Controllers
                         Email = model.Email,
                         IsActive = 1,
                         RoleId = roleId,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
 
                     };
                     _dbContext.tbl_Users.Add(user);
@@ -133,7 +133,7 @@ namespace FieldServiceApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                EmailUtility _emaUtility = new EmailUtility(_appSettings, _emailSettings);
+                EmailUtility _emaUtility = new EmailUtility(_appSettings, _emailSettings,_dbContext);
                 CommanUtility _commanUtility = new CommanUtility(_appSettings);
                 var encEmail = _commanUtility.EncryptString(model.Email);
                 string emailBody = @"<p>Please click on  following link to reset password</p>
@@ -196,9 +196,9 @@ namespace FieldServiceApp.Controllers
             return View(model);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+            }
     }
 }

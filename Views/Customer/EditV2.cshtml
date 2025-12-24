@@ -1,0 +1,507 @@
+﻿@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@model FieldServiceApp.Models.CustomerMasterViewModel
+@inject IOptions<Appsettings> Settings
+@{
+
+    ViewData["Title"] = "Edit Customer";
+    List<string> CompanyTypeList = new List<string>();
+    CompanyTypeList.Add("Business");
+    CompanyTypeList.Add("Residential");
+
+}
+<div role="main" class="page-content container container-plus" style="width:80%">
+    <form class="mt-lg-3" autocomplete="off" action="@Settings.Value.WebBaseURL/Customer/EditV2" method="post">
+        <div class="card bcard mt-2 mt-lg-3">
+            <div class="card-header">
+                <div class="card-title ">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h3 class="text-125">
+                                Edit Customer
+                            </h3>
+                        </div>
+                        <div class="col-md-9 text-nowrap text-right">
+                            <button class="btn btn-info btn-bold px-4" type="submit">
+                                <i class="fa fa-check mr-1"></i>
+                                Submit
+                            </button>
+
+                            <a href="~/Customer/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                                <i class="fa fa-undo mr-1"></i>
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-body px-3 pb-1">
+
+                @Html.HiddenFor(h => h.CustmoerId)
+
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Company Name
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.CompanyName,
+                        new { @placeholder = "Company Name", @class = "form-control", maxlength = "250" })
+                        <span asp-validation-for="CompanyName" class="text-danger"></span>
+                    </div>
+
+
+
+
+
+                </div>
+
+                <div class="form-group row">
+
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Full Name
+                        </label>
+                    </div>
+                    <div class="col-sm-1">
+                        <input type="text" placeholder="Mr/Ms/.." class="form-control" />
+
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.FirstName,
+                        new { @placeholder = "First Name", @class = "form-control" })
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.MiddleName,
+                           new { @placeholder = "Middle Name", @class = "form-control" })
+                        <span asp-validation-for="MiddleName" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(m => m.LastName,
+                          new { @placeholder = "Last Name", @class = "form-control" })
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Main Phone
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Phone,
+                        new { @placeholder = "Phone", @class = "form-control", maxlength = "15" })
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Main Email
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Email,
+                        new { @placeholder = "Email", @class = "form-control", maxlength = "50" })
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+
+
+                <div class="form-group row">
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Work Phone
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.AltPhone,
+                        new { @placeholder = "Work Phone", @class = "form-control", maxlength = "15" })
+                        <span asp-validation-for="AltPhone" class="text-danger"></span>
+                    </div>
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Mobile
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Mobile,
+                        new { @placeholder = "Mobile", @class = "form-control", maxlength = "10" })
+                        <span asp-validation-for="Mobile" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Fax
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.TextBoxFor(m => m.Fax,
+                        new { @placeholder = "Fax", @class = "form-control", maxlength = "20" })
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+                </div>
+                <hr />
+
+                <div class="form-group row">
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Invoice/Bill To
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(model => model.BillingId, new SelectList(Model.Billings.Select(x => new { Value = x.CustomerBillingId, Text = ((x.Address1 ?? "") + (x.Address2 ?? "")) }), "Value", "Text"), "Select Bill To", new { @class = "form-control chosen-select", @placeholder = "Select Bill To" })
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-2 col-form-label text-sm-right pr-0">
+                        <label for="id-form-field-1" class="mb-0">
+                            Ship To
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(model => model.ShipId, new SelectList(Model.Shippings.Select(x => new { Value = x.ShipId, Text = ((x.Address ?? "")) }), "Value", "Text"), "Select Ship To", new { @class = "form-control chosen-select", @placeholder = "Select Ship To"  })
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-lg-3"></div>
+                    <div class="col-sm-3">
+                        <button onclick="addBilling()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                            Add More
+                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="editBilling()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-edit text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="deleteBilling()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-trash text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                    </div>
+                    <div class="col-lg-3"></div>
+                    <div class="col-sm-3">
+                        <button onclick="addShipping()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-3 mb-1">
+                            Add More
+                            <i class="fa fa-plus text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="editShipping()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-edit text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                        <button onclick="deleteShipping()" type="button"
+                                class="btn btn-outline-light btn-h-light-orange btn-a-light-orange border-b-2 text-600 px-2 mb-1">
+                            <i class="fa fa-trash text-110 text-orange-d2 mr-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="mt-5 border-t-1 brc-secondary-l2 py-35 mx-n25">
+                    <div class="offset-md-3 col-md-9 text-nowrap">
+                        <button class="btn btn-info btn-bold px-4" type="submit">
+                            <i class="fa fa-check mr-1"></i>
+                            Submit
+                        </button>
+
+                        <a href="~/Customer/List" class="btn btn-outline-lightgrey btn-bold ml-2 px-4" type="reset">
+                            <i class="fa fa-undo mr-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <link href="~/lib/chosen-js/chosen.css" rel="stylesheet" />
+    </environment>
+    <style>
+        hr {
+            /*margin-bottom: 2rem !important;*/
+        }
+    </style>
+}
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <environment names="Development,Staging,Production">
+        <script src="~/lib/moment/moment.js"></script>
+        <script src="~/lib/inputmask/jquery.inputmask.js"></script>
+        <script src="~/lib/chosen-js/chosen.jquery.js"></script>
+    </environment>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#Phone").inputmask("(999) 999-9999");
+            $("#Mobile").inputmask("9999999999");
+           $(".chosen-select").chosen({ allow_single_deselect: true, width: '100%' })
+
+
+            if ($("#BillingId").val()) {
+                var shipId = $('#ShipId').val();
+                 var data = {
+                 'id':0,
+                 'custid':$("#CustmoerId").val(),
+            };
+
+            $.ajax({
+                url: "/Customer/GetCustomerShippingAddress",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+
+                     {
+                         $('#ShipId').html('');
+                       var options = '';
+
+                options += '<option value="">Select Ship To</option>';
+                       for (var i = 0; i < response.length; i++) {
+                        options += '<option cust="' + response[i]['CustmoerId'] + '" value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
+                        }
+
+                        $('#ShipId').append(options);
+                        $('#ShipId').val(shipId);
+                        $('#ShipId').trigger("chosen:updated");
+
+
+
+            }
+                }
+            })
+            }
+
+
+
+        var SuccessMessage = '@ViewBag.SuccessMessage';
+        var ErrorMessage = '@ViewBag.ErrorMessage';
+        if (SuccessMessage) {
+            swal(SuccessMessage, "", "success");
+            setTimeout(function () { window.location.href = "@Settings.Value.WebBaseURL/Customer/List"; }, 750);
+        }
+        if (ErrorMessage) {
+            swal(ErrorMessage, "", "error");
+        }
+
+        });
+
+       $("#CompanyName").on("change", function () {
+            if ($("#CompanyName").val()) {
+                $("#CompanyType").val("Business");
+                $("#CompanyType").attr("readonly","readonly");
+            }
+            else {
+                   $("#CompanyType").removeAttr("readonly");
+            }
+       });
+
+
+
+        function addShipping() {
+
+              if (!$("#BillingId").val()) {
+                swal("Please select Bill To address ", "", "error");
+                return;
+            }
+
+            var id = 0;
+             $.ajax({
+        url: "/Customer/GetCustomerShippingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+
+            modal = $(modal).appendTo('body');
+
+            $("#CustomerBillingId").val($("#BillingId").val());
+
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function editShipping() {
+            if (!$("#ShipId").val()) {
+                swal("Please select Ship To address to edit", "", "error");
+                return;
+            }
+            var id =$("#ShipId").val();
+            $.ajax({
+        url: "/Customer/GetCustomerShippingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function deleteShipping() {
+            if (!$("#ShipId").val()) {
+                swal("Please select Ship To address to delete", "", "error");
+                return;
+            }
+            var id = $("#ShipId").val();
+
+        }
+
+        function addBilling() {
+            var id = 0;
+            $.ajax({
+        url: "/Customer/GetCustomerBillingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function editBilling() {
+            if (!$("#BillingId").val()) {
+                swal("Please select Bill To address to edit", "", "error");
+                return;
+            }
+
+            var id = $("#BillingId").val();
+            $.ajax({
+        url: "/Customer/GetCustomerBillingPopup/" + id,
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "html",
+        success: function (response) {
+            var modal = response;
+            modal = $(modal).appendTo('body');
+
+            modal.find('button[data-action=delete]').on('click', function () {
+                modal.modal("hide");
+            });
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        }
+    });
+        }
+
+        function deleteBilling() {
+            if (!$("#BillingId").val()) {
+                swal("Please select Bill To address to delete", "", "error");
+                return;
+            }
+
+        }
+
+        //cust="' + response[i]['CustmoerId'] + '"
+
+        $("#BillingId").on("change", function () {
+            $("#ShipId").html('');
+
+             var data = {
+                 'id': $("#BillingId").val(),
+                 'custid':$("#CustmoerId").val(),
+            };
+
+            $.ajax({
+                url: "/Customer/GetCustomerShippingAddress",
+                type: "POST",
+                dataType: "json",
+                data: data,
+                success: function (response) {
+
+                     {
+                         $('#ShipId').html('');
+                       var options = '';
+
+                options += '<option value="">Select Ship To</option>';
+                       for (var i = 0; i < response.length; i++) {
+                        options += '<option cust="' + response[i]['CustmoerId'] + '" value="' + response[i]['ShipId'] + '">' + response[i]['Address'] + '</option>';
+                        }
+
+                       $('#ShipId').append(options);
+                        $('#ShipId').trigger("chosen:updated");
+
+
+
+            }
+                }
+            })
+        });
+
+
+
+          $("#ShipId").on("change", function () {
+
+               if ($("#ShipId").val()) {
+                            var customerId = $($($("#ShipId option:selected"))[0]).attr("cust");
+                   if (customerId.toString()!=$("#BillingId").val().toString()) {
+                       $("#BillingId").val(customerId);
+                            $('#BillingId').trigger("chosen:updated");
+                   }
+                            
+                       }
+
+        });
+
+
+
+    </script>
+}

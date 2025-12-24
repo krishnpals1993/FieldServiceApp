@@ -173,7 +173,7 @@ namespace FieldServiceApp.Controllers
 
             claims.Add(new Claim("access_token", response.AccessToken));
            
-            claims.Add(new Claim("access_token_expires_at", (DateTime.Now.AddSeconds(response.AccessTokenExpiresIn)).ToString()));
+            claims.Add(new Claim("access_token_expires_at", (DateTime.UtcNow.AddSeconds(response.AccessTokenExpiresIn)).ToString()));
             claims.Add(new Claim("refresh_token", response.RefreshToken));
            
             claims.Add(new Claim("refresh_token_expires_at", (DateTime.UtcNow.ToEpochTime() + response.RefreshTokenExpiresIn).ToDateTimeFromEpoch().ToString()));
