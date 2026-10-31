@@ -80,7 +80,7 @@ namespace FieldServiceApp.Controllers
 
 
                 model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                    .Where(w => w.IsActive == 1)
+                    .Where(w => w.IsActive == true)
                                 .Select(s => new EmployeeMasterViewModel
                                 {
                                     EmployeeId = s.EmployeeId,
@@ -197,7 +197,7 @@ namespace FieldServiceApp.Controllers
 
 
                 model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                    .Where(w => w.IsActive == 1)
+                    .Where(w => w.IsActive == true)
                                 .Select(s => new EmployeeMasterViewModel
                                 {
                                     EmployeeId = s.EmployeeId,
@@ -315,7 +315,7 @@ namespace FieldServiceApp.Controllers
 
 
                         model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                            .Where(w => w.IsActive == 1)
+                            .Where(w => w.IsActive == true)
                                         .Select(s => new EmployeeMasterViewModel
                                         {
                                             EmployeeId = s.EmployeeId,
@@ -780,7 +780,7 @@ namespace FieldServiceApp.Controllers
 
 
             model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                .Where(w => w.IsActive == 1)
+                .Where(w => w.IsActive == true)
                             .Select(s => new EmployeeMasterViewModel
                             {
                                 EmployeeId = s.EmployeeId,
@@ -864,7 +864,7 @@ namespace FieldServiceApp.Controllers
 
 
                         model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                            .Where(w => w.IsActive == 1)
+                            .Where(w => w.IsActive == true)
                                         .Select(s => new EmployeeMasterViewModel
                                         {
                                             EmployeeId = s.EmployeeId,
@@ -1322,7 +1322,7 @@ namespace FieldServiceApp.Controllers
 
 
             model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                .Where(w => w.IsActive == 1)
+                .Where(w => w.IsActive == true)
                             .Select(s => new EmployeeMasterViewModel
                             {
                                 EmployeeId = s.EmployeeId,
@@ -1403,7 +1403,7 @@ namespace FieldServiceApp.Controllers
 
 
                         model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                            .Where(w => w.IsActive == 1)
+                            .Where(w => w.IsActive == true)
                                         .Select(s => new EmployeeMasterViewModel
                                         {
                                             EmployeeId = s.EmployeeId,
@@ -1539,7 +1539,7 @@ namespace FieldServiceApp.Controllers
 
 
                     model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                        .Where(w => w.IsActive == 1)
+                        .Where(w => w.IsActive == true)
                                     .Select(s => new EmployeeMasterViewModel
                                     {
                                         EmployeeId = s.EmployeeId,
@@ -2459,7 +2459,7 @@ namespace FieldServiceApp.Controllers
                 model.CustomerList = _orderUtility.GetCustomerListWithShipAddress();
 
                 model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                    .Where(w => w.IsActive == 1)
+                    .Where(w => w.IsActive == true)
                                 .Select(s => new EmployeeMasterViewModel
                                 {
                                     EmployeeId = s.EmployeeId,
@@ -2597,7 +2597,7 @@ namespace FieldServiceApp.Controllers
                 model.CustomerList = _orderUtility.GetCustomerListWithShipAddress();
 
                 model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                    .Where(w => w.IsActive == 1)
+                    .Where(w => w.IsActive == true)
                                 .Select(s => new EmployeeMasterViewModel
                                 {
                                     EmployeeId = s.EmployeeId,
@@ -2738,7 +2738,7 @@ namespace FieldServiceApp.Controllers
 
 
                         model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                            .Where(w => w.IsActive == 1)
+                            .Where(w => w.IsActive == true)
                                         .Select(s => new EmployeeMasterViewModel
                                         {
                                             EmployeeId = s.EmployeeId,
@@ -3744,7 +3744,7 @@ namespace FieldServiceApp.Controllers
 
 
                         model.EmployeeList = _dbContext.tbl_EmployeeMaster
-                            .Where(w => w.IsActive == 1)
+                            .Where(w => w.IsActive == true)
                                         .Select(s => new EmployeeMasterViewModel
                                         {
                                             EmployeeId = s.EmployeeId,
