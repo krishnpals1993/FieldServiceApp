@@ -94,7 +94,7 @@ namespace FieldServiceApp.Controllers
                                 Email = model.Email,
                                 Phone = model.Phone,
                                Color = model.Color,
-                                IsActive = 1,
+                                IsActive = true,
                                 CreatedBy = 1,
                                 CreatedDate = DateTime.UtcNow,
                                 UserId = user.UserId,
@@ -197,7 +197,7 @@ namespace FieldServiceApp.Controllers
                     var checkEmployee = _dbContext.tbl_EmployeeMaster.Where(w => w.EmployeeId == id).FirstOrDefault();
                     if (checkEmployee != null)
                     {
-                        checkEmployee.IsActive = 0;
+                        checkEmployee.IsActive = false;
                         checkEmployee.ModifiedBy = 1;
                         checkEmployee.ModifiedDate = DateTime.UtcNow;
                         _dbContext.SaveChanges();
