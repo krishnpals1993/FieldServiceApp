@@ -68,73 +68,80 @@ namespace FieldServiceApp.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public ActionResult AddItem(ItemMasterViewModel model)
-        {
-            try
-            {
+		[HttpPost]
+		public ActionResult AddItem(ItemMasterViewModel model)
+		{
+			try
+			{
+				if (ModelState.IsValid)
+				{
+					var checkItem = _dbContext.tbl_ItemMaster
+						.FirstOrDefault(w => w.ItemCd == model.ItemCd);
 
+					if (checkItem != null)
+					{
+						ViewBag.ErrorMessage = "Item already exists with this code";
+					}
+					else
+					{
+						int.TryParse(model.ItemUnitId, out int iItemUnitId);
 
-                if (ModelState.IsValid)
-                {
+						ItemMaster item = new ItemMaster()
+						{
+							ItemCd = model.ItemCd,
+							ItemCost = model.ItemCost ?? 0,
+							ItemDescription = model.ItemDescription,
+							ItemUnitId = iItemUnitId,
+							ItemPrice = model.ItemPrice ?? 0,
+							ItemQOH = model.Service == "Y"
+								? 0
+								: (model.ItemQOH ?? 0),
+							Sellable = model.Sellable,
+							Taxable = model.Taxable,
+							Service = model.Service,
+							CategoryId = model.CategoryId,
+							IsActive = 1,
+							CreatedBy = 1,
+							CreatedDate = DateTime.UtcNow
+						};
 
-                    var checkItem = _dbContext.tbl_ItemMaster.Where(w => w.ItemCd == model.ItemCd).FirstOrDefault();
-                    if (checkItem != null)
-                    {
-                        ViewBag.ErrorMessage = "Item already exists with this code";
+						_dbContext.tbl_ItemMaster.Add(item);
+						_dbContext.SaveChanges();
 
-                    }
-                    else
-                    {
-                        int iItemUnitId = 0;
-                        int.TryParse(model.ItemUnitId, out iItemUnitId);
-                        model.iItemUnitId = iItemUnitId;
-                        ItemMaster item = new ItemMaster()
-                        {
-                            ItemCd = model.ItemCd,
-                            ItemCost = model.ItemCost == null ? 0 : model.ItemCost.Value,
-                            ItemDescription = model.ItemDescription,
-                            ItemUnitId = model.iItemUnitId,
-                            ItemPrice = model.ItemPrice == null ? 0 : model.ItemPrice.Value,
-                            ItemQOH = (model.Service == "Y" ? 0 : (model.ItemQOH == null ? 0 : model.ItemQOH.Value)),
-                            Sellable = model.Sellable,
-                            Taxable = model.Taxable,
-                            Service = model.Service,
-                            CategoryId= model.CategoryId,
-                            IsActive = 1,
-                            CreatedBy = 1,
-                            CreatedDate = DateTime.UtcNow
-                        };
+						ViewBag.SuccessMessage = "Item added successfully";
+					}
+				}
+				else
+				{
+					ViewBag.ErrorMessage = "Please check all required fields.";
+				}
+			}
+			catch (Exception ex)
+			{
+				ViewBag.ErrorMessage =
+					ex.InnerException?.Message ?? ex.Message;
+			}
 
-                        _dbContext.tbl_ItemMaster.Add(item);
-                        _dbContext.SaveChanges();
-                        ViewBag.SuccessMessage = "Item added successfully";
+			model.UnitList = _dbContext.tbl_Units
+				.Where(w => w.IsActive == 1)
+				.Select(s => new UnitViewModel
+				{
+					UnitId = s.UnitId,
+					UnitName = s.UnitName
+				}).ToList();
 
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                var a = "";
-            }
+			model.ItemCategoryList = _dbContext.tbl_ItemCategory
+				.Where(w => w.IsActive == 1)
+				.Select(s => new ItemCategoryViewModel
+				{
+					CategoryId = s.CategoryId,
+					CategoryName = s.CategoryName
+				}).ToList();
 
-            model.UnitList = _dbContext.tbl_Units.Select(s => new UnitViewModel
-            {
-                UnitId = s.UnitId,
-                UnitName = s.UnitName
+			return View(model);
+		}
 
-            }).ToList();
-            model.ItemCategoryList = _dbContext.tbl_ItemCategory.Where(w => w.IsActive == 1).Select(s => new ItemCategoryViewModel
-            {
-                CategoryId = s.CategoryId,
-                CategoryName = s.CategoryName
-
-            }).ToList();
-            return View(model);
-        }
-
-
-        public IActionResult EditItem(string id)
+		public IActionResult EditItem(string id)
         {
             ItemMasterViewModel model = new ItemMasterViewModel();
             try
