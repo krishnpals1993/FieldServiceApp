@@ -39,7 +39,7 @@
 
             <div class="card-body px-3 pb-1">
 
-                @Html.HiddenFor(h => h.CustmoerId)
+              @Html.HiddenFor(h => h.CustmoerId)
 
                 <div class="form-group row">
 
@@ -329,39 +329,51 @@
        });
 
 
+function addShipping() {
 
-        function addShipping() {
+    var billingId = $("#BillingId").val();
+    var customerId = $("#CustmoerId").val();
 
-              if (!$("#BillingId").val()) {
-                swal("Please select Bill To address ", "", "error");
-                return;
-            }
+    if (!billingId || billingId == "0") {
+        swal("Please select Bill To address", "", "error");
+        return;
+    }
 
-            var id = 0;
-             $.ajax({
-        url: "/Customer/GetCustomerShippingPopup/" + id,
+    if (!customerId || customerId == "0") {
+        swal("Invalid Customer Id", "", "error");
+        return;
+    }
+
+    $.ajax({
+        url: "/Customer/GetCustomerShippingPopup/0?customerId=" +
+             encodeURIComponent(customerId) +
+             "&billingId=" + encodeURIComponent(billingId),
+
         type: "POST",
-        contentType: "application/json; charset=utf-8",
         dataType: "html",
+
         success: function (response) {
-            var modal = response;
 
-            modal = $(modal).appendTo('body');
+            var modal = $(response).appendTo("body");
 
-            $("#CustomerBillingId").val($("#BillingId").val());
+            modal.find("#CustomerBillingId").val(billingId);
+            modal.find("#CustmoerId").val(customerId);
 
+            modal.modal("show");
 
-            modal.find('button[data-action=delete]').on('click', function () {
-                modal.modal("hide");
-            });
-            modal.modal('show').on('hidden.bs.modal', function () {
+            modal.on("hidden.bs.modal", function () {
                 modal.remove();
             });
+        },
+
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error opening Shipping popup", "", "error");
         }
     });
-        }
+}    
 
-        function editShipping() {
+function editShipping() {
             if (!$("#ShipId").val()) {
                 swal("Please select Ship To address to edit", "", "error");
                 return;
@@ -394,53 +406,59 @@
             var id = $("#ShipId").val();
 
         }
+    function addBilling() {
+    var customerId = $("#CustmoerId").val();
 
-        function addBilling() {
-            var id = 0;
-            $.ajax({
-        url: "/Customer/GetCustomerBillingPopup/" + id,
+    $.ajax({
+        url: "/Customer/GetCustomerBillingPopup/0?customerId=" + customerId,
+        type: "POST",
+        dataType: "html",
+        success: function (response) {
+            var modal = $(response).appendTo('body');
+
+            modal.find("#CustomerId").val(customerId);
+
+            modal.modal('show').on('hidden.bs.modal', function () {
+                modal.remove();
+            });
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error opening billing popup", "", "error");
+        }
+    });
+}
+function editBilling() {
+    if (!$("#BillingId").val()) {
+        swal("Please select Bill To address to edit", "", "error");
+        return;
+    }
+
+    var customerId = $("#CustmoerId").val();
+    var id = $("#BillingId").val();
+
+    $.ajax({
+        url: "/Customer/GetCustomerBillingPopup/" + id + "?customerId=" + customerId,
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "html",
         success: function (response) {
-            var modal = response;
-            modal = $(modal).appendTo('body');
+            var modal = $(response).appendTo('body');
 
             modal.find('button[data-action=delete]').on('click', function () {
                 modal.modal("hide");
             });
+
             modal.modal('show').on('hidden.bs.modal', function () {
                 modal.remove();
             });
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Billing popup open nahi ho raha", "", "error");
         }
     });
-        }
-
-        function editBilling() {
-            if (!$("#BillingId").val()) {
-                swal("Please select Bill To address to edit", "", "error");
-                return;
-            }
-
-            var id = $("#BillingId").val();
-            $.ajax({
-        url: "/Customer/GetCustomerBillingPopup/" + id,
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        dataType: "html",
-        success: function (response) {
-            var modal = response;
-            modal = $(modal).appendTo('body');
-
-            modal.find('button[data-action=delete]').on('click', function () {
-                modal.modal("hide");
-            });
-            modal.modal('show').on('hidden.bs.modal', function () {
-                modal.remove();
-            });
-        }
-    });
-        }
+}
 
         function deleteBilling() {
             if (!$("#BillingId").val()) {
@@ -503,5 +521,18 @@
 
 
 
+    </script>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <script>
+        alert(@Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)ViewBag.ErrorMessage)));
+    </script>
+}
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <script>
+        alert(@Html.Raw(System.Text.Json.JsonSerializer.Serialize((string)ViewBag.SuccessMessage)));
     </script>
 }

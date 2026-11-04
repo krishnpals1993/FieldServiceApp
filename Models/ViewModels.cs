@@ -197,7 +197,8 @@ namespace FieldServiceApp.Models
             Shippings = new List<CustmoerShippingViewModel>();
             Billings = new List<CustomerBillingViewModel>();
         }
-        public int ShipId { get; set; }
+		[Required(ErrorMessage = "Ship To field is required")]
+		public int? ShipId { get; set; }
 
         public int BillingId { get; set; }
         public int CustomerBillingId { get; set; }
@@ -368,9 +369,12 @@ namespace FieldServiceApp.Models
         public List<StateViewModel> StateList { get; set; }
         public List<CityViewModel> CityList { get; set; }
         public List<CustomerShippingApartmentViewModel> ApartmentList { get; set; }
-        public string Zip1 { get; set; }
-        public string Zip2 { get; set; }
-        public string CityName { get; internal set; }
+		[MaxLength(20)]
+		public string Zip1 { get; set; }
+
+		[MaxLength(20)]
+		public string Zip2 { get; set; }
+		public string CityName { get; internal set; }
         public string StateName { get; internal set; }
         public string Notes { get; set; }
         public int CustomerBillingId { get; set; }

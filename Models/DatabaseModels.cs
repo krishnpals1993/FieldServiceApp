@@ -438,7 +438,7 @@ namespace FieldServiceApp.Models
         public DateTime? CreatedDate { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        public string City { get; set; }
+		public string City { get; set; }
         public string State { get; set; }
         public string Country { get; set; }
         public string Address4 { get; set; }
@@ -466,42 +466,58 @@ namespace FieldServiceApp.Models
     }
 
     [Table("CustomerShipping")]
-    public class CustomerShipping
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int CustomerShipId { get; set; }
-        public int CustomerId { get; set; }
-        public int CustomerBillingId { get; set; }
-        public string FirstName { get; set; }
-        public string MiddleName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public int CityId { get; set; }
-        public int StateId { get; set; }
-        public string Address { get; set; }
-        public string Address2 { get; set; }
-        public string Address3 { get; set; }
-        public string Zip1 { get; set; }
-        public string Zip2 { get; set; }
-        public string Notes { get; set; }
-        public Int16 IsActive { get; set; }
-        public int? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public int? ModifiedBy { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string Country { get; set; }
-        public string Name { get; set; }
-        public string Address4 { get; set; }
-        public string Address5 { get; set; }
+	public class CustomerShipping
+	{
+		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		public int CustomerShipId { get; set; }
 
-        public string QBID { get; set; }
-    }
+		public int CustomerId { get; set; }
+		public int CustomerBillingId { get; set; }
 
-    [Table("CustomerShippingApartment")]
+		[NotMapped]
+		public string Name { get; set; }
+
+		public string FirstName { get; set; }
+		public string MiddleName { get; set; }
+		public string LastName { get; set; }
+		public string Email { get; set; }
+		public string Phone { get; set; }
+
+		public int CityId { get; set; }
+		public int StateId { get; set; }
+
+		public string Address { get; set; }
+		public string Address2 { get; set; }
+		public string Address3 { get; set; }
+		public string Address4 { get; set; }
+		public string Address5 { get; set; }
+
+		public string Zip1 { get; set; }
+		public string Zip2 { get; set; }
+		public string Notes { get; set; }
+
+		public Int16 IsActive { get; set; }
+
+		public int? CreatedBy { get; set; }
+		public DateTime? CreatedDate { get; set; }
+		public int? ModifiedBy { get; set; }
+		public DateTime? ModifiedDate { get; set; }
+
+		[NotMapped]
+		public string City { get; set; }
+
+		[NotMapped]
+		public string State { get; set; }
+
+		[NotMapped]
+		public string Country { get; set; }
+
+		[NotMapped]
+		public string QBID { get; set; }
+	}
+
+	[Table("CustomerShippingApartment")]
     public class CustomerShippingApartment
     {
         [Key]

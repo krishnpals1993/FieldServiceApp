@@ -1,25 +1,27 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using FieldServiceApp.Models;
-using FieldServiceApp.Utility;
-using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Collections.Generic;
-using JqueryDataTables.ServerSide.AspNetCoreWeb.Infrastructure;
-using JqueryDataTables.ServerSide.AspNetCoreWeb.Models;
+using System.Linq.Dynamic;
 using System.Text.Json;
+using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using System.Threading.Tasks;
 using FieldServiceApp.Filters;
-using System.Linq.Dynamic;
+using FieldServiceApp.Models;
+using FieldServiceApp.Utility;
+using JqueryDataTables.ServerSide.AspNetCoreWeb.Infrastructure;
+using JqueryDataTables.ServerSide.AspNetCoreWeb.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace FieldServiceApp.Controllers
 {
-    [Authentication]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+	[Authentication]
     public class CustomerController : Controller
     {
         private readonly IOptions<Appsettings> _appSettings;
@@ -317,143 +319,250 @@ namespace FieldServiceApp.Controllers
             }
         }
 
-        public IActionResult Add()
-        {
-            CustomerMasterViewModel model = new CustomerMasterViewModel();
-            try
-            {
+		[HttpGet]
+		public IActionResult Add()
+		{
+			CustomerMasterViewModel model = new CustomerMasterViewModel();
 
+			try
+			{
+				model.CityList = _dbContext.tbl_Cities
+					.Select(s => new CityViewModel
+					{
+						CityId = s.CityId,
+						CityName = s.CityName
+					}).ToList();
 
-                model.CityList = _dbContext.tbl_Cities
-                            .Select(s => new CityViewModel
-                            {
-                                CityId = s.CityId,
-                                CityName = s.CityName
-                            })
-                            .ToList();
+				model.StateList = _dbContext.tbl_States
+					.Select(s => new StateViewModel
+					{
+						StateId = s.StateId,
+						StateName = s.StateName
+					}).ToList();
 
-                model.StateList = _dbContext.tbl_States
-                            .Select(s => new StateViewModel
-                            {
-                                StateId = s.StateId,
-                                StateName = s.StateName
-                            })
-                            .ToList();
+				CustomerMaster customerMaster = new CustomerMaster()
+				{
+					IsActive = 2,
+					CreatedBy = UserId,
+					CreatedDate = DateTime.UtcNow
+				};
 
-                CustomerMaster customerMaster = new CustomerMaster()
-                {
-                    IsActive = 2,
-                    CreatedBy = UserId,
-                    CreatedDate = DateTime.UtcNow
+				_dbContext.tbl_CustomerMaster.Add(customerMaster);
 
-                };
+				_dbContext.SaveChanges();
 
-                _dbContext.tbl_CustomerMaster.Add(customerMaster);
-                _dbContext.SaveChanges();
+				var generatedId = customerMaster.CustomerId;
 
-                model.CustmoerId = customerMaster.CustomerId;
+				if (generatedId <= 0)
+				{
+					throw new Exception("Customer ID generate nahi hui. Database identity configuration check karein.");
+				}
 
-            }
-            catch (Exception ex)
-            {
+				model.CustmoerId = generatedId;
 
-                var a = "";
-            }
+				// SaveChanges ke baad generated ID milegi
+				model.CustmoerId = customerMaster.CustomerId;
 
+				if (model.CustmoerId <= 0)
+				{
+					throw new Exception("Customer ID generate nahi hui.");
+				}
 
-            return View(model);
-        }
+				return View(model);
+			}
+			catch (Exception ex)
+			{
+				// Abhi debugging ke liye actual error dekhein
+				throw;
+			}
+		}
 
+		[HttpPost]
+		public ActionResult Add(CustomerMasterViewModel model)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					LoadDropdownLists(model);
 
-        [HttpPost]
-        public ActionResult Add(CustomerMasterViewModel model)
-        {
-            
-            try
-            {
+					ViewBag.ErrorMessage = string.Join("\n",
+						ModelState.Values
+							.SelectMany(v => v.Errors)
+							.Select(e => string.IsNullOrEmpty(e.ErrorMessage)
+								? "Please enter a valid value."
+								: e.ErrorMessage));
 
+					return View(model);
+				}
 
-                if (ModelState.IsValid)
-                {
+				bool isDuplicate = _dbContext.tbl_CustomerMaster.Any(w =>
+					w.CompanyName == model.CompanyName &&
+					w.CustomerId != model.CustmoerId);
 
-                    var checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName && w.CustomerId != model.CustmoerId).FirstOrDefault();
-                    if (checkCustomer != null)
-                    {
-                        ViewBag.ErrorMessage = "Customer name is already exists";
-                        model.CityList = _dbContext.tbl_Cities
-                           .Select(s => new CityViewModel
-                           {
-                               CityId = s.CityId,
-                               CityName = s.CityName
-                           })
-                           .ToList();
+				if (isDuplicate)
+				{
+					ViewBag.ErrorMessage = "Customer name already exists.";
+					LoadDropdownLists(model);
+					return View(model);
+				}
 
-                        model.StateList = _dbContext.tbl_States
-                                    .Select(s => new StateViewModel
-                                    {
-                                        StateId = s.StateId,
-                                        StateName = s.StateName
-                                    })
-                                    .ToList();
-                        return View(model);
+				var customer = _dbContext.tbl_CustomerMaster
+					.FirstOrDefault(w => w.CustomerId == model.CustmoerId);
 
-                    }
+				if (customer == null)
+				{
+					ViewBag.ErrorMessage = "Customer record not found.";
+					LoadDropdownLists(model);
+					return View(model);
+				}
 
-                     checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CompanyName == model.CompanyName && w.CustomerId != model.CustmoerId).FirstOrDefault();
-                    if (checkCustomer != null)
-                    {
-                        ViewBag.ErrorMessage = "Customer name is already exists";
-                        model.CityList = _dbContext.tbl_Cities
-                           .Select(s => new CityViewModel
-                           {
-                               CityId = s.CityId,
-                               CityName = s.CityName
-                           })
-                           .ToList();
+				customer.CompanyName = model.CompanyName;
+				customer.FullName = model.FullName;
+				customer.FirstName = model.FirstName;
+				customer.MiddleName = model.MiddleName;
+				customer.LastName = model.LastName;
+				customer.Phone = model.Phone;
+				customer.Email = model.Email;
+				customer.AltPhone = model.AltPhone;
+				customer.Mobile = model.Mobile;
+				customer.Fax = model.Fax;
+				customer.CompanyCode = model.Code;
+				customer.ModifiedBy = UserId;
+				customer.Notes = model.Notes;
+				customer.IsActive = 1;
+				customer.ModifiedDate = DateTime.UtcNow;
 
-                        model.StateList = _dbContext.tbl_States
-                                    .Select(s => new StateViewModel
-                                    {
-                                        StateId = s.StateId,
-                                        StateName = s.StateName
-                                    })
-                                    .ToList();
-                        return View(model);
+				_dbContext.SaveChanges();
 
-                    }
+				ViewBag.SuccessMessage = "Customer added successfully.";
+				return RedirectToAction("List", "Customer");
+			}
+			catch (Exception ex)
+			{
+				ViewBag.ErrorMessage = "Something went wrong: " + ex.Message;
+				LoadDropdownLists(model);
+				return View(model);
+			}
+		}
+		[HttpPost]
+		public JsonResult AddBilling(CustomerBillingViewModel model)
+		{
+			ResponseModel response = new ResponseModel();
 
-                    checkCustomer = _dbContext.tbl_CustomerMaster.Where(w => w.CustomerId == model.CustmoerId).FirstOrDefault();
-                    checkCustomer.CompanyName = model.CompanyName;
-                    checkCustomer.FullName = model.FullName;
-                    checkCustomer.FirstName = model.FirstName;
-                    checkCustomer.MiddleName = model.MiddleName;
-                    checkCustomer.LastName = model.LastName;
-                    checkCustomer.Phone = model.Phone;
-                    checkCustomer.Email = model.Email;
-                    checkCustomer.AltPhone = model.AltPhone;
-                    checkCustomer.Mobile = model.Mobile;
-                    checkCustomer.Fax = model.Fax;
-                    checkCustomer.CompanyCode = model.Code;
-                    checkCustomer.ModifiedBy = UserId;
-                    checkCustomer.Notes = model.Notes;
-                    checkCustomer.IsActive = 1;
-                    checkCustomer.ModifiedDate = DateTime.UtcNow;
-                    _dbContext.SaveChanges();
+			try
+			{
+				if (model == null || model.CustomerId <= 0)
+				{
+					response.Status = "0";
+					response.Message = "Invalid Customer";
+					return Json(response);
+				}
 
-                    ViewBag.SuccessMessage = "Customer added successfully";
+				CustomerBilling billing;
 
-                }
-            }
+				// INSERT
+				if (model.CustomerBillingId == 0)
+				{
+					billing = new CustomerBilling();
 
-            catch (Exception ex)
-            {
-         
-            }
+					billing.CustomerId = model.CustomerId;
+					billing.FirstName = model.FirstName;
+					billing.LastName = model.LastName;
+					billing.Address1 = model.Address1;
+					billing.Address2 = model.Address2;
+					billing.Address3 = model.Address3;
+					billing.CityId = model.CityId ?? 0;
+					billing.StateId = model.StateId ?? 0;
+					billing.Zip1 = model.Zip1;
+					billing.Zip2 = model.Zip2;
+					billing.Notes = model.Notes;
 
-            return View(model);
-        }
+					billing.IsActive = 1;
+					billing.CreatedBy = 1;
+					billing.CreatedDate = DateTime.UtcNow;
 
-        public IActionResult Edit(string id, string CustomerBillingId = "", string ShipId = "")
+					_dbContext.tbl_CustomerBillings.Add(billing);
+					_dbContext.SaveChanges();
+
+					response.Message = billing.CustomerBillingId.ToString();
+				}
+				// UPDATE
+				else
+				{
+					billing = _dbContext.tbl_CustomerBillings
+						.FirstOrDefault(x =>
+							x.CustomerBillingId == model.CustomerBillingId &&
+							x.CustomerId == model.CustomerId);
+
+					if (billing == null)
+					{
+						response.Status = "0";
+						response.Message = "Billing address not found";
+						return Json(response);
+					}
+
+					billing.FirstName = model.FirstName;
+					billing.LastName = model.LastName;
+					billing.Address1 = model.Address1;
+					billing.Address2 = model.Address2;
+					billing.Address3 = model.Address3;
+					billing.CityId = model.CityId ?? 0;
+					billing.StateId = model.StateId ?? 0;
+					billing.Zip1 = model.Zip1;
+					billing.Zip2 = model.Zip2;
+					billing.Notes = model.Notes;
+
+					billing.ModifiedBy = 1;
+					billing.ModifiedDate = DateTime.UtcNow;
+
+					_dbContext.SaveChanges();
+
+					response.Message = billing.CustomerBillingId.ToString();
+				}
+
+				// Refresh Billing dropdown list
+				response.AdditionalData = _dbContext.tbl_CustomerBillings
+					.Where(x => x.CustomerId == model.CustomerId)
+					.Select(x => new CustomerBillingViewModel
+					{
+						CustomerBillingId = x.CustomerBillingId,
+						CustomerId = x.CustomerId,
+						Address1 = x.Address1,
+						Address2 = x.Address2,
+						Address3 = x.Address3
+					})
+					.ToList();
+
+				response.Status = "1";
+			}
+			catch (Exception ex)
+			{
+				response.Status = "0";
+				response.Message = ex.Message;
+			}
+
+			return Json(response);
+		}
+		private void LoadDropdownLists(CustomerMasterViewModel model)
+		{
+			model.CityList = _dbContext.tbl_Cities
+				.Select(s => new CityViewModel
+				{
+					CityId = s.CityId,
+					CityName = s.CityName
+				})
+				.ToList();
+
+			model.StateList = _dbContext.tbl_States
+				.Select(s => new StateViewModel
+				{
+					StateId = s.StateId,
+					StateName = s.StateName
+				})
+				.ToList();
+		}
+		public IActionResult Edit(string id, string CustomerBillingId = "", string ShipId = "")
         {
             CustomerMasterViewModel model = new CustomerMasterViewModel();
             try
@@ -1455,345 +1564,270 @@ namespace FieldServiceApp.Controllers
 
             return Json(response);
         }
+		[HttpPost]
+		public JsonResult AddShipping(CustmoerShippingViewModel model)
+		{
+			ResponseModel response = new ResponseModel();
 
-        [HttpPost]
-        public JsonResult AddShipping(CustmoerShippingViewModel model)
-        {
+			try
+			{
+				if (model.CustmoerId <= 0)
+				{
+					response.Status = "0";
+					response.Message = "Invalid Customer Id";
+					return Json(response);
+				}
 
-            ResponseModel response = new ResponseModel();
-            try
-            {
-                if (model.ShipId == 0)
-                {
-                    var checkShipping = _dbContext.tbl_CustmoerShipping.
-                   Where(w => w.CustomerId == model.CustmoerId && w.CustomerBillingId == model.CustomerBillingId
-                   && (w.Address == model.Address && w.Address2 == model.Address2 & w.Address3 == model.Address3))
-                   .FirstOrDefault();
+				if (model.CustomerBillingId <= 0)
+				{
+					response.Status = "0";
+					response.Message = "Please select Bill To address";
+					return Json(response);
+				}
 
-                    if (checkShipping != null)
-                    {
-                        response.Status = "0";
-                        response.Message = "Shipping address already exists";
+				// Add Shipping
+				if (model.ShipId == 0)
+				{
+					var checkShipping = _dbContext.tbl_CustmoerShipping
+						.FirstOrDefault(w =>
+							w.CustomerId == model.CustmoerId &&
+							w.CustomerBillingId == model.CustomerBillingId &&
+							(w.Address ?? "") == (model.Address ?? "") &&
+							(w.Address2 ?? "") == (model.Address2 ?? "") &&
+							(w.Address3 ?? "") == (model.Address3 ?? "")
+						);
 
-                    }
-                    else
-                    {
-                        CustomerShipping customerShipping = new CustomerShipping()
-                        {
-                            CustomerId = model.CustmoerId,
-                            CustomerBillingId = model.CustomerBillingId,
-                            Address = model.Address,
-                            Address2 = model.Address2,
-                            Address3 = model.Address3,
-                            CityId = model.CityId ?? 0,
-                            StateId = model.StateId ?? 0,
-                            Zip1 = model.Zip1,
-                            Zip2 = model.Zip2,
-                            Notes = model.Notes,
-                            CreatedBy = 1,
-                            CreatedDate = DateTime.UtcNow
-                        };
+					if (checkShipping != null)
+					{
+						response.Status = "0";
+						response.Message = "Shipping address already exists";
+						return Json(response);
+					}
 
-                        _dbContext.tbl_CustmoerShipping.Add(customerShipping);
-                        _dbContext.SaveChanges();
+					CustomerShipping customerShipping = new CustomerShipping()
+					{
+						CustomerId = model.CustmoerId,
+						CustomerBillingId = model.CustomerBillingId,
+						Address = model.Address,
+						Address2 = model.Address2,
+						Address3 = model.Address3,
+						CityId = model.CityId ?? 0,
+						StateId = model.StateId ?? 0,
+						Zip1 = model.Zip1,
+						Zip2 = model.Zip2,
+						Notes = model.Notes,
+						CreatedBy = 1,
+						CreatedDate = DateTime.UtcNow,
+						IsActive = 1
+					};
+					var entries = _dbContext.ChangeTracker
+	.Entries<CustomerShipping>()
+	.Where(e => e.State == EntityState.Added ||
+				e.State == EntityState.Modified);
 
-                        response.Status = "1";
-                        response.Message = customerShipping.CustomerShipId.ToString();
+					foreach (var entry in entries)
+					{
+						foreach (var property in entry.Properties)
+						{
+							var value = property.CurrentValue as string;
+							var maxLength = property.Metadata.GetMaxLength();
 
+							if (value != null &&
+								maxLength.HasValue &&
+								value.Length > maxLength.Value)
+							{
+								Console.WriteLine(
+									$"COLUMN: {property.Metadata.Name}, " +
+									$"LENGTH: {value.Length}, " +
+									$"MAX LENGTH: {maxLength.Value}");
+							}
+						}
+					}
+					_dbContext.tbl_CustmoerShipping.Add(customerShipping);
+					_dbContext.SaveChanges();
 
-                    }
-                }
-                else
-                {
+					response.Status = "1";
+					response.Message = customerShipping.CustomerShipId.ToString();
+				}
+				else
+				{
+					// Edit Shipping
+					var checkShipping = _dbContext.tbl_CustmoerShipping
+						.FirstOrDefault(w =>
+							w.CustomerId == model.CustmoerId &&
+							w.CustomerBillingId == model.CustomerBillingId &&
+							(w.Address ?? "") == (model.Address ?? "") &&
+							(w.Address2 ?? "") == (model.Address2 ?? "") &&
+							(w.Address3 ?? "") == (model.Address3 ?? "") &&
+							w.CustomerShipId != model.ShipId
+						);
 
-                    var checkShipping = _dbContext.tbl_CustmoerShipping.
-                 Where(w => w.CustomerId == model.CustmoerId && w.CustomerBillingId == model.CustomerBillingId
-                 && (w.Address == model.Address && w.Address2 == model.Address2 & w.Address3 == model.Address3)
-                 && w.CustomerShipId != model.ShipId)
-                 .FirstOrDefault();
-                    if (checkShipping != null)
-                    {
-                        response.Status = "0";
-                        response.Message = "Shipping address already exists";
+					if (checkShipping != null)
+					{
+						response.Status = "0";
+						response.Message = "Shipping address already exists";
+						return Json(response);
+					}
 
-                    }
-                    else
-                    {
-                        checkShipping = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == model.ShipId).FirstOrDefault();
-                        if (checkShipping != null)
-                        {
-                            checkShipping.Address = model.Address;
-                            checkShipping.Address2 = model.Address2;
-                            checkShipping.Address3 = model.Address3;
-                            checkShipping.Zip1 = model.Zip1;
-                            checkShipping.Zip2 = model.Zip2;
-                            checkShipping.CityId = model.CityId ?? 0;
-                            checkShipping.StateId = model.StateId ?? 0;
-                            checkShipping.Notes = model.Notes;
-                            checkShipping.Address = model.Address;
-                            checkShipping.ModifiedBy = 1;
-                            checkShipping.ModifiedDate = DateTime.UtcNow;
-                            _dbContext.SaveChanges();
+					var shipping = _dbContext.tbl_CustmoerShipping
+						.FirstOrDefault(w => w.CustomerShipId == model.ShipId);
 
+					if (shipping == null)
+					{
+						response.Status = "0";
+						response.Message = "Shipping address not found";
+						return Json(response);
+					}
 
-                            response.Status = "1";
-                            response.Message = checkShipping.CustomerShipId.ToString();
+					shipping.CustomerId = model.CustmoerId;
+					shipping.CustomerBillingId = model.CustomerBillingId;
+					shipping.Address = model.Address;
+					shipping.Address2 = model.Address2;
+					shipping.Address3 = model.Address3;
+					shipping.Zip1 = model.Zip1;
+					shipping.Zip2 = model.Zip2;
+					shipping.CityId = model.CityId ?? 0;
+					shipping.StateId = model.StateId ?? 0;
+					shipping.Notes = model.Notes;
+					shipping.ModifiedBy = 1;
+					shipping.ModifiedDate = DateTime.UtcNow;
 
-                        }
-                    }
+					_dbContext.SaveChanges();
 
+					response.Status = "1";
+					response.Message = shipping.CustomerShipId.ToString();
+				}
 
-                }
+				// Refresh Shipping Dropdown
+				response.AdditionalData = (
+					from shipping in _dbContext.tbl_CustmoerShipping
 
-                response.AdditionalData = (from shipping in _dbContext.tbl_CustmoerShipping
-                                           join city in _dbContext.tbl_Cities on shipping.CityId equals city.CityId
-                                           into city
-                                           from city1 in city.DefaultIfEmpty()
-                                           join state in _dbContext.tbl_States on shipping.StateId equals state.StateId
-                                           into state
-                                           from state1 in state.DefaultIfEmpty()
-                                           where shipping.CustomerId == model.CustmoerId
-                                           select new CustmoerShippingViewModel
-                                           {
-                                               ShipId = shipping.CustomerShipId,
-                                               Address = (shipping.Address ?? "") + " " + (shipping.Address2 ?? "") + " " + (city1.CityName ?? "") + " " + (state1.StateName ?? ""),
-                                               CustmoerId = shipping.CustomerBillingId
-                                           })
-                                                 .ToList();
+					join city in _dbContext.tbl_Cities
+						on shipping.CityId equals city.CityId into cityList
+					from city1 in cityList.DefaultIfEmpty()
 
-            }
-            catch (Exception ex)
-            {
-                response.Status = "0";
-                response.Message = "Error occurred";
-            }
+					join state in _dbContext.tbl_States
+						on shipping.StateId equals state.StateId into stateList
+					from state1 in stateList.DefaultIfEmpty()
 
-            return Json(response);
-        }
+					where shipping.CustomerId == model.CustmoerId
 
+					select new CustmoerShippingViewModel
+					{
+						ShipId = shipping.CustomerShipId,
 
-        public IActionResult GetCustomerShippingPopup(int id)
-        {
-            var model = new CustmoerShippingViewModel();
+						Address = (shipping.Address ?? "") + " " +
+								  (shipping.Address2 ?? "") + " " +
+								  (city1.CityName ?? "") + " " +
+								  (state1.StateName ?? ""),
 
-            model.ShipId = id;
+						CustmoerId = shipping.CustomerId
+					}
+				).ToList();
+			}
+			catch (Exception ex)
+			{
+				response.Status = "0";
+				response.Message = ex.ToString();
+			}
+			return Json(response);
+		}
+		[HttpPost]
+		public IActionResult GetCustomerShippingPopup(int id, int customerId, int billingId)
+		{
+			var model = new CustmoerShippingViewModel();
 
-            if (model.ShipId > 0)
-            {
+			model.ShipId = id;
+			model.CustmoerId = customerId;
+			model.CustomerBillingId = billingId;
 
-                model = _dbContext.tbl_CustmoerShipping.Where(w => w.CustomerShipId == id)
-                     .Select(s => new CustmoerShippingViewModel
-                     {
-                         ShipId = s.CustomerShipId,
-                         FirstName = s.FirstName,
-                         MiddleName = s.MiddleName,
-                         LastName = s.LastName,
-                         Email = s.Email,
-                         Phone = s.Phone,
-                         CustmoerId = s.CustomerId,
-                         CityId = s.CityId,
-                         StateId = s.StateId,
-                         Address = s.Address,
-                         Address2 = s.Address2,
-                         Address3 = s.Address3,
-                         Zip1 = s.Zip1,
-                         Zip2 = s.Zip2,
-                         Notes = s.Notes,
-                         CustomerBillingId = s.CustomerBillingId
-                     }).FirstOrDefault();
+			// Edit Shipping
+			if (id > 0)
+			{
+				model = _dbContext.tbl_CustmoerShipping
+					.Where(w => w.CustomerShipId == id)
+					.Select(s => new CustmoerShippingViewModel
+					{
+						ShipId = s.CustomerShipId,
+						FirstName = s.FirstName,
+						MiddleName = s.MiddleName,
+						LastName = s.LastName,
+						Email = s.Email,
+						Phone = s.Phone,
+						CustmoerId = s.CustomerId,
+						CityId = s.CityId,
+						StateId = s.StateId,
+						Address = s.Address,
+						Address2 = s.Address2,
+						Address3 = s.Address3,
+						Zip1 = s.Zip1,
+						Zip2 = s.Zip2,
+						Notes = s.Notes,
+						CustomerBillingId = s.CustomerBillingId
+					})
+					.FirstOrDefault();
 
-            }
+				if (model == null)
+				{
+					return NotFound();
+				}
+			}
 
-            model.CityList = _dbContext.tbl_Cities
-                               .Select(s => new CityViewModel
-                               {
-                                   CityId = s.CityId,
-                                   CityName = s.CityName
-                               })
-                               .ToList();
+			// City List
+			model.CityList = _dbContext.tbl_Cities
+				.Select(s => new CityViewModel
+				{
+					CityId = s.CityId,
+					CityName = s.CityName
+				})
+				.ToList();
 
-            model.StateList = _dbContext.tbl_States
-                        .Select(s => new StateViewModel
-                        {
-                            StateId = s.StateId,
-                            StateName = s.StateName
-                        })
-                        .ToList();
-            return PartialView("_Shipping", model);
-        }
+			// State List
+			model.StateList = _dbContext.tbl_States
+				.Select(s => new StateViewModel
+				{
+					StateId = s.StateId,
+					StateName = s.StateName
+				})
+				.ToList();
 
+			return PartialView("_Shipping", model);
+		}
+		[HttpPost]
+		
+		public IActionResult GetCustomerBillingPopup(int id, int customerId)
+		{
+			CustomerBillingViewModel model = new CustomerBillingViewModel();
 
-        [HttpPost]
-        public JsonResult AddBilling(CustomerBillingViewModel model)
-        {
+			model.CustomerId = customerId;
 
-            ResponseModel response = new ResponseModel();
-            try
-            {
-                if (model.CustomerBillingId == 0)
-                {
-                    var checkBilling = _dbContext.tbl_CustomerBillings.
-                   Where(w => w.CustomerId == model.CustomerId
-                   && (w.Address1 == model.Address1 && w.Address2 == model.Address2 & w.Address3 == model.Address3))
-                   .FirstOrDefault();
+			if (id > 0)
+			{
+				var billing = _dbContext.tbl_CustomerBillings
+					.FirstOrDefault(x => x.CustomerBillingId == id);
 
-                    if (checkBilling != null)
-                    {
-                        response.Status = "0";
-                        response.Message = "Billing address already exists";
+				if (billing != null)
+				{
+					model.CustomerBillingId = billing.CustomerBillingId;
+					model.CustomerId = billing.CustomerId;
+					model.FirstName = billing.FirstName;
+					model.LastName = billing.LastName;
+					model.Address1 = billing.Address1;
+					model.Address2 = billing.Address2;
+					model.Address3 = billing.Address3;
+					model.Zip1 = billing.Zip1;
+					model.Zip2 = billing.Zip2;
+					model.Notes = billing.Notes;
+					model.StateId = billing.StateId;
+					model.CityId = billing.CityId;
+				}
+			}
 
-                    }
-                    else
-                    {
-                        CustomerBilling customerBilling = new CustomerBilling()
-                        {
-                            CustomerId = model.CustomerId,
-                            Address1 = model.Address1,
-                            Address2 = model.Address2,
-                            Address3 = model.Address3,
-                            CityId = model.CityId ?? 0,
-                            StateId = model.StateId ?? 0,
-                            Zip1 = model.Zip1,
-                            Zip2 = model.Zip2,
-                            Notes = model.Notes,
-                            FirstName = model.FirstName,
-                            LastName = model.LastName,
-                            CreatedBy = 1,
-                            CreatedDate = DateTime.UtcNow
-                        };
+			// Apne existing CityList aur StateList dropdown loading code ko yahin rakhein.
 
-                        _dbContext.tbl_CustomerBillings.Add(customerBilling);
-                        _dbContext.SaveChanges();
-
-                        response.Status = "1";
-                        response.Message = customerBilling.CustomerBillingId.ToString();
-
-
-                    }
-                }
-                else
-                {
-
-                    var checkBilling = _dbContext.tbl_CustomerBillings.
-                   Where(w => w.CustomerId == model.CustomerId && w.CustomerBillingId != model.CustomerBillingId
-                   && (w.Address1 == model.Address1 && w.Address2 == model.Address2 & w.Address3 == model.Address3))
-                   .FirstOrDefault();
-
-                    if (checkBilling != null)
-                    {
-                        response.Status = "0";
-                        response.Message = "Billing address already exists";
-
-                    }
-                    else
-                    {
-                        checkBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == model.CustomerBillingId).FirstOrDefault();
-                        if (checkBilling != null)
-                        {
-                            checkBilling.Address1 = model.Address1;
-                            checkBilling.Address2 = model.Address2;
-                            checkBilling.Address3 = model.Address3;
-                            checkBilling.Zip1 = model.Zip1;
-                            checkBilling.Zip2 = model.Zip2;
-                            checkBilling.CityId = model.CityId ?? 0;
-                            checkBilling.StateId = model.StateId ?? 0;
-                            checkBilling.Notes = model.Notes;
-                            checkBilling.FirstName = model.FirstName;
-                            checkBilling.LastName = model.LastName;
-                            checkBilling.ModifiedBy = 1;
-                            checkBilling.ModifiedDate = DateTime.UtcNow;
-                            _dbContext.SaveChanges();
-
-                            response.Status = "1";
-                            response.Message = checkBilling.CustomerBillingId.ToString();
-
-                        }
-                    }
-
-
-                }
-
-
-                var checkCustomerBilling = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerId == model.CustomerId).ToList();
-                var billings = checkCustomerBilling.Select(s => new CustomerBillingViewModel
-                {
-                    CustomerBillingId = s.CustomerBillingId,
-                    FirstName = s.FirstName,
-                    LastName = s.LastName,
-                    CustomerId = s.CustomerId,
-                    CityId = s.CityId,
-                    StateId = s.StateId,
-                    Address1 = s.Address1 ?? "",
-                    Address2 = s.Address2 ?? "",
-                    Address3 = s.Address3 ?? "",
-                    Zip1 = s.Zip1,
-                    Zip2 = s.Zip2,
-                    Notes = s.Notes,
-                    CreatedDate = DateTime.UtcNow
-
-                }).ToList();
-
-                response.AdditionalData = billings;
-
-            }
-            catch (Exception ex)
-            {
-                response.Status = "0";
-                response.Message = "Error occurred";
-            }
-
-            return Json(response);
-        }
-
-        public IActionResult GetCustomerBillingPopup(int id)
-        {
-            var model = new CustomerBillingViewModel();
-
-            model.CustomerBillingId = id;
-
-            if (id > 0)
-            {
-                model = _dbContext.tbl_CustomerBillings.Where(w => w.CustomerBillingId == id)
-                                        .Select(s => new CustomerBillingViewModel
-                                        {
-                                            CustomerBillingId = s.CustomerBillingId,
-                                            FirstName = s.FirstName,
-                                            LastName = s.LastName,
-                                            CustomerId = s.CustomerId,
-                                            CityId = s.CityId,
-                                            StateId = s.StateId,
-                                            Address1 = s.Address1,
-                                            Address2 = s.Address2,
-                                            Address3 = s.Address3,
-                                            Zip1 = s.Zip1,
-                                            Zip2 = s.Zip2,
-                                            Notes = s.Notes
-
-                                        }).FirstOrDefault();
-
-
-            }
-
-            model.CityList = _dbContext.tbl_Cities
-                               .Select(s => new CityViewModel
-                               {
-                                   CityId = s.CityId,
-                                   CityName = s.CityName
-                               })
-                               .ToList();
-
-            model.StateList = _dbContext.tbl_States
-                        .Select(s => new StateViewModel
-                        {
-                            StateId = s.StateId,
-                            StateName = s.StateName
-                        })
-                        .ToList();
-            return PartialView("_Billing", model);
-        }
-
-
-        protected override void Dispose(bool disposing)
+			return PartialView("_Billing", model);
+		}
+		protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
         }

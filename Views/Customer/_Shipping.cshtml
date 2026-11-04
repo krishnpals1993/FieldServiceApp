@@ -151,53 +151,78 @@
             $("#Zip2").inputmask("99999");
     });
 
-    function saveShipping() {
-        if ((!$("#Address").val()) && (!$("#Address2").val()) && (!$("#Address3").val())) {
-            swal("Please enter address", "", "error");
-            return;
-        }
+   function saveShipping() {
 
-        var dataToPass = {};
-        dataToPass.ShipId = $("#ShipId").val();
-        dataToPass.CustomerBillingId = $("#CustomerBillingId").val();
-        dataToPass.Address = $("#Address").val();
-        dataToPass.Address2 = $("#Address2").val();
-        dataToPass.Address3 = $("#Address3").val();
-        dataToPass.Zip1 = $("#Zip1").val();
-        dataToPass.Zip2 = $("#Zip2").val();
-        dataToPass.Notes = $("#Notes").val();
-        dataToPass.StateId = $("#StateId").val();
-        dataToPass.CityId = $("#CityId").val();
-        dataToPass.CustmoerId = $("#CustmoerId").val();
+    var modal = $(".modal.show").last();
 
-        $.ajax({
-            url: "/Customer/AddShipping",
-            type: "POST",
-            dataType: "json",
-            data: { model: dataToPass },
-            success: function (data) {
-                if (data.Status == "1") {
+    var address = modal.find("#Address").val();
+    var address2 = modal.find("#Address2").val();
+    var address3 = modal.find("#Address3").val();
 
-                       $('#ShipId').html('');
-                    var options = '';
-
-                    options += '<option value="">Select Ship To</option>';
-                    for (var i = 0; i < data.AdditionalData.length; i++) {
-                        options += '<option  value="' + data.AdditionalData[i]['ShipId'] + '">' + (data.AdditionalData[i]['Address']) + '</option>';
-                    }
-
-                    $('#ShipId').append(options);
-                    $('#ShipId').val(data.Message);
-                     $('#ShipId').trigger("chosen:updated");
-                    //$("#ShipId").trigger('change');
-                    $("#btnTClose").trigger('click');
-                }
-                else {
-                    swal(data.Message, "", "error")
-                }
-            }
-        })
-
+    if (!address && !address2 && !address3) {
+        swal("Please enter address", "", "error");
+        return;
     }
 
+    var dataToPass = {};
+
+    dataToPass.ShipId = modal.find("#ShipId").val();
+    dataToPass.CustomerBillingId = modal.find("#CustomerBillingId").val();
+    dataToPass.CustmoerId = modal.find("#CustmoerId").val();
+
+    dataToPass.Address = address;
+    dataToPass.Address2 = address2;
+    dataToPass.Address3 = address3;
+
+    dataToPass.Zip1 = modal.find("#Zip1").val();
+    dataToPass.Zip2 = modal.find("#Zip2").val();
+    dataToPass.Notes = modal.find("#Notes").val();
+
+    dataToPass.StateId = modal.find("#StateId").val();
+    dataToPass.CityId = modal.find("#CityId").val();
+
+    $.ajax({
+        url: "/Customer/AddShipping",
+        type: "POST",
+        dataType: "json",
+        data: { model: dataToPass },
+
+        success: function (data) {
+
+            if (data.Status == "1") {
+
+                var shipDropdown = $("#ShipId");
+
+                shipDropdown.empty();
+
+                shipDropdown.append(
+                    '<option value="">Select Ship To</option>'
+                );
+
+                for (var i = 0; i < data.AdditionalData.length; i++) {
+
+                    shipDropdown.append(
+                        $("<option></option>")
+                            .val(data.AdditionalData[i].ShipId)
+                            .text(data.AdditionalData[i].Address)
+                    );
+                }
+
+                shipDropdown.val(data.Message);
+
+                shipDropdown.trigger("chosen:updated");
+
+                modal.modal("hide");
+            }
+            else {
+                swal(data.Message, "", "error");
+            }
+        },
+
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error saving Shipping address", "", "error");
+        }
+    });
+}
 </script>
